@@ -5,8 +5,16 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <base href="./">
 <title>練馬区旭丘という街について - 練馬区旭丘一丁目町会</title>
-<link rel="stylesheet" href="./css/tailwind.min.css">
-<script>tailwind.config={theme:{extend:{colors:{primary:'#57b5e7',secondary:'#8dd3c7'},borderRadius:{'none':'0px','sm':'4px',DEFAULT:'8px','md':'12px','lg':'16px','xl':'20px','2xl':'24px','3xl':'32px','full':'9999px','button':'8px'}}}}</script>
+<!-- Tailwind CSS v4 CDN -->
+<script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+<!-- Custom Tailwind Configuration -->
+<style type="text/tailwindcss">
+  @theme {
+    --color-primary: #57b5e7;
+    --color-secondary: #8dd3c7;
+    --radius-button: 8px;
+  }
+</style>
 <link href="./css/google-fonts-pacifico.css" rel="stylesheet">
 <link href="./css/remixicon.min.css" rel="stylesheet">
 <style>
@@ -37,7 +45,7 @@ z-index: 1;
 <nav class="w-full px-6 py-4">
 <div class="flex items-center justify-between">
 <div class="flex items-center space-x-3">
-<div class="w-12 h-12 flex items-center justify-center bg-primary rounded-lg">
+<div class="w-12 h-12 flex items-center justify-center bg-[--color-primary] rounded-lg">
 <i class="ri-community-line text-white text-xl"></i>
 </div>
 <div>
@@ -46,11 +54,11 @@ z-index: 1;
 </div>
 </div>
 <div class="hidden md:flex items-center space-x-8">
-<a href="index.html" class="text-gray-700 hover:text-primary transition-colors">ホーム</a>
-<a href="#" class="text-gray-700 hover:text-primary transition-colors">お知らせ</a>
-<a href="#" class="text-gray-700 hover:text-primary transition-colors">活動カレンダー</a>
-<a href="#" class="text-gray-700 hover:text-primary transition-colors">町会について</a>
-<a href="#" class="text-gray-700 hover:text-primary transition-colors">お問い合わせ</a>
+<a href="index.html" class="text-gray-700 hover:text-[--color-primary] transition-colors">ホーム</a>
+<a href="#" class="text-gray-700 hover:text-[--color-primary] transition-colors">お知らせ</a>
+<a href="#" class="text-gray-700 hover:text-[--color-primary] transition-colors">活動カレンダー</a>
+<a href="#" class="text-gray-700 hover:text-[--color-primary] transition-colors">町会について</a>
+<a href="#" class="text-gray-700 hover:text-[--color-primary] transition-colors">お問い合わせ</a>
 </div>
 <button class="md:hidden w-10 h-10 flex items-center justify-center" id="mobile-menu-btn">
 <i class="ri-menu-line text-xl"></i>
@@ -58,11 +66,11 @@ z-index: 1;
 </div>
 <div class="md:hidden mt-4 hidden" id="mobile-menu">
 <div class="flex flex-col space-y-3 py-4 border-t">
-<a href="index.html" class="text-gray-700 hover:text-primary transition-colors">ホーム</a>
-<a href="#" class="text-gray-700 hover:text-primary transition-colors">お知らせ</a>
-<a href="#" class="text-gray-700 hover:text-primary transition-colors">活動カレンダー</a>
-<a href="#" class="text-gray-700 hover:text-primary transition-colors">町会について</a>
-<a href="#" class="text-gray-700 hover:text-primary transition-colors">お問い合わせ</a>
+<a href="index.html" class="text-gray-700 hover:text-[--color-primary] transition-colors">ホーム</a>
+<a href="#" class="text-gray-700 hover:text-[--color-primary] transition-colors">お知らせ</a>
+<a href="#" class="text-gray-700 hover:text-[--color-primary] transition-colors">活動カレンダー</a>
+<a href="#" class="text-gray-700 hover:text-[--color-primary] transition-colors">町会について</a>
+<a href="#" class="text-gray-700 hover:text-[--color-primary] transition-colors">お問い合わせ</a>
 </div>
 </div>
 </nav>
@@ -73,7 +81,7 @@ z-index: 1;
 <div class="max-w-6xl mx-auto">
 <div class="max-w-2xl">
 <h2 class="text-5xl font-bold mb-6 leading-tight">
-<span class="text-primary">練馬区旭丘という</span><br>
+<span class="text-[--color-primary]">練馬区旭丘という</span><br>
 <span class="text-gray-900">街について</span>
 </h2>
 <p class="text-xl text-gray-700 mb-8 leading-relaxed">
@@ -136,19 +144,19 @@ z-index: 1;
 </div>
 <ul class="space-y-3 text-gray-700">
 <li class="flex items-start">
-<div class="w-2 h-2 bg-primary rounded-full mt-2 mr-3 flex-shrink-0"></div>
+<div class="w-2 h-2 bg-[--color-primary] rounded-full mt-2 mr-3 flex-shrink-0"></div>
 <div><span class="font-medium">北：</span>練馬区小竹町</div>
 </li>
 <li class="flex items-start">
-<div class="w-2 h-2 bg-primary rounded-full mt-2 mr-3 flex-shrink-0"></div>
+<div class="w-2 h-2 bg-[--color-primary] rounded-full mt-2 mr-3 flex-shrink-0"></div>
 <div><span class="font-medium">南：</span>中野区江原町</div>
 </li>
 <li class="flex items-start">
-<div class="w-2 h-2 bg-primary rounded-full mt-2 mr-3 flex-shrink-0"></div>
+<div class="w-2 h-2 bg-[--color-primary] rounded-full mt-2 mr-3 flex-shrink-0"></div>
 <div><span class="font-medium">東：</span>豊島区長崎・南長崎・千早</div>
 </li>
 <li class="flex items-start">
-<div class="w-2 h-2 bg-primary rounded-full mt-2 mr-3 flex-shrink-0"></div>
+<div class="w-2 h-2 bg-[--color-primary] rounded-full mt-2 mr-3 flex-shrink-0"></div>
 <div><span class="font-medium">西：</span>練馬区栄町・豊玉上・豊玉北</div>
 </li>
 </ul>
@@ -162,15 +170,15 @@ z-index: 1;
 </div>
 <ul class="space-y-3 text-gray-700">
 <li class="flex items-start">
-<div class="w-2 h-2 bg-secondary rounded-full mt-2 mr-3 flex-shrink-0"></div>
+<div class="w-2 h-2 bg-[--color-secondary] rounded-full mt-2 mr-3 flex-shrink-0"></div>
 <div>東京都道439号椎名町上石神井線（千川通り）</div>
 </li>
 <li class="flex items-start">
-<div class="w-2 h-2 bg-secondary rounded-full mt-2 mr-3 flex-shrink-0"></div>
+<div class="w-2 h-2 bg-[--color-secondary] rounded-full mt-2 mr-3 flex-shrink-0"></div>
 <div>東京都道420号鮫洲大山線（中野通り）</div>
 </li>
 <li class="flex items-start">
-<div class="w-2 h-2 bg-secondary rounded-full mt-2 mr-3 flex-shrink-0"></div>
+<div class="w-2 h-2 bg-[--color-secondary] rounded-full mt-2 mr-3 flex-shrink-0"></div>
 <div>清戸道（おわい街道）</div>
 </li>
 </ul>
@@ -194,19 +202,19 @@ z-index: 1;
 <h4 class="text-xl font-semibold text-gray-900 mb-6">地名変遷の歴史</h4>
 <div class="space-y-4">
 <div class="flex items-start">
-<span class="bg-primary text-white px-3 py-1 rounded text-sm font-semibold mr-4 whitespace-nowrap">江戸時代</span>
+<span class="bg-[--color-primary] text-white px-3 py-1 rounded text-sm font-semibold mr-4 whitespace-nowrap">江戸時代</span>
 <p class="text-gray-700">上板橋村字江古田（多摩郡江古田村の新田）</p>
 </div>
 <div class="flex items-start">
-<span class="bg-primary text-white px-3 py-1 rounded text-sm font-semibold mr-4 whitespace-nowrap">昭和7年</span>
+<span class="bg-[--color-primary] text-white px-3 py-1 rounded text-sm font-semibold mr-4 whitespace-nowrap">昭和7年</span>
 <p class="text-gray-700">板橋区成立、江古田町となる</p>
 </div>
 <div class="flex items-start">
-<span class="bg-primary text-white px-3 py-1 rounded text-sm font-semibold mr-4 whitespace-nowrap">昭和22年</span>
+<span class="bg-[--color-primary] text-white px-3 py-1 rounded text-sm font-semibold mr-4 whitespace-nowrap">昭和22年</span>
 <p class="text-gray-700">練馬区独立に際し練馬区に編入</p>
 </div>
 <div class="flex items-start">
-<span class="bg-primary text-white px-3 py-1 rounded text-sm font-semibold mr-4 whitespace-nowrap">昭和35年</span>
+<span class="bg-[--color-primary] text-white px-3 py-1 rounded text-sm font-semibold mr-4 whitespace-nowrap">昭和35年</span>
 <p class="text-gray-700">地番整理により現町名「旭丘」に改称</p>
 </div>
 </div>
@@ -234,12 +242,12 @@ z-index: 1;
 <div class="grid md:grid-cols-2 gap-8 mb-8">
 <div class="bg-white p-8 rounded-xl shadow-sm">
 <div class="flex items-center mb-6">
-<div class="w-12 h-12 flex items-center justify-center bg-primary/10 rounded-lg mr-4">
-<i class="ri-train-line text-primary text-xl"></i>
+<div class="w-12 h-12 flex items-center justify-center bg-[--color-primary]/10 rounded-lg mr-4">
+<i class="ri-train-line text-[--color-primary] text-xl"></i>
 </div>
 <h4 class="text-xl font-semibold text-gray-900">鉄道アクセス</h4>
 </div>
-<p class="font-semibold text-primary mb-4">西武池袋線 江古田駅</p>
+<p class="font-semibold text-[--color-primary] mb-4">西武池袋線 江古田駅</p>
 <ul class="space-y-2 text-gray-700">
 <li>• 池袋駅まで約7分</li>
 <li>• 新宿駅まで約15分（池袋経由）</li>
@@ -249,8 +257,8 @@ z-index: 1;
 </div>
 <div class="bg-white p-8 rounded-xl shadow-sm">
 <div class="flex items-center mb-6">
-<div class="w-12 h-12 flex items-center justify-center bg-secondary/10 rounded-lg mr-4">
-<i class="ri-bus-line text-secondary text-xl"></i>
+<div class="w-12 h-12 flex items-center justify-center bg-[--color-secondary]/10 rounded-lg mr-4">
+<i class="ri-bus-line text-[--color-secondary] text-xl"></i>
 </div>
 <h4 class="text-xl font-semibold text-gray-900">バス路線</h4>
 </div>
@@ -266,37 +274,37 @@ z-index: 1;
 <div class="grid grid-cols-2 md:grid-cols-5 gap-4">
 <div class="text-center">
 <div class="w-16 h-16 flex items-center justify-center bg-white rounded-full mx-auto mb-2 shadow-sm">
-<i class="ri-building-2-line text-primary text-xl"></i>
+<i class="ri-building-2-line text-[--color-primary] text-xl"></i>
 </div>
-<p class="text-2xl font-bold text-primary">7分</p>
+<p class="text-2xl font-bold text-[--color-primary]">7分</p>
 <p class="text-sm text-gray-600">池袋駅</p>
 </div>
 <div class="text-center">
 <div class="w-16 h-16 flex items-center justify-center bg-white rounded-full mx-auto mb-2 shadow-sm">
-<i class="ri-building-2-line text-primary text-xl"></i>
+<i class="ri-building-2-line text-[--color-primary] text-xl"></i>
 </div>
-<p class="text-2xl font-bold text-primary">15分</p>
+<p class="text-2xl font-bold text-[--color-primary]">15分</p>
 <p class="text-sm text-gray-600">新宿駅</p>
 </div>
 <div class="text-center">
 <div class="w-16 h-16 flex items-center justify-center bg-white rounded-full mx-auto mb-2 shadow-sm">
-<i class="ri-building-2-line text-primary text-xl"></i>
+<i class="ri-building-2-line text-[--color-primary] text-xl"></i>
 </div>
-<p class="text-2xl font-bold text-primary">20分</p>
+<p class="text-2xl font-bold text-[--color-primary]">20分</p>
 <p class="text-sm text-gray-600">渋谷駅</p>
 </div>
 <div class="text-center">
 <div class="w-16 h-16 flex items-center justify-center bg-white rounded-full mx-auto mb-2 shadow-sm">
-<i class="ri-building-2-line text-primary text-xl"></i>
+<i class="ri-building-2-line text-[--color-primary] text-xl"></i>
 </div>
-<p class="text-2xl font-bold text-primary">25分</p>
+<p class="text-2xl font-bold text-[--color-primary]">25分</p>
 <p class="text-sm text-gray-600">東京駅</p>
 </div>
 <div class="text-center">
 <div class="w-16 h-16 flex items-center justify-center bg-white rounded-full mx-auto mb-2 shadow-sm">
-<i class="ri-building-2-line text-primary text-xl"></i>
+<i class="ri-building-2-line text-[--color-primary] text-xl"></i>
 </div>
-<p class="text-2xl font-bold text-primary">10分</p>
+<p class="text-2xl font-bold text-[--color-primary]">10分</p>
 <p class="text-sm text-gray-600">中野駅</p>
 </div>
 </div>
@@ -463,10 +471,10 @@ z-index: 1;
 <h4 class="text-xl font-semibold text-gray-900 mb-6 text-center">地価動向</h4>
 <div class="grid grid-cols-3 gap-8 text-center">
 <div>
-<div class="w-20 h-20 flex items-center justify-center bg-primary/10 rounded-full mx-auto mb-3">
-<i class="ri-money-yen-circle-line text-3xl text-primary"></i>
+<div class="w-20 h-20 flex items-center justify-center bg-[--color-primary]/10 rounded-full mx-auto mb-3">
+<i class="ri-money-yen-circle-line text-3xl text-[--color-primary]"></i>
 </div>
-<p class="text-3xl font-bold text-primary">170万円</p>
+<p class="text-3xl font-bold text-[--color-primary]">170万円</p>
 <p class="text-sm text-gray-600">現在価格（万円/坪）</p>
 </div>
 <div>
@@ -497,22 +505,22 @@ z-index: 1;
 <div class="grid md:grid-cols-2 gap-8">
 <div class="bg-white p-8 rounded-xl shadow-sm">
 <div class="flex items-center mb-6">
-<div class="w-12 h-12 flex items-center justify-center bg-primary/10 rounded-lg mr-4">
-<i class="ri-community-line text-primary text-xl"></i>
+<div class="w-12 h-12 flex items-center justify-center bg-[--color-primary]/10 rounded-lg mr-4">
+<i class="ri-community-line text-[--color-primary] text-xl"></i>
 </div>
 <h4 class="text-xl font-semibold text-gray-900">旭丘地域集会所</h4>
 </div>
 <ul class="space-y-3 text-gray-700">
 <li class="flex items-start">
-<div class="w-2 h-2 bg-primary rounded-full mt-2 mr-3 flex-shrink-0"></div>
+<div class="w-2 h-2 bg-[--color-primary] rounded-full mt-2 mr-3 flex-shrink-0"></div>
 <div><span class="font-semibold">所在地：</span>旭丘1-58-10</div>
 </li>
 <li class="flex items-start">
-<div class="w-2 h-2 bg-primary rounded-full mt-2 mr-3 flex-shrink-0"></div>
+<div class="w-2 h-2 bg-[--color-primary] rounded-full mt-2 mr-3 flex-shrink-0"></div>
 <div><span class="font-semibold">アクセス：</span>江古田駅南口から徒歩5分</div>
 </li>
 <li class="flex items-start">
-<div class="w-2 h-2 bg-primary rounded-full mt-2 mr-3 flex-shrink-0"></div>
+<div class="w-2 h-2 bg-[--color-primary] rounded-full mt-2 mr-3 flex-shrink-0"></div>
 <div><span class="font-semibold">施設構成：</span>
 <ul class="ml-4 mt-1">
 <li>• ホール（1F）：72㎡、定員60人</li>
@@ -582,7 +590,7 @@ z-index: 1;
 <div class="grid md:grid-cols-4 gap-8">
 <div>
 <div class="flex items-center space-x-3 mb-4">
-<div class="w-10 h-10 flex items-center justify-center bg-primary rounded-lg">
+<div class="w-10 h-10 flex items-center justify-center bg-[--color-primary] rounded-lg">
 <i class="ri-community-line text-white"></i>
 </div>
 <div>

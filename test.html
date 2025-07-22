@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Tailwind CSS テスト</title>
+<!-- Tailwind CSS v4 CDN -->
+<script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+<!-- Custom Tailwind Configuration -->
+<style type="text/tailwindcss">
+  @theme {
+    --color-primary: #57b5e7;
+    --color-secondary: #8dd3c7;
+    --radius-button: 8px;
+  }
+</style>
+</head>
+<body class="bg-gray-100 p-8">
+  <div class="max-w-4xl mx-auto">
+    <h1 class="text-4xl font-bold text-gray-900 mb-4">Tailwind CSS テストページ</h1>
+    
+    <div class="bg-white rounded-lg shadow-md p-6 mb-6">
+      <h2 class="text-2xl font-semibold text-[--color-primary] mb-4">カスタムカラーテスト</h2>
+      <p class="text-gray-700 mb-4">このページはTailwind CSS v4 CDNが正しく動作しているかテストします。</p>
+      
+      <div class="flex gap-4 mb-4">
+        <button class="bg-[--color-primary] text-white px-4 py-2 rounded-[--radius-button] hover:bg-blue-600 transition-colors">
+          プライマリボタン
+        </button>
+        <button class="bg-[--color-secondary] text-white px-4 py-2 rounded-[--radius-button] hover:bg-green-600 transition-colors">
+          セカンダリボタン
+        </button>
+      </div>
+      
+      <div class="grid grid-cols-3 gap-4">
+        <div class="bg-red-500 text-white p-4 rounded text-center">赤</div>
+        <div class="bg-green-500 text-white p-4 rounded text-center">緑</div>
+        <div class="bg-blue-500 text-white p-4 rounded text-center">青</div>
+      </div>
+    </div>
+    
+    <div class="bg-gradient-to-r from-[--color-primary] to-[--color-secondary] text-white p-6 rounded-lg">
+      <h3 class="text-xl font-bold mb-2">グラデーションテスト</h3>
+      <p>カスタムカラーを使用したグラデーション背景</p>
+    </div>
+  </div>
+</body>
+</html>
