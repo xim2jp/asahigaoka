@@ -1,647 +1,838 @@
 <!DOCTYPE html>
 <html lang="ja">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<base href="./">
-<title>練馬区旭丘という街について - 練馬区旭丘一丁目町会</title>
-<link rel="stylesheet" href="./css/tailwind.min.css">
-<script>tailwind.config={theme:{extend:{colors:{primary:'#57b5e7',secondary:'#8dd3c7'},borderRadius:{'none':'0px','sm':'4px',DEFAULT:'8px','md':'12px','lg':'16px','xl':'20px','2xl':'24px','3xl':'32px','full':'9999px','button':'8px'}}}}</script>
-<link href="./css/google-fonts-pacifico.css" rel="stylesheet">
-<link href="./css/remixicon.min.css" rel="stylesheet">
-<style>
-:where([class^="ri-"])::before { content: "\f3c2"; }
-.hero-bg {
-background-image: url('./images/hero-background.jfif');
-background-size: cover;
-background-position: center;
-position: relative;
-}
-.hero-bg::before {
-content: '';
-position: absolute;
-top: 0;
-left: 0;
-right: 0;
-bottom: 0;
-background: linear-gradient(135deg, rgba(255,255,255,0.9) 0%, rgba(255,255,255,0.7) 50%, rgba(255,255,255,0.3) 100%);
-}
-.hero-content {
-position: relative;
-z-index: 1;
-}
-</style>
-</head>
-<body class="bg-white">
-<header class="bg-white shadow-sm sticky top-0 z-50">
-<nav class="w-full px-6 py-4">
-<div class="flex items-center justify-between">
-<div class="flex items-center space-x-3">
-<div class="w-12 h-12 flex items-center justify-center bg-primary rounded-lg">
-<i class="ri-community-line text-white text-xl"></i>
-</div>
-<div>
-<h1 class="text-xl font-bold text-gray-900">練馬区旭丘一丁目町会</h1>
-<p class="text-sm text-gray-600">みんなでつくる安心・安全なまち</p>
-</div>
-</div>
-<div class="hidden md:flex items-center space-x-8">
-<a href="index.html" class="text-gray-700 hover:text-primary transition-colors">ホーム</a>
-<a href="#" class="text-gray-700 hover:text-primary transition-colors">お知らせ</a>
-<a href="#" class="text-gray-700 hover:text-primary transition-colors">活動カレンダー</a>
-<a href="#" class="text-gray-700 hover:text-primary transition-colors">町会について</a>
-<a href="#" class="text-gray-700 hover:text-primary transition-colors">お問い合わせ</a>
-</div>
-<button class="md:hidden w-10 h-10 flex items-center justify-center" id="mobile-menu-btn">
-<i class="ri-menu-line text-xl"></i>
-</button>
-</div>
-<div class="md:hidden mt-4 hidden" id="mobile-menu">
-<div class="flex flex-col space-y-3 py-4 border-t">
-<a href="index.html" class="text-gray-700 hover:text-primary transition-colors">ホーム</a>
-<a href="#" class="text-gray-700 hover:text-primary transition-colors">お知らせ</a>
-<a href="#" class="text-gray-700 hover:text-primary transition-colors">活動カレンダー</a>
-<a href="#" class="text-gray-700 hover:text-primary transition-colors">町会について</a>
-<a href="#" class="text-gray-700 hover:text-primary transition-colors">お問い合わせ</a>
-</div>
-</div>
-</nav>
-</header>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>練馬区旭丘という街について - 東京都練馬区旭丘一丁目町会</title>
+    <script src="https://cdn.tailwindcss.com/3.4.16"></script>
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            colors: { primary: "#57b5e7", secondary: "#8dd3c7" },
+            borderRadius: {
+              none: "0px",
+              sm: "4px",
+              DEFAULT: "8px",
+              md: "12px",
+              lg: "16px",
+              xl: "20px",
+              "2xl": "24px",
+              "3xl": "32px",
+              full: "9999px",
+              button: "8px",
+            },
+          },
+        },
+      };
+    </script>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Pacifico&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      href="https://cdnjs.cloudflare.com/ajax/libs/remixicon/4.6.0/remixicon.min.css"
+      rel="stylesheet"
+    />
+    <style>
+      :where([class^="ri-"])::before { content: "\f3c2"; }
+      .hero-bg {
+      background-image: url('https://static.readdy.ai/image/f92efd6e70f0f252a135c1c10bbdceb1/12f3915b93d021be0672bd38c6039a57.jfif');
+      background-size: cover;
+      background-position: center;
+      position: relative;
+      }
+      .hero-bg::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: linear-gradient(135deg, rgba(255,255,255,0.9) 0%, rgba(255,255,255,0.7) 50%, rgba(255,255,255,0.3) 100%);
+      }
+      .hero-content {
+      position: relative;
+      z-index: 1;
+      }
+    </style>
+  </head>
+  <body class="bg-white">
+    <header class="bg-white shadow-sm sticky top-0 z-50">
+      <nav class="w-full px-6 py-4">
+        <div class="flex items-center justify-between">
+          <div class="flex items-center space-x-3">
+            <div
+              class="w-12 h-12 flex items-center justify-center bg-primary rounded-lg"
+            >
+              <i class="ri-community-line text-white text-xl"></i>
+            </div>
+            <div>
+              <h1 class="text-xl font-bold text-gray-900">
+                東京都練馬区旭丘一丁目町会
+              </h1>
+              <p class="text-sm text-gray-600">
+                みんなでつくる安心・安全なまち
+              </p>
+            </div>
+          </div>
+          <div class="hidden md:flex items-center space-x-8">
+            <a
+              href="index.html"
+              class="text-gray-700 hover:text-primary transition-colors"
+              >ホーム</a
+            >
+            <a
+              href="#"
+              class="text-gray-700 hover:text-primary transition-colors"
+              >お知らせ</a
+            >
+            <a
+              href="#"
+              class="text-gray-700 hover:text-primary transition-colors"
+              >活動カレンダー</a
+            >
+            <a
+              href="#"
+              class="text-gray-700 hover:text-primary transition-colors"
+              >町会について</a
+            >
+            <a
+              href="#"
+              class="text-gray-700 hover:text-primary transition-colors"
+              >お問い合わせ</a
+            >
+          </div>
+          <button
+            class="md:hidden w-10 h-10 flex items-center justify-center"
+            id="mobile-menu-btn"
+          >
+            <i class="ri-menu-line text-xl"></i>
+          </button>
+        </div>
+        <div class="md:hidden mt-4 hidden" id="mobile-menu">
+          <div class="flex flex-col space-y-3 py-4 border-t">
+            <a
+              href="index.html"
+              class="text-gray-700 hover:text-primary transition-colors"
+              >ホーム</a
+            >
+            <a
+              href="#"
+              class="text-gray-700 hover:text-primary transition-colors"
+              >お知らせ</a
+            >
+            <a
+              href="#"
+              class="text-gray-700 hover:text-primary transition-colors"
+              >活動カレンダー</a
+            >
+            <a
+              href="#"
+              class="text-gray-700 hover:text-primary transition-colors"
+              >町会について</a
+            >
+            <a
+              href="#"
+              class="text-gray-700 hover:text-primary transition-colors"
+              >お問い合わせ</a
+            >
+          </div>
+        </div>
+      </nav>
+    </header>
 
-<section class="hero-bg min-h-[400px] flex items-center">
-<div class="hero-content w-full px-6">
-<div class="max-w-6xl mx-auto">
-<div class="max-w-2xl">
-<h2 class="text-5xl font-bold mb-6 leading-tight">
-<span class="text-primary">練馬区旭丘という</span><br>
-<span class="text-gray-900">街について</span>
-</h2>
-<p class="text-xl text-gray-700 mb-8 leading-relaxed">
-地域詳細調査報告書 - 歴史と現代が共存する魅力的な街
-</p>
-</div>
-</div>
-</div>
-</section>
+    <!-- ヒーローセクション -->
+    <section class="hero-bg min-h-[400px] flex items-center">
+      <div class="hero-content w-full px-6">
+        <div class="max-w-6xl mx-auto">
+          <div class="max-w-2xl">
+            <h2 class="text-5xl font-bold mb-6 leading-tight">
+              <span class="text-primary">練馬区旭丘</span><br />
+              <span class="text-gray-900">という街について</span>
+            </h2>
+            <p class="text-xl font-bold text-gray-700 mb-8 leading-relaxed">
+              江戸時代の新田開発から始まり、現代の都市型コミュニティへと発展を遂げた旭丘。
+              歴史と文化、そして未来への希望が共存する、私たちの街の物語をご紹介します。
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
 
-<section class="py-16">
-<div class="max-w-6xl mx-auto px-6">
-<div class="text-center mb-12">
-<h3 class="text-3xl font-bold text-gray-900 mb-4">地域概要</h3>
-<p class="text-gray-600">旭丘の基本情報と特徴</p>
-</div>
-<div class="grid md:grid-cols-4 gap-6 mb-8">
-<div class="bg-gradient-to-br from-blue-50 to-blue-100 p-6 rounded-xl text-center">
-<i class="ri-map-2-line text-3xl text-blue-600 mb-3"></i>
-<p class="text-sm text-gray-600 mb-1">面積</p>
-<p class="text-2xl font-bold text-gray-900">0.411 km²</p>
-</div>
-<div class="bg-gradient-to-br from-green-50 to-green-100 p-6 rounded-xl text-center">
-<i class="ri-group-line text-3xl text-green-600 mb-3"></i>
-<p class="text-sm text-gray-600 mb-1">人口密度</p>
-<p class="text-2xl font-bold text-gray-900">18,214 人/km²</p>
-</div>
-<div class="bg-gradient-to-br from-purple-50 to-purple-100 p-6 rounded-xl text-center">
-<i class="ri-building-line text-3xl text-purple-600 mb-3"></i>
-<p class="text-sm text-gray-600 mb-1">丁目数</p>
-<p class="text-2xl font-bold text-gray-900">1-2 丁目</p>
-</div>
-<div class="bg-gradient-to-br from-orange-50 to-orange-100 p-6 rounded-xl text-center">
-<i class="ri-calendar-line text-3xl text-orange-600 mb-3"></i>
-<p class="text-sm text-gray-600 mb-1">住居表示実施年</p>
-<p class="text-2xl font-bold text-gray-900">1960年</p>
-</div>
-</div>
-<div class="bg-white rounded-xl shadow-sm p-8">
-<p class="text-gray-700 leading-relaxed text-lg">
-旭丘は東京都練馬区東部に位置する住宅地で、西武池袋線江古田駅を中心とした商業・住宅複合地域です。面積0.411平方キロメートルという比較的コンパクトな区域に、人口密度18,214.11人/平方キロメートルという高密度な居住環境が形成されています。都心部へのアクセスの良さと、大学や専門学校が集積する学生街としての特色を併せ持つ地域として発展しています。
-</p>
-</div>
-</div>
-</section>
+    <!-- 地域概要セクション -->
+    <section class="py-16">
+      <div class="max-w-6xl mx-auto px-6">
+        <div class="text-center mb-12">
+          <h3 class="text-3xl font-bold text-gray-900 mb-4">地域概要</h3>
+          <p class="text-gray-600">練馬区東部に位置する、交通利便性の高い住宅地</p>
+        </div>
+        <div class="grid md:grid-cols-4 gap-6 mb-12">
+          <div class="bg-gradient-to-br from-[#E0F4FF] to-[#B9E7FF] p-6 rounded-xl text-center">
+            <div class="text-3xl font-bold text-primary mb-2">0.411</div>
+            <div class="text-sm text-gray-700">面積（km²）</div>
+          </div>
+          <div class="bg-gradient-to-br from-[#E3FFE6] to-[#98FF9F] p-6 rounded-xl text-center">
+            <div class="text-3xl font-bold text-green-600 mb-2">18,214</div>
+            <div class="text-sm text-gray-700">人口密度（人/km²）</div>
+          </div>
+          <div class="bg-gradient-to-br from-[#F3E5FF] to-[#E0B6FF] p-6 rounded-xl text-center">
+            <div class="text-3xl font-bold text-purple-600 mb-2">1-2</div>
+            <div class="text-sm text-gray-700">丁目数</div>
+          </div>
+          <div class="bg-gradient-to-br from-[#FFF3E0] to-[#FFD299] p-6 rounded-xl text-center">
+            <div class="text-3xl font-bold text-orange-600 mb-2">1960</div>
+            <div class="text-sm text-gray-700">住居表示実施年</div>
+          </div>
+        </div>
+        <div class="prose max-w-none text-gray-600 leading-relaxed">
+          <p class="mb-4">
+            旭丘は東京都練馬区東部に位置する住宅地で、西武池袋線江古田駅を中心とした商業・住宅複合地域です。
+            面積0.411平方キロメートルという比較的コンパクトな区域に、人口密度18,214.11人/平方キロメートルという高密度な居住環境が形成されています。
+            都心部へのアクセスの良さと、大学や専門学校が集積する学生街としての特色を併せ持つ地域として発展しています。
+          </p>
+          <p>
+            地域は北を小竹町、南を中野区江原町、東を豊島区長崎・南長崎・千早、西を栄町・豊玉上・豊玉北と接し、
+            練馬区内でも特に交通利便性の高い立地にあります。江古田駅周辺は練馬区内屈指の商店数と人口密度を誇り、
+            学生から家族世帯まで幅広い住民層が共存する多様性豊かなコミュニティを形成しています。
+          </p>
+        </div>
+      </div>
+    </section>
 
-<section class="py-16 bg-gray-50">
-<div class="max-w-6xl mx-auto px-6">
-<div class="text-center mb-12">
-<h3 class="text-3xl font-bold text-gray-900 mb-4">地理・位置</h3>
-<p class="text-gray-600">旭丘の立地と周辺環境</p>
-</div>
-<div class="grid md:grid-cols-2 gap-8">
-<div class="bg-white p-8 rounded-xl shadow-sm">
-<div class="flex items-center mb-6">
-<div class="w-12 h-12 flex items-center justify-center bg-blue-100 rounded-lg mr-4">
-<i class="ri-map-pin-line text-blue-600 text-xl"></i>
-</div>
-<h4 class="text-xl font-semibold text-gray-900">位置関係</h4>
-</div>
-<ul class="space-y-3 text-gray-700">
-<li class="flex items-start">
-<div class="w-2 h-2 bg-primary rounded-full mt-2 mr-3 flex-shrink-0"></div>
-<div><span class="font-medium">北：</span>練馬区小竹町</div>
-</li>
-<li class="flex items-start">
-<div class="w-2 h-2 bg-primary rounded-full mt-2 mr-3 flex-shrink-0"></div>
-<div><span class="font-medium">南：</span>中野区江原町</div>
-</li>
-<li class="flex items-start">
-<div class="w-2 h-2 bg-primary rounded-full mt-2 mr-3 flex-shrink-0"></div>
-<div><span class="font-medium">東：</span>豊島区長崎・南長崎・千早</div>
-</li>
-<li class="flex items-start">
-<div class="w-2 h-2 bg-primary rounded-full mt-2 mr-3 flex-shrink-0"></div>
-<div><span class="font-medium">西：</span>練馬区栄町・豊玉上・豊玉北</div>
-</li>
-</ul>
-</div>
-<div class="bg-white p-8 rounded-xl shadow-sm">
-<div class="flex items-center mb-6">
-<div class="w-12 h-12 flex items-center justify-center bg-green-100 rounded-lg mr-4">
-<i class="ri-road-map-line text-green-600 text-xl"></i>
-</div>
-<h4 class="text-xl font-semibold text-gray-900">主要道路</h4>
-</div>
-<ul class="space-y-3 text-gray-700">
-<li class="flex items-start">
-<div class="w-2 h-2 bg-secondary rounded-full mt-2 mr-3 flex-shrink-0"></div>
-<div>東京都道439号椎名町上石神井線（千川通り）</div>
-</li>
-<li class="flex items-start">
-<div class="w-2 h-2 bg-secondary rounded-full mt-2 mr-3 flex-shrink-0"></div>
-<div>東京都道420号鮫洲大山線（中野通り）</div>
-</li>
-<li class="flex items-start">
-<div class="w-2 h-2 bg-secondary rounded-full mt-2 mr-3 flex-shrink-0"></div>
-<div>清戸道（おわい街道）</div>
-</li>
-</ul>
-</div>
-</div>
-<div class="bg-white rounded-xl shadow-sm p-8 mt-8">
-<p class="text-gray-700 leading-relaxed">
-旭丘は練馬区の東端部に位置し、区境を跨いで豊島区・中野区と隣接する地理的特徴を持ちます。特に東京都道439号椎名町上石神井線（千川通り）は、かつて千川上水が流れていた場所で、昭和30年頃の暗渠化により現在の幹線道路として整備されました。
-</p>
-</div>
-</div>
-</section>
+    <!-- 歴史・地名由来セクション -->
+    <section class="py-16 bg-gray-50">
+      <div class="max-w-6xl mx-auto px-6">
+        <div class="text-center mb-12">
+          <h3 class="text-3xl font-bold text-gray-900 mb-4">歴史・地名由来</h3>
+          <p class="text-gray-600">江戸時代から続く、地域の歴史的変遷</p>
+        </div>
+        <div class="grid md:grid-cols-2 gap-12 items-start">
+          <div>
+            <h4 class="text-2xl font-bold text-gray-900 mb-6">地名変遷の歴史</h4>
+            <div class="space-y-4">
+              <div class="bg-white p-4 rounded-lg shadow-sm">
+                <div class="font-semibold text-primary">江戸時代</div>
+                <div class="text-gray-700 mt-1">上板橋村字江古田（多摩郡江古田村の新田）</div>
+              </div>
+              <div class="bg-white p-4 rounded-lg shadow-sm">
+                <div class="font-semibold text-primary">昭和7年</div>
+                <div class="text-gray-700 mt-1">板橋区成立、江古田町となる</div>
+              </div>
+              <div class="bg-white p-4 rounded-lg shadow-sm">
+                <div class="font-semibold text-primary">昭和22年</div>
+                <div class="text-gray-700 mt-1">練馬区独立に際し練馬区に編入</div>
+              </div>
+              <div class="bg-white p-4 rounded-lg shadow-sm">
+                <div class="font-semibold text-primary">昭和35年</div>
+                <div class="text-gray-700 mt-1">地番整理により現町名「旭丘」に改称</div>
+              </div>
+            </div>
+          </div>
+          <div>
+            <h4 class="text-2xl font-bold text-gray-900 mb-6">旭丘の由来</h4>
+            <div class="prose text-gray-600">
+              <p class="mb-4">
+                旭丘の地名の由来には興味深い歴史があります。江戸時代、この地域は上板橋村字江古田と呼ばれ、
+                多摩郡江古田村（現在の中野区）の新田として開墾された土地でした。
+              </p>
+              <p class="mb-4">
+                昭和22年の練馬区独立時、江古田町という名称では中野区の江古田と紛らわしいという問題が生じました。
+                このため、新しい町名について住民投票が行われ、結果的に地元の旭丘小学校の名前にちなんで「旭丘」と決定されました。
+              </p>
+              <p>
+                旭丘小学校自体も、元々は上板橋第三小学校と呼ばれていましたが、
+                練馬区編入の際に「区内で最初に朝日が仰げる丘」という意味を込めて旭丘小学校と改称された経緯があります。
+              </p>
+            </div>
+          </div>
+        </div>
+        <div class="mt-12">
+          <h4 class="text-2xl font-bold text-gray-900 mb-6 text-center">千川上水と桜並木の歴史</h4>
+          <div class="bg-white p-8 rounded-xl shadow-sm">
+            <div class="prose max-w-none text-gray-600">
+              <p class="mb-4">
+                地域を特徴づける重要な歴史的要素として、千川上水の存在があります。
+                江戸時代から昭和30年頃まで、現在の千川通りに沿って千川上水が流れており、
+                その両岸には「新小金井桜」と謳われる美しい桜並木が連なっていました。
+              </p>
+              <p>
+                しかし、都市化の進展とともに上水は暗渠化され、桜並木も伐採されてしまいました。
+                この歴史を物語る貴重な文化財として、大正4年（1915年）造立の「千川堤植桜楓碑」が浅間神社境内に保存されています。
+                この石碑は練馬区の有形文化財に指定されており、地域の美しい自然環境の記憶を現代に伝える重要な史料となっています。
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
 
-<section class="py-16">
-<div class="max-w-6xl mx-auto px-6">
-<div class="text-center mb-12">
-<h3 class="text-3xl font-bold text-gray-900 mb-4">歴史・地名由来</h3>
-<p class="text-gray-600">旭丘の歴史的変遷と文化的背景</p>
-</div>
-<div class="bg-gradient-to-r from-blue-50 to-indigo-50 p-8 rounded-xl mb-8">
-<h4 class="text-xl font-semibold text-gray-900 mb-6">地名変遷の歴史</h4>
-<div class="space-y-4">
-<div class="flex items-start">
-<span class="bg-primary text-white px-3 py-1 rounded text-sm font-semibold mr-4 whitespace-nowrap">江戸時代</span>
-<p class="text-gray-700">上板橋村字江古田（多摩郡江古田村の新田）</p>
-</div>
-<div class="flex items-start">
-<span class="bg-primary text-white px-3 py-1 rounded text-sm font-semibold mr-4 whitespace-nowrap">昭和7年</span>
-<p class="text-gray-700">板橋区成立、江古田町となる</p>
-</div>
-<div class="flex items-start">
-<span class="bg-primary text-white px-3 py-1 rounded text-sm font-semibold mr-4 whitespace-nowrap">昭和22年</span>
-<p class="text-gray-700">練馬区独立に際し練馬区に編入</p>
-</div>
-<div class="flex items-start">
-<span class="bg-primary text-white px-3 py-1 rounded text-sm font-semibold mr-4 whitespace-nowrap">昭和35年</span>
-<p class="text-gray-700">地番整理により現町名「旭丘」に改称</p>
-</div>
-</div>
-</div>
-<div class="bg-white rounded-xl shadow-sm p-8 mb-8">
-<p class="text-gray-700 leading-relaxed mb-4">
-旭丘の地名の由来には興味深い歴史があります。江戸時代、この地域は上板橋村字江古田と呼ばれ、多摩郡江古田村（現在の中野区）の新田として開墾された土地でした。昭和22年の練馬区独立時、江古田町という名称では中野区の江古田と紛らわしいという問題が生じたため、新しい町名について住民投票が行われ、結果的に地元の旭丘小学校の名前にちなんで「旭丘」と決定されました。
-</p>
-</div>
-<div class="bg-gradient-to-r from-yellow-50 to-amber-50 p-8 rounded-xl">
-<h4 class="text-xl font-semibold text-gray-900 mb-4">千川上水と桜並木の歴史</h4>
-<p class="text-gray-700 leading-relaxed">
-地域を特徴づける重要な歴史的要素として、千川上水の存在があります。江戸時代から昭和30年頃まで、現在の千川通りに沿って千川上水が流れており、その両岸には「新小金井桜」と謳われる美しい桜並木が連なっていました。この歴史を物語る貴重な文化財として、大正4年（1915年）造立の「千川堤植桜楓碑」が浅間神社境内に保存されています。
-</p>
-</div>
-</div>
-</section>
+    <!-- 交通アクセスセクション -->
+    <section class="py-16">
+      <div class="max-w-6xl mx-auto px-6">
+        <div class="text-center mb-12">
+          <h3 class="text-3xl font-bold text-gray-900 mb-4">交通アクセス</h3>
+          <p class="text-gray-600">都心へのアクセスに優れた、便利な立地</p>
+        </div>
+        <div class="grid md:grid-cols-2 gap-8">
+          <div>
+            <h4 class="text-xl font-semibold text-gray-900 mb-6">鉄道アクセス</h4>
+            <div class="bg-gradient-to-r from-[#E0F4FF] to-[#B9E7FF] p-6 rounded-xl mb-6">
+              <div class="flex items-center mb-4">
+                <div class="w-12 h-12 flex items-center justify-center bg-primary rounded-lg mr-4">
+                  <i class="ri-train-line text-white text-xl"></i>
+                </div>
+                <div>
+                  <h5 class="font-semibold text-gray-900">西武池袋線 江古田駅</h5>
+                  <p class="text-sm text-gray-600">地域の中心となる駅</p>
+                </div>
+              </div>
+              <div class="grid grid-cols-2 gap-4">
+                <div class="bg-white/80 p-3 rounded">
+                  <div class="text-sm text-gray-600">池袋駅まで</div>
+                  <div class="text-lg font-semibold text-primary">約7分</div>
+                </div>
+                <div class="bg-white/80 p-3 rounded">
+                  <div class="text-sm text-gray-600">新宿駅まで</div>
+                  <div class="text-lg font-semibold text-primary">約15分</div>
+                </div>
+                <div class="bg-white/80 p-3 rounded">
+                  <div class="text-sm text-gray-600">渋谷駅まで</div>
+                  <div class="text-lg font-semibold text-primary">約20分</div>
+                </div>
+                <div class="bg-white/80 p-3 rounded">
+                  <div class="text-sm text-gray-600">東京駅まで</div>
+                  <div class="text-lg font-semibold text-primary">約25分</div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div>
+            <h4 class="text-xl font-semibold text-gray-900 mb-6">バス路線</h4>
+            <div class="space-y-4">
+              <div class="bg-white p-4 rounded-lg shadow-sm">
+                <h5 class="font-semibold text-gray-900 mb-2">関東バス</h5>
+                <ul class="space-y-1 text-sm text-gray-600">
+                  <li>• 中12系統：中野駅北口行</li>
+                  <li>• 中41系統：中野駅北口行</li>
+                  <li>• 中12-1系統：丸山営業所行</li>
+                </ul>
+              </div>
+              <div class="bg-white p-4 rounded-lg shadow-sm">
+                <h5 class="font-semibold text-gray-900 mb-2">国際興業バス</h5>
+                <ul class="space-y-1 text-sm text-gray-600">
+                  <li>• 池07系統：江古田二又～サンシャインシティ南</li>
+                </ul>
+              </div>
+              <div class="bg-white p-4 rounded-lg shadow-sm">
+                <h5 class="font-semibold text-gray-900 mb-2">都営バス</h5>
+                <ul class="space-y-1 text-sm text-gray-600">
+                  <li>• 白61系統：新宿駅西口行</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
 
-<section class="py-16 bg-gradient-to-b from-white to-[#F0F7FF]">
-<div class="max-w-6xl mx-auto px-6">
-<div class="text-center mb-12">
-<h3 class="text-3xl font-bold text-gray-900 mb-4">交通アクセス</h3>
-<p class="text-gray-600">優れた交通利便性で都心へのアクセスも快適</p>
-</div>
-<div class="grid md:grid-cols-2 gap-8 mb-8">
-<div class="bg-white p-8 rounded-xl shadow-sm">
-<div class="flex items-center mb-6">
-<div class="w-12 h-12 flex items-center justify-center bg-primary/10 rounded-lg mr-4">
-<i class="ri-train-line text-primary text-xl"></i>
-</div>
-<h4 class="text-xl font-semibold text-gray-900">鉄道アクセス</h4>
-</div>
-<p class="font-semibold text-primary mb-4">西武池袋線 江古田駅</p>
-<ul class="space-y-2 text-gray-700">
-<li>• 池袋駅まで約7分</li>
-<li>• 新宿駅まで約15分（池袋経由）</li>
-<li>• 練馬駅まで約5分</li>
-<li>• 石神井公園駅まで約15分</li>
-</ul>
-</div>
-<div class="bg-white p-8 rounded-xl shadow-sm">
-<div class="flex items-center mb-6">
-<div class="w-12 h-12 flex items-center justify-center bg-secondary/10 rounded-lg mr-4">
-<i class="ri-bus-line text-secondary text-xl"></i>
-</div>
-<h4 class="text-xl font-semibold text-gray-900">バス路線</h4>
-</div>
-<ul class="space-y-3 text-gray-700">
-<li><span class="font-semibold">関東バス</span>：中12、中41、中12-1系統</li>
-<li><span class="font-semibold">国際興業バス</span>：池07系統</li>
-<li><span class="font-semibold">都営バス</span>：白61系統（新宿駅西口行）</li>
-</ul>
-</div>
-</div>
-<div class="bg-gradient-to-r from-primary/10 to-secondary/10 p-8 rounded-xl">
-<h4 class="text-xl font-semibold text-gray-900 mb-6 text-center">主要駅への所要時間</h4>
-<div class="grid grid-cols-2 md:grid-cols-5 gap-4">
-<div class="text-center">
-<div class="w-16 h-16 flex items-center justify-center bg-white rounded-full mx-auto mb-2 shadow-sm">
-<i class="ri-building-2-line text-primary text-xl"></i>
-</div>
-<p class="text-2xl font-bold text-primary">7分</p>
-<p class="text-sm text-gray-600">池袋駅</p>
-</div>
-<div class="text-center">
-<div class="w-16 h-16 flex items-center justify-center bg-white rounded-full mx-auto mb-2 shadow-sm">
-<i class="ri-building-2-line text-primary text-xl"></i>
-</div>
-<p class="text-2xl font-bold text-primary">15分</p>
-<p class="text-sm text-gray-600">新宿駅</p>
-</div>
-<div class="text-center">
-<div class="w-16 h-16 flex items-center justify-center bg-white rounded-full mx-auto mb-2 shadow-sm">
-<i class="ri-building-2-line text-primary text-xl"></i>
-</div>
-<p class="text-2xl font-bold text-primary">20分</p>
-<p class="text-sm text-gray-600">渋谷駅</p>
-</div>
-<div class="text-center">
-<div class="w-16 h-16 flex items-center justify-center bg-white rounded-full mx-auto mb-2 shadow-sm">
-<i class="ri-building-2-line text-primary text-xl"></i>
-</div>
-<p class="text-2xl font-bold text-primary">25分</p>
-<p class="text-sm text-gray-600">東京駅</p>
-</div>
-<div class="text-center">
-<div class="w-16 h-16 flex items-center justify-center bg-white rounded-full mx-auto mb-2 shadow-sm">
-<i class="ri-building-2-line text-primary text-xl"></i>
-</div>
-<p class="text-2xl font-bold text-primary">10分</p>
-<p class="text-sm text-gray-600">中野駅</p>
-</div>
-</div>
-</div>
-</div>
-</section>
+    <!-- 教育環境セクション -->
+    <section class="py-16 bg-gray-50">
+      <div class="max-w-6xl mx-auto px-6">
+        <div class="text-center mb-12">
+          <h3 class="text-3xl font-bold text-gray-900 mb-4">教育環境</h3>
+          <p class="text-gray-600">幼児教育から高等教育まで、充実した教育環境</p>
+        </div>
+        
+        <!-- みらい青空学園プロジェクト -->
+        <div class="bg-gradient-to-r from-primary/10 to-secondary/10 p-8 rounded-xl mb-12">
+          <h4 class="text-2xl font-bold text-gray-900 mb-6 text-center">みらい青空学園プロジェクト</h4>
+          <div class="grid md:grid-cols-2 gap-8 items-center">
+            <div>
+              <div class="bg-white p-6 rounded-lg shadow-sm">
+                <h5 class="font-semibold text-gray-900 mb-4">開校予定</h5>
+                <div class="space-y-2 text-gray-600">
+                  <p><span class="font-semibold text-primary">令和8年4月</span></p>
+                  <p>練馬区立小中一貫教育校「みらい青空学園」として開校</p>
+                </div>
+              </div>
+              <div class="bg-white p-6 rounded-lg shadow-sm mt-4">
+                <h5 class="font-semibold text-gray-900 mb-4">建設スケジュール</h5>
+                <ul class="space-y-2 text-sm text-gray-600">
+                  <li>• 令和7年7月：新校舎南棟完成</li>
+                  <li>• 令和7年12月：新校舎北棟完成</li>
+                  <li>• 令和8年12月：外構整備完了</li>
+                </ul>
+              </div>
+            </div>
+            <div class="prose text-gray-600">
+              <p>
+                旭丘地域の教育環境は現在大きな変革期を迎えています。
+                令和8年4月に開校予定の「みらい青空学園」は、練馬区で2校目となる施設一体型小中一貫教育校として、
+                9年間を通じた連続性のある教育プログラムを提供する予定です。
+              </p>
+              <p>
+                これにより、小学校から中学校への接続がスムーズになり、
+                より質の高い教育環境が実現されることが期待されています。
+              </p>
+            </div>
+          </div>
+        </div>
 
-<section class="py-16">
-<div class="max-w-6xl mx-auto px-6">
-<div class="text-center mb-12">
-<h3 class="text-3xl font-bold text-gray-900 mb-4">教育環境</h3>
-<p class="text-gray-600">充実した教育施設と新たな学びの場</p>
-</div>
-<div class="bg-gradient-to-r from-green-50 to-emerald-50 p-8 rounded-xl mb-8">
-<h4 class="text-2xl font-bold text-gray-900 mb-6">みらい青空学園プロジェクト</h4>
-<div class="grid md:grid-cols-2 gap-8">
-<div>
-<p class="text-gray-700 mb-4">
-<span class="font-semibold text-lg">開校予定：</span>令和8年4月<br>
-練馬区立小中一貫教育校「みらい青空学園」として開校
-</p>
-<div class="bg-white p-6 rounded-lg">
-<h5 class="font-semibold text-gray-900 mb-3">建設スケジュール</h5>
-<ul class="space-y-2 text-gray-700">
-<li class="flex items-center">
-<i class="ri-checkbox-circle-line text-green-500 mr-2"></i>
-令和7年7月：新校舎南棟完成
-</li>
-<li class="flex items-center">
-<i class="ri-checkbox-circle-line text-green-500 mr-2"></i>
-令和7年12月：新校舎北棟完成
-</li>
-<li class="flex items-center">
-<i class="ri-checkbox-circle-line text-green-500 mr-2"></i>
-令和8年12月：外構整備完了
-</li>
-</ul>
-</div>
-</div>
-<div class="bg-white p-6 rounded-lg">
-<p class="text-sm text-gray-600 mb-3">新校舎完成予想図</p>
-<div class="bg-gradient-to-br from-green-100 to-emerald-100 h-48 rounded-lg flex items-center justify-center">
-<i class="ri-building-2-line text-6xl text-green-600"></i>
-</div>
-</div>
-</div>
-</div>
-<div class="grid md:grid-cols-2 gap-8">
-<div class="bg-white p-8 rounded-xl shadow-sm">
-<h4 class="text-xl font-semibold text-gray-900 mb-4">現在の教育施設</h4>
-<ul class="space-y-4 text-gray-700">
-<li>
-<p class="font-semibold">練馬区立旭丘小学校</p>
-<p class="text-sm text-gray-600">所在地：旭丘2-21-1</p>
-</li>
-<li>
-<p class="font-semibold">練馬区立旭丘中学校</p>
-<p class="text-sm text-gray-600">所在地：旭丘2-40-1</p>
-</li>
-<li>
-<p class="font-semibold">日本大学芸術学部</p>
-<p class="text-sm text-gray-600">所在地：旭丘2-42-1（江古田キャンパス）</p>
-</li>
-</ul>
-</div>
-<div class="bg-white p-8 rounded-xl shadow-sm">
-<h4 class="text-xl font-semibold text-gray-900 mb-4">教育環境の特徴</h4>
-<p class="text-gray-700 leading-relaxed">
-旭丘地域の教育環境は現在大きな変革期を迎えています。令和8年4月に開校予定の「みらい青空学園」は、練馬区で2校目となる施設一体型小中一貫教育校として、9年間を通じた連続性のある教育プログラムを提供する予定です。
-</p>
-</div>
-</div>
-</div>
-</section>
+        <!-- 現在の教育施設 -->
+        <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div class="bg-white p-6 rounded-xl shadow-sm">
+            <div class="flex items-center mb-4">
+              <div class="w-10 h-10 flex items-center justify-center bg-primary/10 rounded-lg mr-3">
+                <i class="ri-school-line text-primary"></i>
+              </div>
+              <h5 class="font-semibold text-gray-900">練馬区立旭丘小学校</h5>
+            </div>
+            <p class="text-sm text-gray-600 mb-2">所在地：旭丘2-21-1</p>
+            <p class="text-sm text-gray-600">
+              教育目標：よく考え工夫する子ども、思いやりのある心やさしい子ども、進んでものごとにとりくむ子ども
+            </p>
+          </div>
+          <div class="bg-white p-6 rounded-xl shadow-sm">
+            <div class="flex items-center mb-4">
+              <div class="w-10 h-10 flex items-center justify-center bg-secondary/10 rounded-lg mr-3">
+                <i class="ri-building-line text-secondary"></i>
+              </div>
+              <h5 class="font-semibold text-gray-900">練馬区立旭丘中学校</h5>
+            </div>
+            <p class="text-sm text-gray-600 mb-2">所在地：旭丘2-40-1</p>
+            <p class="text-sm text-gray-600">
+              令和8年度から小中一貫教育校として生まれ変わる予定
+            </p>
+          </div>
+          <div class="bg-white p-6 rounded-xl shadow-sm">
+            <div class="flex items-center mb-4">
+              <div class="w-10 h-10 flex items-center justify-center bg-purple-100 rounded-lg mr-3">
+                <i class="ri-graduation-cap-line text-purple-600"></i>
+              </div>
+              <h5 class="font-semibold text-gray-900">日本大学芸術学部</h5>
+            </div>
+            <p class="text-sm text-gray-600 mb-2">所在地：旭丘2-42-1</p>
+            <p class="text-sm text-gray-600">
+              江古田キャンパスとして、芸術系学部・大学院が設置
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
 
-<section class="py-16 bg-gray-50">
-<div class="max-w-6xl mx-auto px-6">
-<div class="text-center mb-12">
-<h3 class="text-3xl font-bold text-gray-900 mb-4">文化・史跡</h3>
-<p class="text-gray-600">地域の歴史と文化を今に伝える貴重な文化財</p>
-</div>
-<div class="bg-gradient-to-r from-purple-50 to-pink-50 p-8 rounded-xl mb-8">
-<h4 class="text-2xl font-bold text-gray-900 mb-6">江古田の富士塚</h4>
-<div class="grid md:grid-cols-2 gap-8">
-<div>
-<div class="bg-white p-6 rounded-lg mb-4">
-<p class="text-gray-700 mb-3">
-<span class="font-semibold">指定文化財：</span><br>
-• 国指定重要有形民俗文化財<br>
-• 練馬区登録有形民俗文化財
-</p>
-<p class="text-gray-700 mb-3">
-<span class="font-semibold">規模：</span>高さ約8m、直径約30m
-</p>
-<p class="text-gray-700">
-<span class="font-semibold">築造：</span>天保10年（1839年）、小竹丸祓講により建設
-</p>
-</div>
-</div>
-<div class="bg-white p-6 rounded-lg">
-<p class="text-gray-700 leading-relaxed">
-江戸時代末期に築造された富士塚は、富士信仰の集団である富士講の重要な文化遺産です。関東大震災で一度倒壊しましたが、地域住民の厚い信仰心により修復され、現在も地域交流の重要な拠点として機能しています。
-</p>
-</div>
-</div>
-</div>
-<div class="grid md:grid-cols-2 gap-8">
-<div class="bg-white p-8 rounded-xl shadow-sm">
-<div class="flex items-center mb-4">
-<div class="w-10 h-10 flex items-center justify-center bg-red-100 rounded-lg mr-3">
-<i class="ri-ancient-gate-line text-red-600"></i>
-</div>
-<h4 class="text-xl font-semibold text-gray-900">旭丘穴守稲荷神社</h4>
-</div>
-<ul class="space-y-2 text-gray-700">
-<li><span class="font-semibold">所在地：</span>旭丘1-20-5</li>
-<li><span class="font-semibold">祭神：</span>倉稲魂命（ウカノミタマノミコト）</li>
-<li><span class="font-semibold">創建：</span>不詳（大正5年には鳥居が奉納済み）</li>
-<li><span class="font-semibold">ご利益：</span>商売繁昌、地域の繁栄祈願</li>
-</ul>
-</div>
-<div class="bg-white p-8 rounded-xl shadow-sm">
-<div class="flex items-center mb-4">
-<div class="w-10 h-10 flex items-center justify-center bg-pink-100 rounded-lg mr-3">
-<i class="ri-leaf-line text-pink-600"></i>
-</div>
-<h4 class="text-xl font-semibold text-gray-900">千川堤植桜楓碑</h4>
-</div>
-<p class="text-gray-700 leading-relaxed">
-大正4年（1915年）造立の石碑は、かつて千川上水沿いに咲き誇った「新小金井桜」の記憶を現代に伝える貴重な文化財です。練馬区の有形文化財に指定されており、地域の美しい自然環境の歴史を物語っています。
-</p>
-</div>
-</div>
-</div>
-</section>
+    <!-- 文化・史跡セクション -->
+    <section class="py-16">
+      <div class="max-w-6xl mx-auto px-6">
+        <div class="text-center mb-12">
+          <h3 class="text-3xl font-bold text-gray-900 mb-4">文化・史跡</h3>
+          <p class="text-gray-600">地域の歴史と信仰を今に伝える文化財</p>
+        </div>
+        
+        <div class="grid md:grid-cols-2 gap-8">
+          <!-- 江古田の富士塚 -->
+          <div class="bg-gradient-to-br from-red-50 to-orange-50 p-8 rounded-xl">
+            <h4 class="text-2xl font-bold text-gray-900 mb-6">江古田の富士塚</h4>
+            <div class="bg-white p-6 rounded-lg shadow-sm mb-6">
+              <div class="grid grid-cols-2 gap-4 mb-4">
+                <div>
+                  <div class="text-sm text-gray-600">指定文化財</div>
+                  <div class="font-semibold text-red-600">国指定重要有形民俗文化財</div>
+                </div>
+                <div>
+                  <div class="text-sm text-gray-600">規模</div>
+                  <div class="font-semibold">高さ約8m、直径約30m</div>
+                </div>
+              </div>
+              <div class="text-sm text-gray-600">
+                <p class="mb-2">築造：天保10年（1839年）</p>
+                <p>小竹丸祓講により建設</p>
+              </div>
+            </div>
+            <div class="prose text-gray-600">
+              <p class="text-sm">
+                江古田の富士塚は、江戸時代末期の天保10年（1839年）に築造されました。
+                富士信仰の集団である富士講の講員が交替で富士山登拝を行いましたが、
+                選ばれなかった者も江古田の富士塚に登拝することで同等のご利益を得られるとされました。
+              </p>
+              <p class="text-sm mt-3">
+                関東大震災（1923年）で一度倒壊しましたが、翌年には地域住民の厚い信仰心により修復工事が行われ、
+                現在の形状に復元されました。
+              </p>
+            </div>
+          </div>
 
-<section class="py-16">
-<div class="max-w-6xl mx-auto px-6">
-<div class="text-center mb-12">
-<h3 class="text-3xl font-bold text-gray-900 mb-4">生活環境</h3>
-<p class="text-gray-600">充実した施設で快適な暮らしをサポート</p>
-</div>
-<div class="grid md:grid-cols-3 gap-8 mb-8">
-<div class="bg-gradient-to-br from-red-100 to-red-200 p-8 rounded-xl text-center">
-<i class="ri-hospital-line text-5xl text-red-600 mb-4"></i>
-<h4 class="text-xl font-semibold text-gray-900 mb-3">医療機関</h4>
-<p class="text-gray-700">練馬総合病院<br>
-<span class="text-sm">224床・総合診療</span></p>
-</div>
-<div class="bg-gradient-to-br from-blue-100 to-blue-200 p-8 rounded-xl text-center">
-<i class="ri-shopping-cart-line text-5xl text-blue-600 mb-4"></i>
-<h4 class="text-xl font-semibold text-gray-900 mb-3">商業施設</h4>
-<p class="text-gray-700">江古田駅周辺<br>
-<span class="text-sm">日常生活に必要な店舗が充実</span></p>
-</div>
-<div class="bg-gradient-to-br from-green-100 to-green-200 p-8 rounded-xl text-center">
-<i class="ri-tree-line text-5xl text-green-600 mb-4"></i>
-<h4 class="text-xl font-semibold text-gray-900 mb-3">公園・緑地</h4>
-<p class="text-gray-700">旭丘なかよし緑地<br>
-<span class="text-sm">えごのみ児童遊園</span></p>
-</div>
-</div>
-<div class="bg-white rounded-xl shadow-sm p-8">
-<h4 class="text-xl font-semibold text-gray-900 mb-6 text-center">地価動向</h4>
-<div class="grid grid-cols-3 gap-8 text-center">
-<div>
-<div class="w-20 h-20 flex items-center justify-center bg-primary/10 rounded-full mx-auto mb-3">
-<i class="ri-money-yen-circle-line text-3xl text-primary"></i>
-</div>
-<p class="text-3xl font-bold text-primary">170万円</p>
-<p class="text-sm text-gray-600">現在価格（万円/坪）</p>
-</div>
-<div>
-<div class="w-20 h-20 flex items-center justify-center bg-green-100 rounded-full mx-auto mb-3">
-<i class="ri-arrow-up-line text-3xl text-green-600"></i>
-</div>
-<p class="text-3xl font-bold text-green-600">+3.7%</p>
-<p class="text-sm text-gray-600">10年前比</p>
-</div>
-<div>
-<div class="w-20 h-20 flex items-center justify-center bg-orange-100 rounded-full mx-auto mb-3">
-<i class="ri-arrow-down-line text-3xl text-orange-600"></i>
-</div>
-<p class="text-3xl font-bold text-orange-600">-7.6%</p>
-<p class="text-sm text-gray-600">10年後予想</p>
-</div>
-</div>
-</div>
-</div>
-</section>
+          <!-- 旭丘穴守稲荷神社 -->
+          <div class="bg-gradient-to-br from-blue-50 to-purple-50 p-8 rounded-xl">
+            <h4 class="text-2xl font-bold text-gray-900 mb-6">旭丘穴守稲荷神社</h4>
+            <div class="bg-white p-6 rounded-lg shadow-sm mb-6">
+              <div class="space-y-3">
+                <div>
+                  <div class="text-sm text-gray-600">所在地</div>
+                  <div class="font-semibold">旭丘1-20-5</div>
+                </div>
+                <div>
+                  <div class="text-sm text-gray-600">祭神</div>
+                  <div class="font-semibold">倉稲魂命（ウカノミタマノミコト）</div>
+                </div>
+                <div>
+                  <div class="text-sm text-gray-600">ご利益</div>
+                  <div class="font-semibold text-blue-600">商売繁昌、地域の繁栄祈願</div>
+                </div>
+              </div>
+            </div>
+            <div class="prose text-gray-600">
+              <p class="text-sm">
+                明治から大正期にかけて大田区羽田の穴守稲荷神社が大流行した背景を受け、
+                地域の町内会・商店会が商売繁昌を祈願して勧請したものと推測されます。
+              </p>
+              <p class="text-sm mt-3">
+                創建年代は不詳ですが、大正5年（1916年）には鳥居が奉納されていることから、
+                少なくとも100年以上の歴史を持つ由緒ある神社です。
+              </p>
+            </div>
+          </div>
+        </div>
 
-<section class="py-16 bg-gray-50">
-<div class="max-w-6xl mx-auto px-6">
-<div class="text-center mb-12">
-<h3 class="text-3xl font-bold text-gray-900 mb-4">コミュニティ・防災</h3>
-<p class="text-gray-600">安心・安全な地域づくりへの取り組み</p>
-</div>
-<div class="grid md:grid-cols-2 gap-8">
-<div class="bg-white p-8 rounded-xl shadow-sm">
-<div class="flex items-center mb-6">
-<div class="w-12 h-12 flex items-center justify-center bg-primary/10 rounded-lg mr-4">
-<i class="ri-community-line text-primary text-xl"></i>
-</div>
-<h4 class="text-xl font-semibold text-gray-900">旭丘地域集会所</h4>
-</div>
-<ul class="space-y-3 text-gray-700">
-<li class="flex items-start">
-<div class="w-2 h-2 bg-primary rounded-full mt-2 mr-3 flex-shrink-0"></div>
-<div><span class="font-semibold">所在地：</span>旭丘1-58-10</div>
-</li>
-<li class="flex items-start">
-<div class="w-2 h-2 bg-primary rounded-full mt-2 mr-3 flex-shrink-0"></div>
-<div><span class="font-semibold">アクセス：</span>江古田駅南口から徒歩5分</div>
-</li>
-<li class="flex items-start">
-<div class="w-2 h-2 bg-primary rounded-full mt-2 mr-3 flex-shrink-0"></div>
-<div><span class="font-semibold">施設構成：</span>
-<ul class="ml-4 mt-1">
-<li>• ホール（1F）：72㎡、定員60人</li>
-<li>• 集会室（2F）：43㎡、定員27人</li>
-<li>• 和室（3F）：69㎡、定員30人</li>
-</ul>
-</div>
-</li>
-</ul>
-</div>
-<div class="bg-white p-8 rounded-xl shadow-sm">
-<div class="flex items-center mb-6">
-<div class="w-12 h-12 flex items-center justify-center bg-red-100 rounded-lg mr-4">
-<i class="ri-shield-check-line text-red-600 text-xl"></i>
-</div>
-<h4 class="text-xl font-semibold text-gray-900">防災・安全対策</h4>
-</div>
-<ul class="space-y-3 text-gray-700">
-<li class="flex items-start">
-<div class="w-2 h-2 bg-red-500 rounded-full mt-2 mr-3 flex-shrink-0"></div>
-<div><span class="font-semibold">避難拠点：</span>
-<ul class="ml-4 mt-1">
-<li>• 旭丘小学校（震度5弱以上で開設）</li>
-<li>• 旭丘中学校（地域避難拠点）</li>
-</ul>
-</div>
-</li>
-<li class="flex items-start">
-<div class="w-2 h-2 bg-red-500 rounded-full mt-2 mr-3 flex-shrink-0"></div>
-<div><span class="font-semibold">安全対策：</span>
-<ul class="ml-4 mt-1">
-<li>• 江古田駅前交番による警備</li>
-<li>• 防災訓練の定期実施</li>
-</ul>
-</div>
-</li>
-</ul>
-</div>
-</div>
-</div>
-</section>
+        <!-- 千川堤植桜楓碑 -->
+        <div class="bg-gray-100 p-8 rounded-xl mt-8">
+          <div class="text-center mb-6">
+            <h4 class="text-xl font-bold text-gray-900">千川堤植桜楓碑</h4>
+            <p class="text-sm text-gray-600">大正4年造立・練馬区有形文化財</p>
+          </div>
+          <p class="text-gray-600 text-center">
+            かつての千川上水と美しい桜並木の記憶を現代に伝える貴重な石碑。
+            地域の歴史的変遷と文化的継承を物語る重要な文化遺産として、浅間神社境内に大切に保存されています。
+          </p>
+        </div>
+      </div>
+    </section>
 
-<section class="py-16">
-<div class="max-w-6xl mx-auto px-6">
-<div class="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-2xl p-12">
-<h3 class="text-3xl font-bold text-gray-900 mb-8 text-center">まとめ</h3>
-<div class="max-w-4xl mx-auto space-y-6 text-gray-700 leading-relaxed">
-<p>
-東京都練馬区旭丘は、0.411平方キロメートルという限られた面積の中に、豊かな歴史と現代的な利便性が共存する魅力的な地域です。江戸時代の新田開発から始まり、昭和35年の地名改称を経て現在の姿に至るまで、地域住民の愛着と誇りによって育まれてきました。
-</p>
-<p>
-交通利便性においては、西武池袋線江古田駅を中心として池袋まで約7分という都心へのアクセスの良さを誇り、バス路線も充実しています。教育環境では、令和8年開校予定の「みらい青空学園」による小中一貫教育の導入や、日本大学芸術学部の立地により、学生街としての活気と文化的雰囲気を醸成しています。
-</p>
-<p>
-文化・史跡面では、国指定重要有形民俗文化財である江古田の富士塚をはじめ、地域の信仰と文化を継承する神社・文化財が大切に保存されています。生活環境では、練馬総合病院による医療体制の充実、多様な商業施設の立地により、日常生活の利便性が高く保たれています。
-</p>
-<p>
-コミュニティ活動も活発で、旭丘地域集会所を拠点とした多世代交流や文化活動、防災訓練などが継続的に行われています。これらの要素が相互に作用し合い、住民の生活の質の向上と地域コミュニティの結束を支えています。旭丘は、都市部の利便性と地域コミュニティの温かさを両立させた、住みやすく魅力的な街として今後も発展していくことが期待されます。
-</p>
-</div>
-</div>
-</div>
-</section>
+    <!-- 生活環境セクション -->
+    <section class="py-16 bg-gray-50">
+      <div class="max-w-6xl mx-auto px-6">
+        <div class="text-center mb-12">
+          <h3 class="text-3xl font-bold text-gray-900 mb-4">生活環境</h3>
+          <p class="text-gray-600">充実した医療・商業施設で快適な暮らしをサポート</p>
+        </div>
 
-<footer class="bg-gray-900 text-white py-12">
-<div class="max-w-6xl mx-auto px-6">
-<div class="grid md:grid-cols-4 gap-8">
-<div>
-<div class="flex items-center space-x-3 mb-4">
-<div class="w-10 h-10 flex items-center justify-center bg-primary rounded-lg">
-<i class="ri-community-line text-white"></i>
-</div>
-<div>
-<h5 class="font-semibold">練馬区</h5>
-<p class="text-sm text-gray-400">旭丘一丁目町会</p>
-</div>
-</div>
-<p class="text-gray-400 text-sm">
-AI と共に築く新しい地域コミュニティ。すべての世代が参加しやすい町会活動を目指しています。
-</p>
-</div>
-<div>
-<h6 class="font-semibold mb-4">基本情報</h6>
-<div class="space-y-2 text-sm text-gray-400">
-<p>〒179-0071</p>
-<p>東京都練馬区旭丘1丁目</p>
-<p>TEL: 03-1234-5678</p>
-<p>FAX: 03-1234-5679</p>
-</div>
-</div>
-<div>
-<h6 class="font-semibold mb-4">リンク</h6>
-<div class="space-y-2 text-sm">
-<a href="#" class="text-gray-400 hover:text-white transition-colors block">プライバシーポリシー</a>
-<a href="#" class="text-gray-400 hover:text-white transition-colors block">サイトマップ</a>
-<a href="#" class="text-gray-400 hover:text-white transition-colors block">お問い合わせ</a>
-<a href="#" class="text-gray-400 hover:text-white transition-colors block">アクセス</a>
-</div>
-</div>
-<div>
-<h6 class="font-semibold mb-4">SNS</h6>
-<div class="flex space-x-3">
-<a href="#" class="w-8 h-8 flex items-center justify-center bg-gray-800 rounded hover:bg-gray-700 transition-colors">
-<i class="ri-facebook-fill"></i>
-</a>
-<a href="#" class="w-8 h-8 flex items-center justify-center bg-gray-800 rounded hover:bg-gray-700 transition-colors">
-<i class="ri-twitter-x-line"></i>
-</a>
-<a href="#" class="w-8 h-8 flex items-center justify-center bg-gray-800 rounded hover:bg-gray-700 transition-colors">
-<i class="ri-line-fill"></i>
-</a>
-</div>
-</div>
-</div>
-<div class="border-t border-gray-800 mt-8 pt-8 text-center text-sm text-gray-400">
-<p>本報告書は2025年1月現在の情報に基づいて作成されております。</p>
-<p class="mt-2">&copy; 2024 練馬区旭丘一丁目町会. All rights reserved.</p>
-</div>
-</div>
-</footer>
+        <div class="grid md:grid-cols-3 gap-8">
+          <!-- 医療機関 -->
+          <div class="bg-white p-6 rounded-xl shadow-sm">
+            <div class="flex items-center mb-4">
+              <div class="w-12 h-12 flex items-center justify-center bg-red-100 rounded-lg mr-4">
+                <i class="ri-hospital-line text-red-600 text-xl"></i>
+              </div>
+              <h4 class="text-xl font-semibold text-gray-900">医療機関</h4>
+            </div>
+            <div class="bg-red-50 p-4 rounded-lg mb-4">
+              <h5 class="font-semibold text-gray-900 mb-2">練馬総合病院</h5>
+              <ul class="text-sm text-gray-600 space-y-1">
+                <li>• 所在地：旭丘1-24-1</li>
+                <li>• 病床数：224床（一般病床）</li>
+                <li>• 江古田駅南口より徒歩約7分</li>
+              </ul>
+            </div>
+            <p class="text-sm text-gray-600">
+              内科、外科、整形外科、脳神経外科、産婦人科など幅広い診療科を有する地域の中核病院
+            </p>
+          </div>
 
-<script>
-document.addEventListener('DOMContentLoaded', function() {
-const mobileMenuBtn = document.getElementById('mobile-menu-btn');
-const mobileMenu = document.getElementById('mobile-menu');
-mobileMenuBtn.addEventListener('click', function() {
-mobileMenu.classList.toggle('hidden');
-});
-});
-</script>
-</body>
+          <!-- 商業施設 -->
+          <div class="bg-white p-6 rounded-xl shadow-sm">
+            <div class="flex items-center mb-4">
+              <div class="w-12 h-12 flex items-center justify-center bg-blue-100 rounded-lg mr-4">
+                <i class="ri-shopping-cart-line text-blue-600 text-xl"></i>
+              </div>
+              <h4 class="text-xl font-semibold text-gray-900">商業施設</h4>
+            </div>
+            <ul class="space-y-2 text-sm text-gray-600">
+              <li class="flex items-center">
+                <i class="ri-checkbox-circle-line text-primary mr-2"></i>
+                江古田ストアハウス
+              </li>
+              <li class="flex items-center">
+                <i class="ri-checkbox-circle-line text-primary mr-2"></i>
+                ウェルシア江古田店
+              </li>
+              <li class="flex items-center">
+                <i class="ri-checkbox-circle-line text-primary mr-2"></i>
+                マクドナルド江古田店
+              </li>
+              <li class="flex items-center">
+                <i class="ri-checkbox-circle-line text-primary mr-2"></i>
+                モスバーガー江古田旭丘店
+              </li>
+              <li class="flex items-center">
+                <i class="ri-checkbox-circle-line text-primary mr-2"></i>
+                ローソンストア100
+              </li>
+            </ul>
+          </div>
+
+          <!-- 公園・緑地 -->
+          <div class="bg-white p-6 rounded-xl shadow-sm">
+            <div class="flex items-center mb-4">
+              <div class="w-12 h-12 flex items-center justify-center bg-green-100 rounded-lg mr-4">
+                <i class="ri-plant-line text-green-600 text-xl"></i>
+              </div>
+              <h4 class="text-xl font-semibold text-gray-900">公園・緑地</h4>
+            </div>
+            <div class="space-y-3">
+              <div class="bg-green-50 p-3 rounded">
+                <h5 class="font-semibold text-gray-900">旭丘なかよし緑地</h5>
+                <p class="text-sm text-gray-600">面積：388.98㎡</p>
+                <p class="text-sm text-gray-600">所在地：旭丘1-54-7</p>
+              </div>
+              <div class="bg-green-50 p-3 rounded">
+                <h5 class="font-semibold text-gray-900">えごのみ児童遊園</h5>
+                <p class="text-sm text-gray-600">面積：412.13㎡</p>
+                <p class="text-sm text-gray-600">所在地：旭丘1-44-8</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 地価動向 -->
+        <div class="bg-gradient-to-r from-primary/10 to-secondary/10 p-8 rounded-xl mt-8">
+          <h4 class="text-xl font-semibold text-gray-900 mb-6 text-center">地価動向</h4>
+          <div class="grid md:grid-cols-3 gap-6 text-center">
+            <div>
+              <div class="text-3xl font-bold text-gray-900">170万円</div>
+              <div class="text-sm text-gray-600">現在価格（万円/坪）</div>
+            </div>
+            <div>
+              <div class="text-3xl font-bold text-green-600">+3.7%</div>
+              <div class="text-sm text-gray-600">10年前比</div>
+            </div>
+            <div>
+              <div class="text-3xl font-bold text-orange-600">-7.6%</div>
+              <div class="text-sm text-gray-600">10年後予想</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- コミュニティ・防災セクション -->
+    <section class="py-16">
+      <div class="max-w-6xl mx-auto px-6">
+        <div class="text-center mb-12">
+          <h3 class="text-3xl font-bold text-gray-900 mb-4">コミュニティ・防災</h3>
+          <p class="text-gray-600">地域の絆を深め、安全を守る活動</p>
+        </div>
+
+        <div class="grid md:grid-cols-2 gap-8">
+          <!-- 旭丘地域集会所 -->
+          <div>
+            <h4 class="text-xl font-semibold text-gray-900 mb-6">旭丘地域集会所</h4>
+            <div class="bg-white p-6 rounded-xl shadow-sm">
+              <div class="mb-4">
+                <p class="text-sm text-gray-600">所在地：旭丘1-58-10</p>
+                <p class="text-sm text-gray-600">アクセス：江古田駅南口から徒歩5分</p>
+                <p class="text-sm text-gray-600">利用時間：午前9時～午後9時30分</p>
+              </div>
+              <div class="space-y-3">
+                <div class="bg-gray-50 p-3 rounded">
+                  <h5 class="font-semibold text-gray-900">ホール（1F）</h5>
+                  <p class="text-sm text-gray-600">72㎡、定員60人</p>
+                </div>
+                <div class="bg-gray-50 p-3 rounded">
+                  <h5 class="font-semibold text-gray-900">集会室（2F）</h5>
+                  <p class="text-sm text-gray-600">43㎡、定員27人</p>
+                </div>
+                <div class="bg-gray-50 p-3 rounded">
+                  <h5 class="font-semibold text-gray-900">和室（3F）</h5>
+                  <p class="text-sm text-gray-600">69㎡、定員30人</p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- 防災・安全対策 -->
+          <div>
+            <h4 class="text-xl font-semibold text-gray-900 mb-6">防災・安全対策</h4>
+            <div class="space-y-4">
+              <div class="bg-red-50 p-6 rounded-xl">
+                <h5 class="font-semibold text-gray-900 mb-3">避難拠点</h5>
+                <ul class="space-y-2 text-sm text-gray-600">
+                  <li class="flex items-start">
+                    <i class="ri-map-pin-line text-red-600 mr-2 mt-0.5"></i>
+                    <div>
+                      <p class="font-semibold">旭丘小学校</p>
+                      <p>震度5弱以上で開設</p>
+                    </div>
+                  </li>
+                  <li class="flex items-start">
+                    <i class="ri-map-pin-line text-red-600 mr-2 mt-0.5"></i>
+                    <div>
+                      <p class="font-semibold">旭丘中学校</p>
+                      <p>地域避難拠点として機能</p>
+                    </div>
+                  </li>
+                </ul>
+              </div>
+              <div class="bg-blue-50 p-6 rounded-xl">
+                <h5 class="font-semibold text-gray-900 mb-3">安全対策</h5>
+                <ul class="space-y-2 text-sm text-gray-600">
+                  <li class="flex items-center">
+                    <i class="ri-shield-check-line text-blue-600 mr-2"></i>
+                    江古田駅前交番による警備
+                  </li>
+                  <li class="flex items-center">
+                    <i class="ri-shield-check-line text-blue-600 mr-2"></i>
+                    防災訓練の定期実施
+                  </li>
+                  <li class="flex items-center">
+                    <i class="ri-shield-check-line text-blue-600 mr-2"></i>
+                    不審者対応訓練
+                  </li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- まとめセクション -->
+    <section class="py-16 bg-gradient-to-b from-white to-gray-50">
+      <div class="max-w-6xl mx-auto px-6">
+        <div class="max-w-4xl mx-auto">
+          <h3 class="text-3xl font-bold text-gray-900 mb-8 text-center">まとめ</h3>
+          <div class="prose max-w-none text-gray-600 leading-relaxed">
+            <p class="mb-6">
+              東京都練馬区旭丘は、0.411平方キロメートルという限られた面積の中に、
+              豊かな歴史と現代的な利便性が共存する魅力的な地域です。
+              江戸時代の新田開発から始まり、昭和35年の地名改称を経て現在の姿に至るまで、
+              地域住民の愛着と誇りによって育まれてきました。
+            </p>
+            <p class="mb-6">
+              交通利便性においては、西武池袋線江古田駅を中心として池袋まで約7分という都心へのアクセスの良さを誇り、
+              バス路線も充実しています。教育環境では、令和8年開校予定の「みらい青空学園」による小中一貫教育の導入や、
+              日本大学芸術学部の立地により、学生街としての活気と文化的雰囲気を醸成しています。
+            </p>
+            <p class="mb-6">
+              文化・史跡面では、国指定重要有形民俗文化財である江古田の富士塚をはじめ、
+              地域の信仰と文化を継承する神社・文化財が大切に保存されています。
+              生活環境では、練馬総合病院による医療体制の充実、多様な商業施設の立地により、
+              日常生活の利便性が高く保たれています。
+            </p>
+            <p>
+              コミュニティ活動も活発で、旭丘地域集会所を拠点とした多世代交流や文化活動、
+              防災訓練などが継続的に行われています。これらの要素が相互に作用し合い、
+              住民の生活の質の向上と地域コミュニティの結束を支えています。
+              旭丘は、都市部の利便性と地域コミュニティの温かさを両立させた、
+              住みやすく魅力的な街として今後も発展していくことが期待されます。
+            </p>
+          </div>
+          <div class="bg-gray-100 p-6 rounded-xl mt-8 text-center">
+            <p class="text-sm text-gray-600">
+              本ページは2025年1月現在の情報に基づいて作成されております。<br>
+              詳細な最新情報については、各関係機関にお問い合わせください。
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- フッター -->
+    <footer class="bg-gray-900 text-white py-12">
+      <div class="max-w-6xl mx-auto px-6">
+        <div class="grid md:grid-cols-4 gap-8">
+          <div>
+            <div class="flex items-center space-x-3 mb-4">
+              <div
+                class="w-10 h-10 flex items-center justify-center bg-primary rounded-lg"
+              >
+                <i class="ri-community-line text-white"></i>
+              </div>
+              <div>
+                <h5 class="font-semibold">東京都練馬区</h5>
+                <p class="text-sm text-gray-400">旭丘一丁目町会</p>
+              </div>
+            </div>
+            <p class="text-gray-400 text-sm">
+              AI
+              と共に築く新しい地域コミュニティ。すべての世代が参加しやすい町会活動を目指しています。
+            </p>
+          </div>
+          <div>
+            <h6 class="font-semibold mb-4">基本情報</h6>
+            <div class="space-y-2 text-sm text-gray-400">
+              <p>〒179-0071</p>
+              <p>東京都練馬区旭丘1丁目</p>
+              <p>TEL: 03-1234-5678</p>
+              <p>FAX: 03-1234-5679</p>
+            </div>
+          </div>
+          <div>
+            <h6 class="font-semibold mb-4">リンク</h6>
+            <div class="space-y-2 text-sm">
+              <a
+                href="#"
+                class="text-gray-400 hover:text-white transition-colors block"
+                >プライバシーポリシー</a
+              >
+              <a
+                href="#"
+                class="text-gray-400 hover:text-white transition-colors block"
+                >サイトマップ</a
+              >
+              <a
+                href="#"
+                class="text-gray-400 hover:text-white transition-colors block"
+                >お問い合わせ</a
+              >
+              <a
+                href="#"
+                class="text-gray-400 hover:text-white transition-colors block"
+                >アクセス</a
+              >
+            </div>
+          </div>
+          <div>
+            <h6 class="font-semibold mb-4">SNS</h6>
+            <div class="flex space-x-3">
+              <a
+                href="#"
+                class="w-8 h-8 flex items-center justify-center bg-gray-800 rounded hover:bg-gray-700 transition-colors"
+              >
+                <i class="ri-facebook-fill"></i>
+              </a>
+              <a
+                href="#"
+                class="w-8 h-8 flex items-center justify-center bg-gray-800 rounded hover:bg-gray-700 transition-colors"
+              >
+                <i class="ri-twitter-x-line"></i>
+              </a>
+              <a
+                href="#"
+                class="w-8 h-8 flex items-center justify-center bg-gray-800 rounded hover:bg-gray-700 transition-colors"
+              >
+                <i class="ri-line-fill"></i>
+              </a>
+            </div>
+          </div>
+        </div>
+        <div
+          class="border-t border-gray-800 mt-8 pt-8 text-center text-sm text-gray-400"
+        >
+          <p>&copy; 2024 東京都練馬区旭丘一丁目町会. All rights reserved.</p>
+        </div>
+      </div>
+    </footer>
+
+    <script id="mobile-menu-script">
+      document.addEventListener("DOMContentLoaded", function () {
+        const mobileMenuBtn = document.getElementById("mobile-menu-btn");
+        const mobileMenu = document.getElementById("mobile-menu");
+        mobileMenuBtn.addEventListener("click", function () {
+          mobileMenu.classList.toggle("hidden");
+        });
+      });
+    </script>
+  </body>
 </html>
