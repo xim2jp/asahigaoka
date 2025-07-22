@@ -144,11 +144,11 @@
 ## 5. システム構成
 
 ### 5.1 技術スタック
-- **フロントエンド**: Next.js, React, Tailwind CSS
-- **バックエンド**: Node.js, Express
-- **AI/ML**: OpenAI API, LangChain
-- **データベース**: PostgreSQL, Redis
-- **インフラ**: AWS or Google Cloud
+- **フロントエンド**: すべて静的なコンテンツとし、外部依存しない形で、HTML+CSS+JSで構成する、
+- **バックエンド**: 動的な要素は、Difyサービスを利用しノーコードで補う データベースアクセスはaws lambda 
+- **AI/ML**: Claude 4 sonnet
+- **データベース**: AWS Dynamo
+- **インフラ**: AWS
 - **SNS連携**: LINE Messaging API, Twitter API
 
 ### 5.2 外部連携
