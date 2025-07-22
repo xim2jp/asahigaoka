@@ -1,0 +1,113 @@
+name: Deploy to GitHub Pages
+
+on:
+  pull_request:
+    branches:
+      - main
+    types:
+      - opened
+      - synchronize
+      - reopened
+  push:
+    branches:
+      - main
+
+permissions:
+  contents: write
+  pages: write
+  id-token: write
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Git
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+
+      - name: Create or update gh-pages branch
+        run: |
+          # Check if gh-pages branch exists
+          if git ls-remote --heads origin gh-pages | grep gh-pages; then
+            echo "gh-pages branch exists, checking it out"
+            git checkout gh-pages
+            git pull origin gh-pages
+          else
+            echo "Creating gh-pages branch"
+            git checkout --orphan gh-pages
+          fi
+
+      - name: Sync with main branch
+        run: |
+          # Remove all files from gh-pages
+          git rm -rf . || true
+          
+          # Checkout all files from main branch
+          git checkout main -- .
+          
+          # Remove workflow files from gh-pages to avoid recursive triggers
+          rm -rf .github/workflows
+          
+          # Add all files
+          git add -A
+          
+          # Commit changes if there are any
+          if git diff --staged --quiet; then
+            echo "No changes to commit"
+          else
+            git commit -m "Deploy from main branch - ${{ github.event.pull_request.head.sha || github.sha }}"
+          fi
+
+      - name: Push to gh-pages
+        run: |
+          git push origin gh-pages --force
+
+      - name: Add PR comment with preview URL (PR only)
+        if: github.event_name == 'pull_request'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const prNumber = context.issue.number;
+            const owner = context.repo.owner;
+            const repo = context.repo.repo;
+            
+            // Get the GitHub Pages URL
+            const pagesUrl = `https://${owner}.github.io/${repo}/`;
+            
+            const comment = `🚀 **Preview deployed!**\n\nYour changes have been deployed to GitHub Pages:\n${pagesUrl}\n\n_Note: It may take a few minutes for GitHub Pages to update._`;
+            
+            // Check if we already commented
+            const comments = await github.rest.issues.listComments({
+              owner,
+              repo,
+              issue_number: prNumber,
+            });
+            
+            const botComment = comments.data.find(comment => 
+              comment.user.type === 'Bot' && 
+              comment.body.includes('Preview deployed!')
+            );
+            
+            if (botComment) {
+              // Update existing comment
+              await github.rest.issues.updateComment({
+                owner,
+                repo,
+                comment_id: botComment.id,
+                body: comment,
+              });
+            } else {
+              // Create new comment
+              await github.rest.issues.createComment({
+                owner,
+                repo,
+                issue_number: prNumber,
+                body: comment,
+              });
+            }
