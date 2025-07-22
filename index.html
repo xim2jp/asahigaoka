@@ -4,16 +4,14 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>練馬区旭丘一丁目町会</title>
-<script src="https://cdn.tailwindcss.com/3.4.16"></script>
+<link rel="stylesheet" href="css/tailwind.min.css">
 <script>tailwind.config={theme:{extend:{colors:{primary:'#57b5e7',secondary:'#8dd3c7'},borderRadius:{'none':'0px','sm':'4px',DEFAULT:'8px','md':'12px','lg':'16px','xl':'20px','2xl':'24px','3xl':'32px','full':'9999px','button':'8px'}}}}</script>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Pacifico&display=swap" rel="stylesheet">
-<link href="https://cdnjs.cloudflare.com/ajax/libs/remixicon/4.6.0/remixicon.min.css" rel="stylesheet">
+<link href="css/google-fonts-pacifico.css" rel="stylesheet">
+<link href="css/remixicon.min.css" rel="stylesheet">
 <style>
 :where([class^="ri-"])::before { content: "\f3c2"; }
 .hero-bg {
-background-image: url('https://static.readdy.ai/image/f92efd6e70f0f252a135c1c10bbdceb1/12f3915b93d021be0672bd38c6039a57.jfif');
+background-image: url('images/hero-background.jfif');
 background-size: cover;
 background-position: center;
 position: relative;
@@ -124,7 +122,7 @@ z-index: 1;
 </div>
 <div class="relative">
 <div class="aspect-[4/5] rounded-xl overflow-hidden bg-gray-100 sticky top-24">
-<img src="https://static.readdy.ai/image/f92efd6e70f0f252a135c1c10bbdceb1/56ef5f1156827bb0567c83725efaf82a.png" alt="町会長" class="w-full h-full object-cover">
+<img src="images/president-photo.png" alt="町会長" class="w-full h-full object-cover">
 </div>
 <div class="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/60 to-transparent p-6">
 <p class="text-white font-semibold">会長</p>
@@ -254,7 +252,7 @@ z-index: 1;
 <p class="text-gray-600">町会の範囲と主要施設をご確認いただけます</p>
 </div>
 <div class="relative rounded-xl overflow-hidden shadow-sm">
-<div class="aspect-[16/9] bg-cover bg-center" style="background-image: url('https://public.readdy.ai/gen_page/map_placeholder_1280x720.png')"></div>
+<div class="aspect-[16/9] bg-cover bg-center" style="background-image: url('images/map-placeholder.png')"></div>
 <div class="absolute top-4 left-4 bg-white/90 backdrop-blur-sm p-4 rounded-lg shadow-sm">
 <h4 class="font-semibold text-gray-900 mb-2">主要施設</h4>
 <ul class="space-y-2 text-sm text-gray-600">
@@ -473,7 +471,9 @@ z-index: 1;
 </div>
 <div class="grid md:grid-cols-3 gap-8">
 <div class="bg-white rounded-xl shadow-sm overflow-hidden">
-<div class="h-48 bg-cover bg-center" style="background-image: url('https://readdy.ai/api/search-image?query=japanese%20community%20festival%20with%20families%20enjoying%20traditional%20games%20and%20food%20stalls%2C%20children%20playing%20happily%2C%20elderly%20people%20smiling%2C%20warm%20community%20atmosphere%2C%20cherry%20blossom%20decorations%2C%20local%20neighborhood%20festival%20in%20Tokyo&width=400&height=300&seq=activity001&orientation=landscape')"></div>
+<div class="h-48 bg-gradient-to-br from-pink-100 to-pink-200 flex items-center justify-center">
+<i class="ri-community-line text-4xl text-pink-600"></i>
+</div>
 <div class="p-6">
 <h4 class="text-xl font-semibold text-gray-900 mb-3">地域交流イベント</h4>
 <p class="text-gray-600 mb-4">季節ごとのお祭りや交流会を通じて、世代を超えた地域のつながりを深めています。</p>
@@ -486,7 +486,9 @@ z-index: 1;
 </div>
 </div>
 <div class="bg-white rounded-xl shadow-sm overflow-hidden">
-<div class="h-48 bg-cover bg-center" style="background-image: url('https://readdy.ai/api/search-image?query=japanese%20community%20disaster%20preparedness%20training%20with%20residents%20practicing%20emergency%20procedures%2C%20safety%20equipment%20demonstration%2C%20local%20fire%20department%20instructors%2C%20serious%20but%20supportive%20atmosphere%2C%20community%20center%20setting&width=400&height=300&seq=activity002&orientation=landscape')"></div>
+<div class="h-48 bg-gradient-to-br from-red-100 to-red-200 flex items-center justify-center">
+<i class="ri-shield-check-line text-4xl text-red-600"></i>
+</div>
 <div class="p-6">
 <h4 class="text-xl font-semibold text-gray-900 mb-3">防災・防犯活動</h4>
 <p class="text-gray-600 mb-4">定期的な防災訓練や見回り活動で、安心・安全な街づくりに取り組んでいます。</p>
@@ -499,7 +501,9 @@ z-index: 1;
 </div>
 </div>
 <div class="bg-white rounded-xl shadow-sm overflow-hidden">
-<div class="h-48 bg-cover bg-center" style="background-image: url('https://readdy.ai/api/search-image?query=japanese%20community%20environmental%20cleanup%20activity%20with%20volunteers%20of%20all%20ages%20cleaning%20local%20park%20and%20streets%2C%20wearing%20matching%20vests%2C%20collecting%20trash%2C%20beautiful%20clean%20neighborhood%2C%20teamwork%20and%20cooperation&width=400&height=300&seq=activity003&orientation=landscape')"></div>
+<div class="h-48 bg-gradient-to-br from-green-100 to-green-200 flex items-center justify-center">
+<i class="ri-leaf-line text-4xl text-green-600"></i>
+</div>
 <div class="p-6">
 <h4 class="text-xl font-semibold text-gray-900 mb-3">環境美化活動</h4>
 <p class="text-gray-600 mb-4">地域の清掃活動や緑化推進で、美しい住環境の維持に努めています。</p>
