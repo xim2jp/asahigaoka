@@ -5,8 +5,16 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <base href="./">
 <title>練馬区旭丘一丁目町会</title>
-<link rel="stylesheet" href="./css/tailwind.min.css">
-<script>tailwind.config={theme:{extend:{colors:{primary:'#57b5e7',secondary:'#8dd3c7'},borderRadius:{'none':'0px','sm':'4px',DEFAULT:'8px','md':'12px','lg':'16px','xl':'20px','2xl':'24px','3xl':'32px','full':'9999px','button':'8px'}}}}</script>
+<!-- Tailwind CSS v4 CDN -->
+<script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+<!-- Custom Tailwind Configuration -->
+<style type="text/tailwindcss">
+  @theme {
+    --color-primary: #57b5e7;
+    --color-secondary: #8dd3c7;
+    --radius-button: 8px;
+  }
+</style>
 <link href="./css/google-fonts-pacifico.css" rel="stylesheet">
 <link href="./css/remixicon.min.css" rel="stylesheet">
 <style>
@@ -37,7 +45,7 @@ z-index: 1;
 <nav class="w-full px-6 py-4">
 <div class="flex items-center justify-between">
 <div class="flex items-center space-x-3">
-<div class="w-12 h-12 flex items-center justify-center bg-primary rounded-lg">
+<div class="w-12 h-12 flex items-center justify-center bg-[--color-primary] rounded-lg">
 <i class="ri-community-line text-white text-xl"></i>
 </div>
 <div>
@@ -46,11 +54,11 @@ z-index: 1;
 </div>
 </div>
 <div class="hidden md:flex items-center space-x-8">
-<a href="#" class="text-gray-700 hover:text-primary transition-colors">ホーム</a>
-<a href="#" class="text-gray-700 hover:text-primary transition-colors">お知らせ</a>
-<a href="#" class="text-gray-700 hover:text-primary transition-colors">活動カレンダー</a>
-<a href="#" class="text-gray-700 hover:text-primary transition-colors">町会について</a>
-<a href="#" class="text-gray-700 hover:text-primary transition-colors">お問い合わせ</a>
+<a href="#" class="text-gray-700 hover:text-[--color-primary] transition-colors">ホーム</a>
+<a href="#" class="text-gray-700 hover:text-[--color-primary] transition-colors">お知らせ</a>
+<a href="#" class="text-gray-700 hover:text-[--color-primary] transition-colors">活動カレンダー</a>
+<a href="#" class="text-gray-700 hover:text-[--color-primary] transition-colors">町会について</a>
+<a href="#" class="text-gray-700 hover:text-[--color-primary] transition-colors">お問い合わせ</a>
 </div>
 <button class="md:hidden w-10 h-10 flex items-center justify-center" id="mobile-menu-btn">
 <i class="ri-menu-line text-xl"></i>
@@ -58,11 +66,11 @@ z-index: 1;
 </div>
 <div class="md:hidden mt-4 hidden" id="mobile-menu">
 <div class="flex flex-col space-y-3 py-4 border-t">
-<a href="#" class="text-gray-700 hover:text-primary transition-colors">ホーム</a>
-<a href="#" class="text-gray-700 hover:text-primary transition-colors">お知らせ</a>
-<a href="#" class="text-gray-700 hover:text-primary transition-colors">活動カレンダー</a>
-<a href="#" class="text-gray-700 hover:text-primary transition-colors">町会について</a>
-<a href="#" class="text-gray-700 hover:text-primary transition-colors">お問い合わせ</a>
+<a href="#" class="text-gray-700 hover:text-[--color-primary] transition-colors">ホーム</a>
+<a href="#" class="text-gray-700 hover:text-[--color-primary] transition-colors">お知らせ</a>
+<a href="#" class="text-gray-700 hover:text-[--color-primary] transition-colors">活動カレンダー</a>
+<a href="#" class="text-gray-700 hover:text-[--color-primary] transition-colors">町会について</a>
+<a href="#" class="text-gray-700 hover:text-[--color-primary] transition-colors">お問い合わせ</a>
 </div>
 </div>
 </nav>
@@ -72,7 +80,7 @@ z-index: 1;
 <div class="max-w-6xl mx-auto">
 <div class="max-w-2xl">
 <h2 class="text-6xl font-bold mb-6 leading-tight">
-<span class="text-primary">ネット社会と共に築く</span><br>
+<span class="text-[--color-primary]">ネット社会と共に築く</span><br>
 <span class="text-gray-600">新しい地域コミュニティ</span><br>
 <span class="text-gray-900 text-7xl mt-4 block whitespace-nowrap">練馬区旭丘一丁目町会</span>
 </h2>
@@ -81,21 +89,21 @@ z-index: 1;
 </p>
 <div class="space-y-6">
 <div class="flex flex-col sm:flex-row gap-4">
-<button class="bg-primary text-white px-8 py-4 !rounded-button font-semibold hover:bg-blue-600 transition-colors whitespace-nowrap">
+<button class="bg-[--color-primary] text-white px-8 py-4 rounded-[--radius-button] font-semibold hover:bg-blue-600 transition-colors whitespace-nowrap">
 町会に参加する
 </button>
-<button class="border-2 border-primary text-primary px-8 py-4 !rounded-button font-semibold hover:bg-primary hover:text-white transition-colors whitespace-nowrap">
+<button class="border-2 border-[--color-primary] text-[--color-primary] px-8 py-4 rounded-[--radius-button] font-semibold hover:bg-[--color-primary] hover:text-white transition-colors whitespace-nowrap">
 活動を見る
 </button>
 </div>
 <div class="flex items-center gap-4">
-<a href="#" class="flex items-center gap-2 text-gray-600 hover:text-primary transition-colors">
+<a href="#" class="flex items-center gap-2 text-gray-600 hover:text-[--color-primary] transition-colors">
 <div class="w-10 h-10 flex items-center justify-center bg-white/90 backdrop-blur-sm rounded-full shadow-sm">
 <i class="ri-line-fill text-xl"></i>
 </div>
 <span class="text-sm font-medium">公式 LINE</span>
 </a>
-<a href="#" class="flex items-center gap-2 text-gray-600 hover:text-primary transition-colors">
+<a href="#" class="flex items-center gap-2 text-gray-600 hover:text-[--color-primary] transition-colors">
 <div class="w-10 h-10 flex items-center justify-center bg-white/90 backdrop-blur-sm rounded-full shadow-sm">
 <i class="ri-twitter-x-line text-xl"></i>
 </div>
@@ -119,7 +127,7 @@ z-index: 1;
 国指定重要有形民俗文化財の江古田の富士塚や、かつて千川上水沿いに咲き誇った「新小金井桜」の記憶を伝える千川堤植桜楓碑など、地域の歴史と文化を今に伝える貴重な文化財が大切に保存されています。令和8年には小中一貫教育校「みらい青空学園」の開校も予定され、新しい時代に向けた街づくりが進んでいます。
 </p>
 <div class="text-right mt-6">
-<a href="town.html" class="inline-flex items-center text-primary hover:text-blue-700 font-semibold">
+<a href="town.html" class="inline-flex items-center text-[--color-primary] hover:text-blue-700 font-semibold">
 詳しく見る
 <i class="ri-arrow-right-line ml-2"></i>
 </a>
@@ -157,108 +165,108 @@ z-index: 1;
 <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
 <div class="bg-white p-6 rounded-xl shadow-sm">
 <h5 class="font-semibold text-gray-900 mb-4 flex items-center">
-<i class="ri-team-line mr-2 text-primary"></i>
+<i class="ri-team-line mr-2 text-[--color-primary]"></i>
 執行部
 </h5>
 <ul class="space-y-3 text-gray-600">
 <li class="flex items-center">
-<div class="w-2 h-2 bg-primary rounded-full mr-2"></div>
+<div class="w-2 h-2 bg-[--color-primary] rounded-full mr-2"></div>
 会長（防災）：野口 文江
 </li>
 <li class="flex items-center">
-<div class="w-2 h-2 bg-primary rounded-full mr-2"></div>
+<div class="w-2 h-2 bg-[--color-primary] rounded-full mr-2"></div>
 副会長（環境）：天野 一雄
 </li>
 <li class="flex items-center">
-<div class="w-2 h-2 bg-primary rounded-full mr-2"></div>
+<div class="w-2 h-2 bg-[--color-primary] rounded-full mr-2"></div>
 副会長（防犯）：細野 一夫
 </li>
 <li class="flex items-center">
-<div class="w-2 h-2 bg-primary rounded-full mr-2"></div>
+<div class="w-2 h-2 bg-[--color-primary] rounded-full mr-2"></div>
 副会長（会計）：飯塚 富美
 </li>
 <li class="flex items-center">
-<div class="w-2 h-2 bg-primary rounded-full mr-2"></div>
+<div class="w-2 h-2 bg-[--color-primary] rounded-full mr-2"></div>
 総務：木下 利三郎
 </li>
 <li class="flex items-center">
-<div class="w-2 h-2 bg-primary rounded-full mr-2"></div>
+<div class="w-2 h-2 bg-[--color-primary] rounded-full mr-2"></div>
 庶務：井口 博史
 </li>
 <li class="flex items-center">
-<div class="w-2 h-2 bg-primary rounded-full mr-2"></div>
+<div class="w-2 h-2 bg-[--color-primary] rounded-full mr-2"></div>
 会計：磨山 敏郎
 </li>
 <li class="flex items-center">
-<div class="w-2 h-2 bg-primary rounded-full mr-2"></div>
+<div class="w-2 h-2 bg-[--color-primary] rounded-full mr-2"></div>
 監査：田口 泰治
 </li>
 <li class="flex items-center">
-<div class="w-2 h-2 bg-primary rounded-full mr-2"></div>
+<div class="w-2 h-2 bg-[--color-primary] rounded-full mr-2"></div>
 監査：矢崎 一郎
 </li>
 </ul>
 </div>
 <div class="bg-white p-6 rounded-xl shadow-sm">
 <h5 class="font-semibold text-gray-900 mb-4 flex items-center">
-<i class="ri-building-line mr-2 text-primary"></i>
+<i class="ri-building-line mr-2 text-[--color-primary]"></i>
 部長・副部長
 </h5>
 <ul class="space-y-3 text-gray-600">
 <li class="flex items-center">
-<div class="w-2 h-2 bg-primary rounded-full mr-2"></div>
+<div class="w-2 h-2 bg-[--color-primary] rounded-full mr-2"></div>
 第1部部長：前崎 裕弘
 </li>
 <li class="flex items-center">
-<div class="w-2 h-2 bg-primary rounded-full mr-2"></div>
+<div class="w-2 h-2 bg-[--color-primary] rounded-full mr-2"></div>
 第2部部長：一ノ瀬 裕之
 </li>
 <li class="flex items-center">
-<div class="w-2 h-2 bg-primary rounded-full mr-2"></div>
+<div class="w-2 h-2 bg-[--color-primary] rounded-full mr-2"></div>
 第3部副部長：本間 善保
 </li>
 <li class="flex items-center">
-<div class="w-2 h-2 bg-primary rounded-full mr-2"></div>
+<div class="w-2 h-2 bg-[--color-primary] rounded-full mr-2"></div>
 第4部部長：白澤 聡一
 </li>
 <li class="flex items-center">
-<div class="w-2 h-2 bg-primary rounded-full mr-2"></div>
+<div class="w-2 h-2 bg-[--color-primary] rounded-full mr-2"></div>
 第4部副部長：畑中 裕司
 </li>
 </ul>
 </div>
 <div class="bg-white p-6 rounded-xl shadow-sm">
 <h5 class="font-semibold text-gray-900 mb-4 flex items-center">
-<i class="ri-women-line mr-2 text-primary"></i>
+<i class="ri-women-line mr-2 text-[--color-primary]"></i>
 女性会委員
 </h5>
 <ul class="space-y-3 text-gray-600">
 <li class="flex items-center">
-<div class="w-2 h-2 bg-primary rounded-full mr-2"></div>
+<div class="w-2 h-2 bg-[--color-primary] rounded-full mr-2"></div>
 三好 一恵
 </li>
 <li class="flex items-center">
-<div class="w-2 h-2 bg-primary rounded-full mr-2"></div>
+<div class="w-2 h-2 bg-[--color-primary] rounded-full mr-2"></div>
 玉木 美保子
 </li>
 <li class="flex items-center">
-<div class="w-2 h-2 bg-primary rounded-full mr-2"></div>
+<div class="w-2 h-2 bg-[--color-primary] rounded-full mr-2"></div>
 高山 直子
 </li>
 <li class="flex items-center">
-<div class="w-2 h-2 bg-primary rounded-full mr-2"></div>
+<div class="w-2 h-2 bg-[--color-primary] rounded-full mr-2"></div>
 本橋 よし子
 </li>
 <li class="flex items-center">
-<div class="w-2 h-2 bg-primary rounded-full mr-2"></div>
+<div class="w-2 h-2 bg-[--color-primary] rounded-full mr-2"></div>
 瀧島 君江
 </li>
 <li class="flex items-center">
-<div class="w-2 h-2 bg-primary rounded-full mr-2"></div>
+<div class="w-2 h-2 bg-[--color-primary] rounded-full mr-2"></div>
 渡辺 奈央子
 </li>
 <li class="flex items-center">
-<div class="w-2 h-2 bg-primary rounded-full mr-2"></div>
+<div class="w-2 h-2 bg-[--color-primary] rounded-full mr-2"></div>
 堅持
 </li>
 </ul>
@@ -322,10 +330,10 @@ z-index: 1;
 <div class="bg-gradient-to-r from-white to-[#F8FBFF] p-6 rounded-lg shadow-sm border">
 <div class="flex items-start space-x-3">
 <div class="w-6 h-6 flex items-center justify-center">
-<i class="ri-calendar-event-line text-primary"></i>
+<i class="ri-calendar-event-line text-[--color-primary]"></i>
 </div>
 <div>
-<span class="bg-primary text-white px-2 py-1 rounded text-xs font-semibold">イベント</span>
+<span class="bg-[--color-primary] text-white px-2 py-1 rounded text-xs font-semibold">イベント</span>
 <h4 class="font-semibold text-gray-900 mt-2">年末餅つき大会開催</h4>
 <p class="text-sm text-gray-600 mt-2">12月28日（土）に恒例の餅つき大会を開催します。ご家族でお楽しみください。</p>
 <span class="text-xs text-gray-500 mt-3 block">2024年11月28日</span>
@@ -335,10 +343,10 @@ z-index: 1;
 <div class="bg-white p-6 rounded-lg shadow-sm border">
 <div class="flex items-start space-x-3">
 <div class="w-6 h-6 flex items-center justify-center">
-<i class="ri-information-line text-secondary"></i>
+<i class="ri-information-line text-[--color-secondary]"></i>
 </div>
 <div>
-<span class="bg-secondary text-white px-2 py-1 rounded text-xs font-semibold">お知らせ</span>
+<span class="bg-[--color-secondary] text-white px-2 py-1 rounded text-xs font-semibold">お知らせ</span>
 <h4 class="font-semibold text-gray-900 mt-2">AI アシスタント導入完了</h4>
 <p class="text-sm text-gray-600 mt-2">町会専用 AI アシスタントが稼働開始しました。お気軽にご質問ください。</p>
 <span class="text-xs text-gray-500 mt-3 block">2024年11月25日</span>
@@ -355,7 +363,7 @@ z-index: 1;
 <p class="text-gray-600">12月の町会活動予定をご確認ください</p>
 </div>
 <div class="bg-white rounded-xl shadow-sm border overflow-hidden">
-<div class="bg-primary text-white p-4">
+<div class="bg-[--color-primary] text-white p-4">
 <div class="flex items-center justify-between">
 <h4 class="text-xl font-semibold">2024年12月</h4>
 <div class="flex space-x-2">
@@ -467,9 +475,9 @@ z-index: 1;
 <div class="h-20 p-2 border rounded">
 <div class="text-sm font-semibold">27</div>
 </div>
-<div class="h-20 p-2 border rounded bg-primary/10">
+<div class="h-20 p-2 border rounded bg-[--color-primary]/10">
 <div class="text-sm font-semibold">28</div>
-<div class="text-xs text-primary mt-1">餅つき大会</div>
+<div class="text-xs text-[--color-primary] mt-1">餅つき大会</div>
 </div>
 <div class="h-20 p-2 border rounded">
 <div class="text-sm font-semibold">29</div>
@@ -548,7 +556,7 @@ z-index: 1;
 </div>
 <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
 <div class="bg-gradient-to-br from-[#E0F4FF] to-[#B9E7FF] p-6 rounded-xl text-center">
-<div class="w-16 h-16 flex items-center justify-center bg-primary text-white rounded-full mx-auto mb-4 shadow-lg">
+<div class="w-16 h-16 flex items-center justify-center bg-[--color-primary] text-white rounded-full mx-auto mb-4 shadow-lg">
 <i class="ri-parent-line text-2xl"></i>
 </div>
 <h4 class="text-lg font-semibold text-gray-900 mb-2">子育て世代</h4>
@@ -667,7 +675,7 @@ z-index: 1;
 <div class="grid md:grid-cols-4 gap-8">
 <div>
 <div class="flex items-center space-x-3 mb-4">
-<div class="w-10 h-10 flex items-center justify-center bg-primary rounded-lg">
+<div class="w-10 h-10 flex items-center justify-center bg-[--color-primary] rounded-lg">
 <i class="ri-community-line text-white"></i>
 </div>
 <div>
@@ -718,12 +726,12 @@ AI と共に築く新しい地域コミュニティ。すべての世代が参�
 </div>
 </footer>
 <div class="fixed bottom-6 right-6 z-50">
-<button class="w-16 h-16 bg-primary text-white rounded-full shadow-lg hover:bg-blue-600 transition-all duration-300 flex items-center justify-center" id="ai-chat-btn">
+<button class="w-16 h-16 bg-[--color-primary] text-white rounded-full shadow-lg hover:bg-blue-600 transition-all duration-300 flex items-center justify-center" id="ai-chat-btn">
 <i class="ri-robot-line text-2xl"></i>
 </button>
 </div>
 <div class="fixed bottom-24 right-6 w-80 bg-white rounded-xl shadow-2xl border hidden z-50" id="ai-chat-window">
-<div class="bg-primary text-white p-4 rounded-t-xl">
+<div class="bg-[--color-primary] text-white p-4 rounded-t-xl">
 <div class="flex items-center justify-between">
 <div class="flex items-center space-x-2">
 <div class="w-8 h-8 flex items-center justify-center bg-white/20 rounded-full">
@@ -741,8 +749,8 @@ AI と共に築く新しい地域コミュニティ。すべての世代が参�
 </div>
 <div class="h-80 p-4 overflow-y-auto" id="chat-messages">
 <div class="flex items-start space-x-2 mb-4">
-<div class="w-8 h-8 flex items-center justify-center bg-primary/10 rounded-full flex-shrink-0">
-<i class="ri-robot-line text-primary text-sm"></i>
+<div class="w-8 h-8 flex items-center justify-center bg-[--color-primary]/10 rounded-full flex-shrink-0">
+<i class="ri-robot-line text-[--color-primary] text-sm"></i>
 </div>
 <div class="bg-gray-100 p-3 rounded-lg max-w-xs">
 <p class="text-sm">こんにちは！町会 AI アシスタントです。町会活動や地域情報について、お気軽にお尋ねください。</p>
@@ -752,7 +760,7 @@ AI と共に築く新しい地域コミュニティ。すべての世代が参�
 <div class="p-4 border-t">
 <div class="flex space-x-2">
 <input type="text" placeholder="メッセージを入力..." class="flex-1 px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent" id="chat-input">
-<button class="w-10 h-10 flex items-center justify-center bg-primary text-white rounded-lg hover:bg-blue-600 transition-colors" id="send-message">
+<button class="w-10 h-10 flex items-center justify-center bg-[--color-primary] text-white rounded-lg hover:bg-blue-600 transition-colors" id="send-message">
 <i class="ri-send-plane-line"></i>
 </button>
 </div>
@@ -787,7 +795,7 @@ if (message) {
 const userMessageDiv = document.createElement('div');
 userMessageDiv.className = 'flex justify-end mb-4';
 userMessageDiv.innerHTML = `
-<div class="bg-primary text-white p-3 rounded-lg max-w-xs">
+<div class="bg-[--color-primary] text-white p-3 rounded-lg max-w-xs">
 <p class="text-sm">${message}</p>
 </div>
 `;
@@ -796,8 +804,8 @@ setTimeout(() => {
 const aiResponseDiv = document.createElement('div');
 aiResponseDiv.className = 'flex items-start space-x-2 mb-4';
 aiResponseDiv.innerHTML = `
-<div class="w-8 h-8 flex items-center justify-center bg-primary/10 rounded-full flex-shrink-0">
-<i class="ri-robot-line text-primary text-sm"></i>
+<div class="w-8 h-8 flex items-center justify-center bg-[--color-primary]/10 rounded-full flex-shrink-0">
+<i class="ri-robot-line text-[--color-primary] text-sm"></i>
 </div>
 <div class="bg-gray-100 p-3 rounded-lg max-w-xs">
 <p class="text-sm">ご質問ありがとうございます。町会の活動についてお答えします。詳細は担当者にお繋ぎすることも可能です。</p>
