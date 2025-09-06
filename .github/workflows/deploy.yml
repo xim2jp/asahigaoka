@@ -33,7 +33,11 @@ jobs:
             --exclude "node_modules/*" \
             --exclude "package*.json" \
             --exclude "Dockerfile" \
-            --exclude "docker-compose.yml"
+            --exclude "docker-compose.yml" \
+            --exclude "misc/*" \
+            --exclude "mics/*" \
+            --exclude "database/*" \
+            --exclude "docs/*"
       
       - name: Invalidate CloudFront
         run: |
