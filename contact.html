@@ -1,0 +1,466 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>お問い合わせ - 東京都練馬区旭丘一丁目町会</title>
+    <script src="https://cdn.tailwindcss.com/3.4.16"></script>
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            colors: { primary: "#57b5e7", secondary: "#8dd3c7" },
+            borderRadius: {
+              none: "0px",
+              sm: "4px",
+              DEFAULT: "8px",
+              md: "12px",
+              lg: "16px",
+              xl: "20px",
+              "2xl": "24px",
+              "3xl": "32px",
+              full: "9999px",
+              button: "8px",
+            },
+          },
+        },
+      };
+    </script>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Pacifico&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      href="https://cdnjs.cloudflare.com/ajax/libs/remixicon/4.6.0/remixicon.min.css"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="css/template.css" />
+    <link rel="stylesheet" href="css/contact.css" />
+  </head>
+  <body class="bg-white">
+    <!-- ヘッダー -->
+    <header class="bg-white shadow-sm sticky top-0 z-50">
+      <nav class="w-full px-6 py-4">
+        <div class="flex items-center justify-between">
+          <div class="flex items-center space-x-3">
+            <div
+              class="w-12 h-12 flex items-center justify-center bg-primary rounded-lg"
+            >
+              <i class="ri-community-line text-white text-xl"></i>
+            </div>
+            <div>
+              <h1 class="text-xl font-bold text-gray-900">
+                東京都練馬区旭丘一丁目町会
+              </h1>
+              <p class="text-sm text-gray-600">
+                みんなでつくる安心・安全なまち
+              </p>
+            </div>
+          </div>
+          <div class="hidden md:flex items-center space-x-8">
+            <a
+              href="index.html"
+              class="text-gray-700 hover:text-primary transition-colors"
+              >ホーム</a
+            >
+            <a
+              href="news.html"
+              class="text-gray-700 hover:text-primary transition-colors"
+              >お知らせ</a
+            >
+            <a
+              href="calendar.html"
+              class="text-gray-700 hover:text-primary transition-colors"
+              >活動カレンダー</a
+            >
+            <a
+              href="about.html"
+              class="text-gray-700 hover:text-primary transition-colors"
+              >町会について</a
+            >
+            <a
+              href="contact.html"
+              class="text-primary hover:text-primary transition-colors"
+              >お問い合わせ</a
+            >
+          </div>
+          <button
+            class="md:hidden w-10 h-10 flex items-center justify-center"
+            id="mobile-menu-btn"
+          >
+            <i class="ri-menu-line text-xl"></i>
+          </button>
+        </div>
+        <div class="md:hidden mt-4 hidden" id="mobile-menu">
+          <div class="flex flex-col space-y-3 py-4 border-t">
+            <a
+              href="index.html"
+              class="text-gray-700 hover:text-primary transition-colors"
+              >ホーム</a
+            >
+            <a
+              href="news.html"
+              class="text-gray-700 hover:text-primary transition-colors"
+              >お知らせ</a
+            >
+            <a
+              href="calendar.html"
+              class="text-gray-700 hover:text-primary transition-colors"
+              >活動カレンダー</a
+            >
+            <a
+              href="about.html"
+              class="text-gray-700 hover:text-primary transition-colors"
+              >町会について</a
+            >
+            <a
+              href="contact.html"
+              class="text-primary hover:text-primary transition-colors"
+              >お問い合わせ</a
+            >
+          </div>
+        </div>
+      </nav>
+    </header>
+
+    <!-- ページヒーローセクション -->
+    <section class="page-hero">
+      <div class="page-hero-content">
+        <div>
+          <h2 class="page-title">お問い合わせ</h2>
+          <p class="page-subtitle">町会へのご質問・ご意見・ご要望をお待ちしております</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- メインコンテンツ -->
+    <main>
+      <section class="py-16">
+        <div class="max-w-6xl mx-auto px-6">
+          <div class="text-center mb-12">
+            <p class="text-lg text-gray-600">
+              東京都練馬区旭丘一丁目町会へのお問い合わせは、<br class="md:hidden">
+              以下の方法からお選びください。
+            </p>
+          </div>
+
+          <!-- 連絡方法カード -->
+          <div class="grid md:grid-cols-3 gap-8 mb-16">
+            <!-- メール -->
+            <div class="bg-white rounded-xl shadow-lg hover:shadow-xl transition-shadow p-8 text-center">
+              <div class="w-20 h-20 bg-gradient-to-br from-primary to-blue-600 rounded-full flex items-center justify-center mx-auto mb-6">
+                <i class="ri-mail-line text-3xl text-white"></i>
+              </div>
+              <h3 class="text-xl font-bold text-gray-900 mb-3">メール</h3>
+              <p class="text-gray-600 mb-6">
+                24時間受付中<br>
+                2〜3営業日以内に返信
+              </p>
+              <a href="mailto:block1@asahigaoka-nerima.tokyo" class="inline-block">
+                <div class="text-primary font-semibold mb-4">block1@asahigaoka-nerima.tokyo</div>
+                <button class="bg-primary text-white px-6 py-3 rounded-lg hover:bg-blue-600 transition-colors">
+                  メールを送る
+                </button>
+              </a>
+            </div>
+
+            <!-- LINE -->
+            <div class="bg-white rounded-xl shadow-lg hover:shadow-xl transition-shadow p-8 text-center">
+              <div class="w-20 h-20 bg-gradient-to-br from-[#00C300] to-[#00B900] rounded-full flex items-center justify-center mx-auto mb-6">
+                <i class="ri-line-fill text-3xl text-white"></i>
+              </div>
+              <h3 class="text-xl font-bold text-gray-900 mb-3">LINE公式アカウント</h3>
+              <p class="text-gray-600 mb-6">
+                AI「あさひくん」が<br>
+                24時間対応
+              </p>
+              <div class="text-[#00C300] font-semibold mb-4">@619ynqur</div>
+              <div class="mb-4">
+                <img src="https://qr-official.line.me/gs/M_619ynqur_GW.png?oat_content=qr" alt="LINE QRコード" class="w-32 h-32 mx-auto border-2 border-gray-200 rounded-lg p-2">
+              </div>
+              <a href="https://line.me/R/ti/p/@619ynqur" target="_blank" class="inline-block">
+                <button class="bg-[#00C300] text-white px-6 py-3 rounded-lg hover:bg-[#00B900] transition-colors">
+                  友だち追加
+                </button>
+              </a>
+            </div>
+
+            <!-- X (Twitter) -->
+            <div class="bg-white rounded-xl shadow-lg hover:shadow-xl transition-shadow p-8 text-center">
+              <div class="w-20 h-20 bg-gradient-to-br from-gray-900 to-gray-700 rounded-full flex items-center justify-center mx-auto mb-6">
+                <i class="ri-twitter-x-line text-3xl text-white"></i>
+              </div>
+              <h3 class="text-xl font-bold text-gray-900 mb-3">X（旧Twitter）</h3>
+              <p class="text-gray-600 mb-6">
+                最新情報を発信中<br>
+                DMでもお問い合わせ可
+              </p>
+              <a href="https://x.com/b1_asahigaoka" target="_blank" class="inline-block">
+                <div class="text-gray-700 font-semibold mb-4">@b1_asahigaoka</div>
+                <button class="bg-gray-900 text-white px-6 py-3 rounded-lg hover:bg-gray-700 transition-colors">
+                  Xでフォロー
+                </button>
+              </a>
+            </div>
+          </div>
+
+          <!-- お問い合わせ時のお願い -->
+          <div class="bg-yellow-50 border-l-4 border-yellow-400 p-6 rounded-lg mb-12">
+            <h3 class="text-lg font-bold text-gray-900 mb-3">
+              <i class="ri-information-line text-yellow-600 mr-2"></i>
+              お問い合わせの際のお願い
+            </h3>
+            <ul class="space-y-2 text-gray-700">
+              <li class="flex items-start">
+                <i class="ri-checkbox-circle-line text-yellow-600 mr-2 mt-1"></i>
+                <span>お問い合わせ内容によっては、返信にお時間をいただく場合がございます。</span>
+              </li>
+              <li class="flex items-start">
+                <i class="ri-checkbox-circle-line text-yellow-600 mr-2 mt-1"></i>
+                <span>本町会は代表電話番号はございませんので、直接のお電話での対応は行っておりません。<br />緊急の際は、お手数ですが、LINE公式アカウントまたはX（旧Twitter）でのお問い合わせをお願いいたします。<br />
+                また、以下の地域集会所に詰め人がいる可能性があります。</span>
+              </li>
+              <li class="flex items-start">
+                <i class="ri-checkbox-circle-line text-yellow-600 mr-2 mt-1"></i>
+                <span>いただいた個人情報は、お問い合わせへの対応のみに使用いたします。</span>
+              </li>
+            </ul>
+          </div>
+
+          <!-- 旭丘地域集会所情報 -->
+          <div class="bg-gray-50 rounded-xl p-8">
+            <h3 class="text-2xl font-bold text-gray-900 mb-6 text-center">旭丘地域集会所</h3>
+            <p class="text-center text-gray-600 mb-8">
+              地域の活動拠点として、町会関連のお問い合わせも承っております
+            </p>
+            <div class="grid md:grid-cols-2 gap-8">
+              <div>
+                <div class="space-y-4">
+                  <div class="flex items-start">
+                    <i class="ri-map-pin-line text-primary text-xl mr-3 mt-1"></i>
+                    <div>
+                      <p class="font-semibold text-gray-900">所在地</p>
+                      <p class="text-gray-600">〒176-0005 東京都練馬区旭丘1丁目58番10号</p>
+                    </div>
+                  </div>
+                  <div class="flex items-start">
+                    <i class="ri-phone-line text-primary text-xl mr-3 mt-1"></i>
+                    <div>
+                      <p class="font-semibold text-gray-900">電話番号</p>
+                      <p class="text-gray-600">03-3950-4842</p>
+                    </div>
+                  </div>
+                  <div class="flex items-start">
+                    <i class="ri-time-line text-primary text-xl mr-3 mt-1"></i>
+                    <div>
+                      <p class="font-semibold text-gray-900">開館時間</p>
+                      <p class="text-gray-600">午前9時〜午後9時30分</p>
+                      <p class="text-sm text-gray-500 mt-1">※午後5時以降は利用状況により変動</p>
+                    </div>
+                  </div>
+                  <div class="flex items-start">
+                    <i class="ri-calendar-close-line text-primary text-xl mr-3 mt-1"></i>
+                    <div>
+                      <p class="font-semibold text-gray-900">休館日</p>
+                      <p class="text-gray-600">年末年始（12月29日〜1月3日）</p>
+                    </div>
+                  </div>
+                  <div class="flex items-start">
+                    <i class="ri-train-line text-primary text-xl mr-3 mt-1"></i>
+                    <div>
+                      <p class="font-semibold text-gray-900">アクセス</p>
+                      <p class="text-gray-600">西武池袋線「江古田駅」南口から徒歩5分</p>
+                      <p class="text-sm text-gray-500 mt-1">※駐車場はございません</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div>
+                <!-- Google Maps埋め込み -->
+                <iframe 
+                  src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3238.3584014797847!2d139.67077731525995!3d35.74211698017673!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x6018ee4e4e9e5555%3A0x1234567890abcdef!2z5p2x5Lqs6YO957e06aas5Yy65pev5LiY77yR5LiB55uu77yV77yY4oiS77yR77yQ!5e0!3m2!1sja!2sjp!4v1234567890"
+                  width="100%" 
+                  height="300" 
+                  style="border:0;" 
+                  allowfullscreen="" 
+                  loading="lazy" 
+                  referrerpolicy="no-referrer-when-downgrade"
+                  class="rounded-lg">
+                </iframe>
+              </div>
+            </div>
+            <div class="mt-6 p-4 bg-blue-50 rounded-lg">
+              <p class="text-sm text-gray-700">
+                <i class="ri-information-line text-blue-600 mr-2"></i>
+                <span class="font-semibold">受付時間：</span>午前9時〜午後5時（月〜金、祝休日・年末年始を除く）
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <!-- フッター -->
+    <footer class="bg-gray-900 text-white py-12">
+      <div class="max-w-6xl mx-auto px-6">
+        <div class="grid md:grid-cols-4 gap-8">
+          <div>
+            <div class="flex items-center space-x-3 mb-4">
+              <div
+                class="w-10 h-10 flex items-center justify-center bg-primary rounded-lg"
+              >
+                <i class="ri-community-line text-white"></i>
+              </div>
+              <div>
+                <h5 class="font-semibold">東京都練馬区</h5>
+                <p class="text-sm text-gray-400">旭丘一丁目町会</p>
+              </div>
+            </div>
+            <p class="text-gray-400 text-sm">
+              AI
+              と共に築く新しい地域コミュニティ。すべての世代が参加しやすい町会活動を目指しています。
+            </p>
+          </div>
+          <div>
+            <h6 class="font-semibold mb-4">基本情報</h6>
+            <div class="space-y-2 text-sm text-gray-400">
+              <p>〒179-0071</p>
+              <p>東京都練馬区旭丘1丁目</p>
+              <p>TEL: 03-3950-4842（旭丘地域集会所）</p>
+              <p>Email: block1@asahigaoka-nerima.tokyo</p>
+            </div>
+          </div>
+          <div>
+            <h6 class="font-semibold mb-4">リンク</h6>
+            <div class="space-y-2 text-sm">
+              <a
+                href="privacy.html"
+                class="text-gray-400 hover:text-white transition-colors block"
+                >プライバシーポリシー</a
+              >
+              <a
+                href="sitemap.html"
+                class="text-gray-400 hover:text-white transition-colors block"
+                >サイトマップ</a
+              >
+              <a
+                href="contact.html"
+                class="text-gray-400 hover:text-white transition-colors block"
+                >お問い合わせ</a
+              >
+              <a
+                href="access.html"
+                class="text-gray-400 hover:text-white transition-colors block"
+                >アクセス</a
+              >
+            </div>
+          </div>
+          <div>
+            <h6 class="font-semibold mb-4">SNS</h6>
+            <div class="flex space-x-3">
+              <a
+                href="https://www.facebook.com/b1.asahigaoka"
+                target="_blank"
+                class="w-8 h-8 flex items-center justify-center bg-gray-800 rounded hover:bg-gray-700 transition-colors"
+              >
+                <i class="ri-facebook-fill"></i>
+              </a>
+              <a
+                href="https://x.com/b1_asahigaoka"
+                target="_blank"
+                class="w-8 h-8 flex items-center justify-center bg-gray-800 rounded hover:bg-gray-700 transition-colors"
+              >
+                <i class="ri-twitter-x-line"></i>
+              </a>
+              <a
+                href="https://line.me/R/ti/p/@619ynqur"
+                target="_blank"
+                class="w-8 h-8 flex items-center justify-center bg-gray-800 rounded hover:bg-gray-700 transition-colors"
+              >
+                <i class="ri-line-fill"></i>
+              </a>
+            </div>
+          </div>
+        </div>
+        <div
+          class="border-t border-gray-800 mt-8 pt-8 text-center text-sm text-gray-400"
+        >
+          <p>&copy; 2024 東京都練馬区旭丘一丁目町会. All rights reserved.</p>
+        </div>
+      </div>
+    </footer>
+
+    <!-- AIチャットボット -->
+    <div class="fixed bottom-6 right-6 z-50">
+      <button
+        class="w-16 h-16 bg-primary text-white rounded-full shadow-lg hover:bg-blue-600 transition-all duration-300 flex items-center justify-center"
+        id="ai-chat-btn"
+      >
+        <i class="ri-robot-line text-2xl"></i>
+      </button>
+    </div>
+    <div
+      class="fixed bottom-24 right-6 w-80 bg-white rounded-xl shadow-2xl border hidden z-50"
+      id="ai-chat-window"
+    >
+      <div class="bg-primary text-white p-4 rounded-t-xl">
+        <div class="flex items-center justify-between">
+          <div class="flex items-center space-x-2">
+            <div
+              class="w-8 h-8 flex items-center justify-center bg-white/20 rounded-full"
+            >
+              <i class="ri-robot-line"></i>
+            </div>
+            <div>
+              <h6 class="font-semibold">町会 AI アシスタント</h6>
+              <p class="text-xs opacity-90">オンライン</p>
+            </div>
+          </div>
+          <button
+            class="w-6 h-6 flex items-center justify-center hover:bg-white/20 rounded"
+            id="close-chat"
+          >
+            <i class="ri-close-line"></i>
+          </button>
+        </div>
+      </div>
+      <div class="h-80 p-4 overflow-y-auto" id="chat-messages">
+        <div class="flex items-start space-x-2 mb-4">
+          <div
+            class="w-8 h-8 flex items-center justify-center bg-primary/10 rounded-full flex-shrink-0"
+          >
+            <i class="ri-robot-line text-primary text-sm"></i>
+          </div>
+          <div class="bg-gray-100 p-3 rounded-lg max-w-xs">
+            <p class="text-sm">
+              こんにちは！町会 AI
+              アシスタントです。町会活動や地域情報について、お気軽にお尋ねください。
+            </p>
+          </div>
+        </div>
+      </div>
+      <div class="p-4 border-t">
+        <div class="flex space-x-2">
+          <input
+            type="text"
+            placeholder="メッセージを入力..."
+            class="flex-1 px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
+            id="chat-input"
+          />
+          <button
+            class="w-10 h-10 flex items-center justify-center bg-primary text-white rounded-lg hover:bg-blue-600 transition-colors"
+            id="send-message"
+          >
+            <i class="ri-send-plane-line"></i>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- JavaScript -->
+    <script src="js/template.js"></script>
+    <script src="js/contact.js"></script>
+  </body>
+</html>

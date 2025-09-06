@@ -1,0 +1,157 @@
+/* テンプレート用共通スタイル */
+
+/* Remixiconの修正 */
+:where([class^="ri-"])::before { 
+  content: "\f3c2"; 
+}
+
+/* ページヒーローセクション */
+.page-hero {
+  background-image: url('https://static.readdy.ai/image/f92efd6e70f0f252a135c1c10bbdceb1/12f3915b93d021be0672bd38c6039a57.jfif');
+  background-size: cover;
+  background-position: center;
+  min-height: 400px;
+  display: flex;
+  align-items: center;
+  position: relative;
+}
+
+.page-hero::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(135deg, rgba(255,255,255,0.9) 0%, rgba(255,255,255,0.7) 50%, rgba(255,255,255,0.3) 100%);
+}
+
+.page-hero-content {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  padding: 0 24px;
+}
+
+.page-hero-content > div {
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.page-title {
+  font-size: 3rem;
+  font-weight: bold;
+  color: #111827;
+  margin-bottom: 1.5rem;
+  line-height: 1.2;
+}
+
+.page-subtitle {
+  font-size: 1.25rem;
+  color: #4b5563;
+  max-width: 800px;
+  line-height: 1.8;
+}
+
+/* レスポンシブ対応 */
+@media (max-width: 768px) {
+  .page-hero {
+    min-height: 300px;
+  }
+  
+  .page-title {
+    font-size: 2rem;
+  }
+  
+  .page-subtitle {
+    font-size: 1rem;
+  }
+}
+
+/* その他の共通スタイル */
+.section-title {
+  font-size: 2rem;
+  font-weight: bold;
+  color: #111827;
+  margin-bottom: 1rem;
+  text-align: center;
+}
+
+.section-subtitle {
+  font-size: 1rem;
+  color: #6b7280;
+  text-align: center;
+  margin-bottom: 3rem;
+}
+
+/* カード共通スタイル */
+.card {
+  background: white;
+  border-radius: 12px;
+  padding: 24px;
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+  transition: all 0.3s ease;
+}
+
+.card:hover {
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+  transform: translateY(-2px);
+}
+
+/* ボタン共通スタイル */
+.btn-primary {
+  background: linear-gradient(135deg, #57b5e7 0%, #4FA0D0 100%);
+  color: white;
+  padding: 12px 24px;
+  border-radius: 8px;
+  font-weight: 600;
+  transition: all 0.3s ease;
+  display: inline-block;
+  text-decoration: none;
+  border: none;
+  cursor: pointer;
+}
+
+.btn-primary:hover {
+  background: linear-gradient(135deg, #4FA0D0 0%, #4590C0 100%);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 6px rgba(87, 181, 231, 0.3);
+}
+
+.btn-secondary {
+  background: white;
+  color: #57b5e7;
+  padding: 12px 24px;
+  border-radius: 8px;
+  font-weight: 600;
+  transition: all 0.3s ease;
+  display: inline-block;
+  text-decoration: none;
+  border: 2px solid #57b5e7;
+  cursor: pointer;
+}
+
+.btn-secondary:hover {
+  background: #57b5e7;
+  color: white;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 6px rgba(87, 181, 231, 0.3);
+}
+
+/* コンテンツコンテナ */
+.content-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 24px;
+}
+
+/* セクション間隔 */
+.section-spacing {
+  padding: 64px 0;
+}
+
+@media (max-width: 768px) {
+  .section-spacing {
+    padding: 48px 0;
+  }
+}
