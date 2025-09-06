@@ -1,0 +1,7 @@
+# このファイルをterraform.tfvarsにコピーして使用してください
+# cp terraform.tfvars.example terraform.tfvars
+
+# AWSの認証情報は環境変数で設定することを推奨します：
+# export AWS_ACCESS_KEY_ID="your-access-key"
+# export AWS_SECRET_ACCESS_KEY="your-secret-key"
+# export AWS_DEFAULT_REGION="ap-northeast-1"

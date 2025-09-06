@@ -1,0 +1,51 @@
+name: Deploy to S3
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ap-northeast-1
+      
+      - name: Sync to S3
+        run: |
+          aws s3 sync . s3://asahigaoka-nerima-tokyo/ \
+            --delete \
+            --exclude "*.md" \
+            --exclude ".*" \
+            --exclude ".*/*" \
+            --exclude ".git/*" \
+            --exclude ".github/*" \
+            --exclude "terraform/*" \
+            --exclude "node_modules/*" \
+            --exclude "package*.json" \
+            --exclude "Dockerfile" \
+            --exclude "docker-compose.yml"
+      
+      - name: Invalidate CloudFront
+        run: |
+          DISTRIBUTION_ID=$(aws cloudfront list-distributions \
+            --query "DistributionList.Items[?Aliases.Items[?contains(@, 'asahigaoka-nerima.tokyo')]].Id" \
+            --output text)
+          
+          if [ ! -z "$DISTRIBUTION_ID" ]; then
+            aws cloudfront create-invalidation \
+              --distribution-id $DISTRIBUTION_ID \
+              --paths "/*"
+            echo "CloudFront cache invalidated for distribution: $DISTRIBUTION_ID"
+          else
+            echo "CloudFront distribution not found"
+          fi
