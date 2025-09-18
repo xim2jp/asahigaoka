@@ -1,0 +1,451 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>災害時の行動マニュアル - 東京都練馬区旭丘一丁目町会</title>
+    <script src="https://cdn.tailwindcss.com/3.4.16"></script>
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            colors: { primary: "#57b5e7", secondary: "#8dd3c7" },
+            borderRadius: {
+              none: "0px",
+              sm: "4px",
+              DEFAULT: "8px",
+              md: "12px",
+              lg: "16px",
+              xl: "20px",
+              "2xl": "24px",
+              "3xl": "32px",
+              full: "9999px",
+              button: "8px",
+            },
+          },
+        },
+      };
+    </script>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Pacifico&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      href="https://cdnjs.cloudflare.com/ajax/libs/remixicon/4.6.0/remixicon.min.css"
+      rel="stylesheet"
+    />
+  </head>
+  <body class="bg-white">
+    <header class="bg-white shadow-sm sticky top-0 z-50">
+      <nav class="w-full px-6 py-4">
+        <div class="flex items-center justify-between">
+          <div class="flex items-center space-x-3">
+            <div
+              class="w-12 h-12 flex items-center justify-center bg-primary rounded-lg"
+            >
+              <i class="ri-community-line text-white text-xl"></i>
+            </div>
+            <div>
+              <h1 class="text-xl font-bold text-gray-900">
+                東京都練馬区旭丘一丁目町会
+              </h1>
+              <p class="text-sm text-gray-600">みんなでつくる安心・安全なまち</p>
+            </div>
+          </div>
+          <div class="hidden md:flex items-center space-x-8">
+            <a
+              href="index.html"
+              class="text-gray-700 hover:text-primary transition-colors"
+              >ホーム</a
+            >
+            <a
+              href="news.html"
+              class="text-gray-700 hover:text-primary transition-colors"
+              >お知らせ</a
+            >
+            <a
+              href="reports.html"
+              class="text-gray-700 hover:text-primary transition-colors"
+              >事業資料</a
+            >
+            <a
+              href="town.html"
+              class="text-gray-700 hover:text-primary transition-colors"
+              >町会について</a
+            >
+            <a
+              href="antidisaster_index.html"
+              class="text-primary hover:text-primary transition-colors font-semibold"
+              >災害特集</a
+            >
+            <a
+              href="contact.html"
+              class="text-gray-700 hover:text-primary transition-colors"
+              >お問い合わせ</a
+            >
+          </div>
+          <button
+            class="md:hidden w-10 h-10 flex items-center justify-center"
+            id="mobile-menu-btn"
+          >
+            <i class="ri-menu-line text-xl"></i>
+          </button>
+        </div>
+        <div class="md:hidden mt-4 hidden" id="mobile-menu">
+          <div class="flex flex-col space-y-3 py-4 border-t">
+            <a
+              href="index.html"
+              class="text-gray-700 hover:text-primary transition-colors"
+              >ホーム</a
+            >
+            <a
+              href="news.html"
+              class="text-gray-700 hover:text-primary transition-colors"
+              >お知らせ</a
+            >
+            <a
+              href="reports.html"
+              class="text-gray-700 hover:text-primary transition-colors"
+              >事業資料</a
+            >
+            <a
+              href="town.html"
+              class="text-gray-700 hover:text-primary transition-colors"
+              >町会について</a
+            >
+            <a
+              href="antidisaster_index.html"
+              class="text-primary hover:text-primary transition-colors font-semibold"
+              >災害特集</a
+            >
+            <a
+              href="contact.html"
+              class="text-gray-700 hover:text-primary transition-colors"
+              >お問い合わせ</a
+            >
+          </div>
+        </div>
+      </nav>
+    </header>
+
+    <main>
+      <section class="relative overflow-hidden">
+        <div class="absolute inset-0">
+          <img
+            src="images/antidisaster-action.png"
+            alt="地震時の行動フローチャート"
+            class="w-full h-full object-cover"
+          />
+          <div class="absolute inset-0 bg-gradient-to-r from-indigo-900/80 via-indigo-800/70 to-sky-500/60"></div>
+        </div>
+        <div class="relative px-6 py-20">
+          <div class="max-w-5xl mx-auto text-white">
+            <p class="uppercase tracking-[0.4em] text-sm mb-4">ACTION PLAN</p>
+            <h2 class="text-4xl md:text-5xl font-bold leading-tight mb-6">
+              災害時の行動マニュアル
+            </h2>
+            <p class="text-lg md:text-xl text-white/90 leading-relaxed">
+              地震発生直後から避難所運営まで。旭丘一丁目町会がまとめた時間軸別アクションと、
+              安否確認班・医療・情報伝達の体制を紹介します。
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <section class="py-16 bg-white">
+        <div class="max-w-6xl mx-auto px-6">
+          <h3 class="text-2xl md:text-3xl font-bold text-gray-900">発災から72時間の行動フローチャート</h3>
+          <p class="text-gray-700 mt-4 md:max-w-4xl">
+            総務省消防庁が推奨する流れに基づき、旭丘一丁目町会向けに細分化しました。余震に注意しながら、安全第一で進めましょう。
+          </p>
+
+          <div class="mt-10 grid gap-8">
+            <div class="border border-gray-200 rounded-2xl p-6 shadow-sm">
+              <div class="flex items-center gap-4">
+                <div class="w-12 h-12 flex items-center justify-center bg-primary/10 text-primary rounded-full text-xl font-semibold">
+                  0〜10分
+                </div>
+                <h4 class="text-xl font-semibold text-gray-900">身の安全確保と初期消火</h4>
+              </div>
+              <ul class="mt-4 space-y-3 text-sm text-gray-700">
+                <li>・揺れを感じたらテーブルの下などに身を隠し、頭部を保護。</li>
+                <li>・揺れが収まったら火元を確認し、可能ならすぐ消火。火が大きい場合は安全確保を優先。</li>
+                <li>・家族の安否を確認し、ケガ人がいれば応急手当を実施。</li>
+                <li>・ブレーカー・ガス元栓を閉め、靴を履いて足元を保護。</li>
+              </ul>
+            </div>
+
+            <div class="border border-gray-200 rounded-2xl p-6 shadow-sm">
+              <div class="flex items-center gap-4">
+                <div class="w-12 h-12 flex items-center justify-center bg-primary/10 text-primary rounded-full text-xl font-semibold">
+                  10〜30分
+                </div>
+                <h4 class="text-xl font-semibold text-gray-900">近隣との安否確認・救出</h4>
+              </div>
+              <ul class="mt-4 space-y-3 text-sm text-gray-700">
+                <li>・家族や隣近所と声を掛け合い、要支援者や独居高齢者の状況を確認。</li>
+                <li>・倒壊家屋や閉じ込めがあれば、複数人でバール等を利用し救助（無理はしない）。</li>
+                <li>・屋外へ避難する際はブロック塀やガラスに注意し、広い道路側を歩く。</li>
+                <li>・避難判断を家族で共有し、非常持出袋を携えて徒歩避難の準備。</li>
+              </ul>
+            </div>
+
+            <div class="border border-gray-200 rounded-2xl p-6 shadow-sm">
+              <div class="flex items-center gap-4">
+                <div class="w-12 h-12 flex items-center justify-center bg-primary/10 text-primary rounded-full text-xl font-semibold">
+                  30〜120分
+                </div>
+                <h4 class="text-xl font-semibold text-gray-900">指定避難所へ移動・情報集約</h4>
+              </div>
+              <ul class="mt-4 space-y-3 text-sm text-gray-700">
+                <li>・徒歩で旭丘小学校または旭丘中学校へ。避難前に戸締りを確認。</li>
+                <li>・避難所到着後は受付で家族構成と健康状態を伝え、町会安否確認班へ状況を共有。</li>
+                <li>・ペットは指定エリアで管理。飼い主責任で用品を持参。</li>
+                <li>・避難所で配布される情報掲示板や防災無線から最新情報を入手。</li>
+              </ul>
+            </div>
+
+            <div class="border border-gray-200 rounded-2xl p-6 shadow-sm">
+              <div class="flex items-center gap-4">
+                <div class="w-12 h-12 flex items-center justify-center bg-primary/10 text-primary rounded-full text-xl font-semibold">
+                  2〜72時間
+                </div>
+                <h4 class="text-xl font-semibold text-gray-900">避難所運営・情報伝達・共助活動</h4>
+              </div>
+              <ul class="mt-4 space-y-3 text-sm text-gray-700">
+                <li>・避難所運営に協力し、物資配布や清掃など役割分担を行う。</li>
+                <li>・町会災害対策本部と連絡を取り、安否情報を集約。ねりま情報メール・防災ラジオで行政情報を確認。</li>
+                <li>・給水ステーションや炊き出しについて、町会からの連絡に従う。</li>
+                <li>・広域避難が必要な場合は、江古田の森公園や武蔵大学方面へ移動し消防等の指示を受ける。</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="py-16 bg-gray-50">
+        <div class="max-w-6xl mx-auto px-6">
+          <div class="grid lg:grid-cols-2 gap-10 items-start">
+            <div>
+              <h3 class="text-2xl font-bold text-gray-900">町会の連絡体制</h3>
+              <p class="text-gray-700 mt-4">
+                旭丘一丁目町会は冗長化された連絡網で情報を共有します。電話連絡網→メール・SNS→トランシーバー→徒歩伝達の順に切り替え、確実に情報を届けます。
+              </p>
+              <ul class="mt-6 space-y-3 text-sm text-gray-700">
+                <li class="flex items-start gap-3">
+                  <i class="ri-phone-line text-primary text-lg"></i>
+                  <span>町会役員・班長の連絡先リストを毎年度更新。深夜でも連絡可能な体制を整備。</span>
+                </li>
+                <li class="flex items-start gap-3">
+                  <i class="ri-walk-line text-primary text-lg"></i>
+                  <span>通信障害時には班長が徒歩で各戸を巡回し状況を報告。</span>
+                </li>
+                <li class="flex items-start gap-3">
+                  <i class="ri-survey-line text-primary text-lg"></i>
+                  <span>役員から町会災害対策本部→区災害対策本部・消防署へ情報をエスカレーション。</span>
+                </li>
+              </ul>
+            </div>
+            <div class="bg-white border border-gray-200 rounded-3xl p-6 shadow-sm">
+              <h4 class="text-lg font-semibold text-gray-900">安否確認班の役割</h4>
+              <p class="text-sm text-gray-700 mt-3">
+                町内を複数ブロックに分け、班長と民生委員が各戸を訪問し「無事」「軽傷」「要救助」などを確認。安否旗（緑=無事／赤=要救助）を活用し、情報を本部へ迅速に報告します。
+              </p>
+              <ul class="mt-4 space-y-2 text-sm text-gray-700">
+                <li>・要支援者には事前に担当者を決め、発災後は優先訪問</li>
+                <li>・トランシーバーまたは報告書で町会本部へ情報共有</li>
+                <li>・救助要請は消防団・消防署へ速やかに連絡</li>
+              </ul>
+              <div class="mt-6 p-4 bg-primary/10 rounded-xl text-sm text-primary">
+                安否確認訓練では、安否旗掲出や報告手順をシミュレーションします。ご協力をお願いします。
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="py-16 bg-white">
+        <div class="max-w-6xl mx-auto px-6">
+          <div class="grid lg:grid-cols-2 gap-8 items-start">
+            <div>
+              <h3 class="text-2xl font-bold text-gray-900">医療・ライフライン情報</h3>
+              <p class="text-gray-700 mt-4">
+                練馬総合病院（旭丘1-24-1）は災害拠点連携病院に指定。軽症者は旭丘中学校の医療救護所が一次対応します。薬が必要な場合は薬剤師会による臨時薬局や処方箋なし調剤を活用しましょう。
+              </p>
+              <ul class="mt-6 space-y-3 text-sm text-gray-700">
+                <li class="flex items-start gap-3">
+                  <i class="ri-first-aid-kit-line text-primary text-lg"></i>
+                  <span>救護所ではトリアージ後、必要に応じて区内外の病院へ搬送。</span>
+                </li>
+                <li class="flex items-start gap-3">
+                  <i class="ri-capsule-line text-primary text-lg"></i>
+                  <span>薬局は最低限の処方薬を提供できる特例あり。お薬手帳を持参。</span>
+                </li>
+                <li class="flex items-start gap-3">
+                  <i class="ri-tools-line text-primary text-lg"></i>
+                  <span>給水ステーション（学田公園ほか）では1日3L/人を供給。ポリタンクを持参。</span>
+                </li>
+              </ul>
+            </div>
+            <div class="bg-gray-50 border border-gray-200 rounded-3xl p-6 shadow-sm">
+              <h4 class="text-lg font-semibold text-gray-900">広域避難時のポイント</h4>
+              <ul class="mt-4 space-y-3 text-sm text-gray-700">
+                <li class="flex items-start gap-3">
+                  <i class="ri-compass-4-line text-primary text-lg"></i>
+                  <span>火災の煙は風下を避け、千川通りなど延焼遮断帯を通って移動。</span>
+                </li>
+                <li class="flex items-start gap-3">
+                  <i class="ri-map-pin-line text-primary text-lg"></i>
+                  <span>江古田の森公園・武蔵大学の集合場所で消防や行政の指示に従う。</span>
+                </li>
+                <li class="flex items-start gap-3">
+                  <i class="ri-shield-cross-line text-primary text-lg"></i>
+                  <span>園路・広場で集まり、救援情報を共有。広域避難後も町会本部への報告を忘れずに。</span>
+                </li>
+              </ul>
+              <p class="mt-6 text-sm text-gray-700">
+                隣接敷地との柵・垣根を取り外す合意や代替脱出路の共有も、発災前に話し合っておくと安心です。
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <footer class="bg-gray-900 text-white py-12">
+      <div class="max-w-6xl mx-auto px-6">
+        <div class="grid md:grid-cols-4 gap-8">
+          <div>
+            <div class="flex items-center space-x-3 mb-4">
+              <div
+                class="w-10 h-10 flex items-center justify-center bg-primary rounded-lg"
+              >
+                <i class="ri-community-line text-white"></i>
+              </div>
+              <div>
+                <h5 class="font-semibold">東京都練馬区</h5>
+                <p class="text-sm text-gray-400">旭丘一丁目町会</p>
+              </div>
+            </div>
+            <p class="text-gray-400 text-sm">
+              AIと共に築く新しい地域コミュニティ。すべての世代が参加しやすい町会活動を目指しています。
+            </p>
+          </div>
+          <div>
+            <h6 class="font-semibold mb-4">基本情報</h6>
+            <div class="space-y-2 text-sm text-gray-400">
+              <p>〒179-0071</p>
+              <p>東京都練馬区旭丘1丁目</p>
+              <p>TEL: 03-3950-4842（旭丘地域集会所）</p>
+              <p>Email: block1@asahigaoka-nerima.tokyo</p>
+            </div>
+          </div>
+          <div>
+            <h6 class="font-semibold mb-4">リンク</h6>
+            <div class="space-y-2 text-sm">
+              <a
+                href="privacy.html"
+                class="text-gray-400 hover:text-white transition-colors block"
+                >プライバシーポリシー</a
+              >
+              <a
+                href="sitemap.html"
+                class="text-gray-400 hover:text-white transition-colors block"
+                >サイトマップ</a
+              >
+              <a
+                href="contact.html"
+                class="text-gray-400 hover:text-white transition-colors block"
+                >お問い合わせ</a
+              >
+              <a
+                href="access.html"
+                class="text-gray-400 hover:text-white transition-colors block"
+                >アクセス</a
+              >
+            </div>
+          </div>
+          <div>
+            <h6 class="font-semibold mb-4">SNS</h6>
+            <div class="flex space-x-3">
+              <a
+                href="https://www.facebook.com/b1.asahigaoka"
+                target="_blank"
+                class="w-8 h-8 flex items-center justify-center bg-gray-800 rounded hover:bg-gray-700 transition-colors"
+              >
+                <i class="ri-facebook-fill"></i>
+              </a>
+              <a
+                href="https://x.com/b1_asahigaoka"
+                target="_blank"
+                class="w-8 h-8 flex items-center justify-center bg-gray-800 rounded hover:bg-gray-700 transition-colors"
+              >
+                <i class="ri-twitter-x-line"></i>
+              </a>
+              <a
+                href="https://line.me/R/ti/p/@619ynqur"
+                target="_blank"
+                class="w-8 h-8 flex items-center justify-center bg-gray-800 rounded hover:bg-gray-700 transition-colors"
+              >
+                <i class="ri-line-fill"></i>
+              </a>
+            </div>
+          </div>
+        </div>
+        <div
+          class="border-t border-gray-800 mt-8 pt-8 text-center text-sm text-gray-400"
+        >
+          <p>&copy; 2025 東京都練馬区旭丘一丁目町会. All rights reserved.</p>
+        </div>
+      </div>
+    </footer>
+
+    <script id="mobile-menu-script">
+      document.addEventListener("DOMContentLoaded", function () {
+        const mobileMenuBtn = document.getElementById("mobile-menu-btn");
+        const mobileMenu = document.getElementById("mobile-menu");
+        mobileMenuBtn.addEventListener("click", function () {
+          mobileMenu.classList.toggle("hidden");
+        });
+      });
+    </script>
+
+    <script>
+      window.difyChatbotConfig = {
+        token: 't7gW8m8CMAZ2rcNw',
+        baseUrl: 'http://top-overly-pup.ngrok-free.app',
+        inputs: {
+          // You can define the inputs from the Start node here
+          // key is the variable name
+          // e.g.
+          // name: "NAME"
+        },
+        systemVariables: {
+          // user_id: 'YOU CAN DEFINE USER ID HERE',
+          // conversation_id: 'YOU CAN DEFINE CONVERSATION ID HERE, IT MUST BE A VALID UUID',
+        },
+        userVariables: {
+          // avatar_url: 'YOU CAN DEFINE USER AVATAR URL HERE',
+          // name: 'YOU CAN DEFINE USER NAME HERE',
+        },
+      }
+    </script>
+    <script
+      src="http://top-overly-pup.ngrok-free.app/embed.min.js"
+      id="t7gW8m8CMAZ2rcNw"
+      defer
+    ></script>
+    <style>
+      #dify-chatbot-bubble-button {
+        background-color: #1C64F2 !important;
+      }
+      #dify-chatbot-bubble-window {
+        width: 24rem !important;
+        height: 40rem !important;
+      }
+    </style>
+    <script src="js/template.js"></script>
+  </body>
+</html>

@@ -1,0 +1,437 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>家庭備蓄とローリングストック - 東京都練馬区旭丘一丁目町会</title>
+    <script src="https://cdn.tailwindcss.com/3.4.16"></script>
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            colors: { primary: "#57b5e7", secondary: "#8dd3c7" },
+            borderRadius: {
+              none: "0px",
+              sm: "4px",
+              DEFAULT: "8px",
+              md: "12px",
+              lg: "16px",
+              xl: "20px",
+              "2xl": "24px",
+              "3xl": "32px",
+              full: "9999px",
+              button: "8px",
+            },
+          },
+        },
+      };
+    </script>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Pacifico&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      href="https://cdnjs.cloudflare.com/ajax/libs/remixicon/4.6.0/remixicon.min.css"
+      rel="stylesheet"
+    />
+  </head>
+  <body class="bg-white">
+    <header class="bg-white shadow-sm sticky top-0 z-50">
+      <nav class="w-full px-6 py-4">
+        <div class="flex items-center justify-between">
+          <div class="flex items-center space-x-3">
+            <div
+              class="w-12 h-12 flex items-center justify-center bg-primary rounded-lg"
+            >
+              <i class="ri-community-line text-white text-xl"></i>
+            </div>
+            <div>
+              <h1 class="text-xl font-bold text-gray-900">
+                東京都練馬区旭丘一丁目町会
+              </h1>
+              <p class="text-sm text-gray-600">みんなでつくる安心・安全なまち</p>
+            </div>
+          </div>
+          <div class="hidden md:flex items-center space-x-8">
+            <a
+              href="index.html"
+              class="text-gray-700 hover:text-primary transition-colors"
+              >ホーム</a
+            >
+            <a
+              href="news.html"
+              class="text-gray-700 hover:text-primary transition-colors"
+              >お知らせ</a
+            >
+            <a
+              href="reports.html"
+              class="text-gray-700 hover:text-primary transition-colors"
+              >事業資料</a
+            >
+            <a
+              href="town.html"
+              class="text-gray-700 hover:text-primary transition-colors"
+              >町会について</a
+            >
+            <a
+              href="antidisaster_index.html"
+              class="text-primary hover:text-primary transition-colors font-semibold"
+              >災害特集</a
+            >
+            <a
+              href="contact.html"
+              class="text-gray-700 hover:text-primary transition-colors"
+              >お問い合わせ</a
+            >
+          </div>
+          <button
+            class="md:hidden w-10 h-10 flex items-center justify-center"
+            id="mobile-menu-btn"
+          >
+            <i class="ri-menu-line text-xl"></i>
+          </button>
+        </div>
+        <div class="md:hidden mt-4 hidden" id="mobile-menu">
+          <div class="flex flex-col space-y-3 py-4 border-t">
+            <a
+              href="index.html"
+              class="text-gray-700 hover:text-primary transition-colors"
+              >ホーム</a
+            >
+            <a
+              href="news.html"
+              class="text-gray-700 hover:text-primary transition-colors"
+              >お知らせ</a
+            >
+            <a
+              href="reports.html"
+              class="text-gray-700 hover:text-primary transition-colors"
+              >事業資料</a
+            >
+            <a
+              href="town.html"
+              class="text-gray-700 hover:text-primary transition-colors"
+              >町会について</a
+            >
+            <a
+              href="antidisaster_index.html"
+              class="text-primary hover:text-primary transition-colors font-semibold"
+              >災害特集</a
+            >
+            <a
+              href="contact.html"
+              class="text-gray-700 hover:text-primary transition-colors"
+              >お問い合わせ</a
+            >
+          </div>
+        </div>
+      </nav>
+    </header>
+
+    <main>
+      <section class="relative overflow-hidden">
+        <div class="absolute inset-0">
+          <img
+            src="images/antidisaster-preparedness.png"
+            alt="備蓄棚を整理する家族"
+            class="w-full h-full object-cover"
+          />
+          <div class="absolute inset-0 bg-gradient-to-r from-amber-900/80 via-amber-700/70 to-amber-400/60"></div>
+        </div>
+        <div class="relative px-6 py-20">
+          <div class="max-w-5xl mx-auto text-white">
+            <p class="uppercase tracking-[0.4em] text-sm mb-4">HOME PREPAREDNESS</p>
+            <h2 class="text-4xl md:text-5xl font-bold leading-tight mb-6">
+              家庭備蓄とローリングストック
+            </h2>
+            <p class="text-lg md:text-xl text-white/90 leading-relaxed">
+              3日分から1週間分へ。旭丘一丁目の家庭が日常生活に取り入れやすい備蓄アイデアと、
+              年齢・家族構成別の非常持出品リストを紹介します。
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <section class="py-16 bg-white">
+        <div class="max-w-6xl mx-auto px-6">
+          <div class="md:flex md:items-end md:justify-between">
+            <div>
+              <h3 class="text-2xl md:text-3xl font-bold text-gray-900">家庭備蓄の基本：3日分→1週間分</h3>
+              <p class="text-gray-700 mt-4 md:max-w-3xl">
+                国や区は最低3日、できれば1週間分の備蓄を推奨しています。水は1人1日3リットルを目安に、家族人数×日数分を確保。
+                食料はレトルト、缶詰、乾パン、インスタント麺など常温保存できるものを中心に揃えます。
+              </p>
+            </div>
+            <span class="mt-6 md:mt-0 inline-flex items-center px-4 py-2 rounded-full bg-primary/10 text-primary font-semibold text-sm">
+              目標：1週間分のローリングストック
+            </span>
+          </div>
+
+          <div class="grid md:grid-cols-2 gap-8 mt-10">
+            <div class="border border-gray-200 rounded-2xl p-6 shadow-sm">
+              <h4 class="text-lg font-semibold text-gray-900">備蓄のポイント</h4>
+              <ul class="mt-4 space-y-3 text-sm text-gray-700">
+                <li class="flex items-start gap-3">
+                  <i class="ri-water-flash-line text-primary text-lg"></i>
+                  <span>水：1人1日3L×人数×日数分。ペット用の飲料水も忘れずに。</span>
+                </li>
+                <li class="flex items-start gap-3">
+                  <i class="ri-bowl-line text-primary text-lg"></i>
+                  <span>食料：米・パックご飯、乾麺、缶詰、レトルト食品、栄養補助食品をバランスよく。</span>
+                </li>
+                <li class="flex items-start gap-3">
+                  <i class="ri-battery-charge-line text-primary text-lg"></i>
+                  <span>生活用品：懐中電灯、ラジオ、モバイルバッテリー、カセットコンロ、ガスボンベ、簡易トイレ、衛生用品。</span>
+                </li>
+                <li class="flex items-start gap-3">
+                  <i class="ri-temp-cold-line text-primary text-lg"></i>
+                  <span>防寒具と雨具、長袖長ズボン、厚底靴を家族分用意。</span>
+                </li>
+              </ul>
+            </div>
+            <div class="border border-gray-200 rounded-2xl p-6 shadow-sm">
+              <h4 class="text-lg font-semibold text-gray-900">ローリングストックの進め方</h4>
+              <p class="text-sm text-gray-700 mt-3">
+                「少し多めに買って、使ったら補充」を習慣化します。パントリーや床下収納を活用し、古いものから先に使うルールを家族で共有しましょう。
+              </p>
+              <ul class="mt-4 space-y-2 text-sm text-gray-700">
+                <li>・週末に食べたレトルト食品を、その週の買い物で補充</li>
+                <li>・賞味期限1年以上の食品を常に残すよう在庫を管理</li>
+                <li>・冷凍食品も便利だが、停電に備えて常温保存品を中心に</li>
+                <li>・備蓄棚の写真を撮って管理アプリやチェックシートで更新</li>
+              </ul>
+              <div class="mt-6 p-4 bg-secondary/10 rounded-xl text-sm text-secondary/90">
+                9月の「防災の日」前後は、区がローリングストックの写真募集やスーパーでの啓発を実施。参加すると備蓄の見直しにつながります。
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="py-16 bg-gray-50">
+        <div class="max-w-6xl mx-auto px-6">
+          <div class="grid lg:grid-cols-3 gap-8">
+            <div class="lg:col-span-2">
+              <h3 class="text-2xl font-bold text-gray-900">非常持出品リスト</h3>
+              <p class="text-gray-700 mt-4">
+                緊急避難時に持ち出すリュックは、重量15kg以下を目安に家族構成で分担。玄関近くに置き、季節や子どもの成長に合わせて内容を更新します。
+              </p>
+              <div class="mt-6 grid md:grid-cols-2 gap-6">
+                <div class="border border-gray-200 rounded-2xl p-6 shadow-sm">
+                  <h4 class="text-lg font-semibold text-gray-900">共通セット</h4>
+                  <ul class="mt-4 space-y-2 text-sm text-gray-700">
+                    <li>・懐中電灯、携帯ラジオ、予備電池</li>
+                    <li>・携帯充電器、モバイルバッテリー</li>
+                    <li>・笛（ホイッスル）、軍手、雨具</li>
+                    <li>・救急セット、常備薬、包帯</li>
+                    <li>・現金（小銭含む）、身分証コピー</li>
+                    <li>・非常食、高カロリー食品、水500ml数本</li>
+                    <li>・着替え、下着、タオル、ビニール袋</li>
+                  </ul>
+                </div>
+                <div class="border border-gray-200 rounded-2xl p-6 shadow-sm">
+                  <h4 class="text-lg font-semibold text-gray-900">家族構成別アイテム</h4>
+                  <ul class="mt-4 space-y-2 text-sm text-gray-700">
+                    <li>・乳幼児：紙おむつ、粉ミルク・液体ミルク、哺乳瓶、母子手帳、お気に入りのおもちゃ</li>
+                    <li>・高齢者：常用薬、補聴器電池、入れ歯用品、成人用おむつ、杖</li>
+                    <li>・女性：生理用品、予備眼鏡、ヘアゴム</li>
+                    <li>・ペット：ペットフード、リード、ペットシーツ、排泄処理袋、予備首輪</li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+            <div class="bg-primary text-white rounded-3xl p-6 shadow-lg">
+              <h4 class="text-lg font-semibold">クイックチェック</h4>
+              <ul class="mt-4 space-y-3 text-sm text-white/90">
+                <li>□ 非常持出袋を玄関付近に置いていますか？</li>
+                <li>□ お薬手帳や保険証コピーはジップバッグにまとめていますか？</li>
+                <li>□ 子どものサイズに合う着替えに入れ替えましたか？</li>
+                <li>□ ペットの餌・トイレ用品は最新に更新しましたか？</li>
+              </ul>
+              <p class="mt-6 text-sm text-white/80">
+                町会では、非常持出袋の中身を見直す「防災リュックお披露目会」を実施。新しいアイデアを共有しましょう。
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="py-16 bg-white">
+        <div class="max-w-6xl mx-auto px-6">
+          <div class="grid lg:grid-cols-2 gap-8 items-start">
+            <div>
+              <h3 class="text-2xl font-bold text-gray-900">特別な配慮が必要な方の備え</h3>
+              <p class="text-gray-700 mt-4">
+                要支援者名簿への登録や個別避難計画の作成は早めに。介助が必要な方は、地域の安否確認班・民生委員と連携して「誰が迎えに行くか」「どのルートを使うか」を具体的に決めておきます。
+              </p>
+              <ul class="mt-6 space-y-3 text-sm text-gray-700">
+                <li class="flex items-start gap-3">
+                  <i class="ri-user-shared-line text-primary text-lg"></i>
+                  <span>地域の支援者と日常的に交流し、緊急時の連絡方法を確認。</span>
+                </li>
+                <li class="flex items-start gap-3">
+                  <i class="ri-hotel-bed-line text-primary text-lg"></i>
+                  <span>福祉避難所の位置を把握し、必要な医療用品リストを作成。</span>
+                </li>
+                <li class="flex items-start gap-3">
+                  <i class="ri-wheelchair-fill text-primary text-lg"></i>
+                  <span>段差や狭い路地の回避ルートを事前に現地確認。</span>
+                </li>
+              </ul>
+            </div>
+            <div class="bg-gray-50 border border-gray-200 rounded-3xl p-6 shadow-sm">
+              <h4 class="text-lg font-semibold text-gray-900">備蓄管理のDX活用</h4>
+              <p class="text-sm text-gray-700 mt-3">
+                「東京備蓄ナビ」などのウェブサービスを使うと、家族構成を入力するだけで必要量と賞味期限を一覧化できます。食品のバーコードを読み取って期限を通知するアプリも活用し、最後は実物を目で確認する習慣をつけましょう。
+              </p>
+              <ul class="mt-4 space-y-2 text-sm text-gray-700">
+                <li>・冷蔵庫や収納棚にチェックリストを貼り、家族で更新</li>
+                <li>・期限が近い食品は普段の食事で使い、買い足し</li>
+                <li>・非常トイレ袋やガスボンベは購入時期をメモし5年目安で更新</li>
+              </ul>
+              <p class="mt-4 text-sm text-gray-700">
+                「備えあれば憂いなし」。定期的な見直しで、いつでも使える鮮度の高い備蓄を維持しましょう。
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <footer class="bg-gray-900 text-white py-12">
+      <div class="max-w-6xl mx-auto px-6">
+        <div class="grid md:grid-cols-4 gap-8">
+          <div>
+            <div class="flex items-center space-x-3 mb-4">
+              <div
+                class="w-10 h-10 flex items-center justify-center bg-primary rounded-lg"
+              >
+                <i class="ri-community-line text-white"></i>
+              </div>
+              <div>
+                <h5 class="font-semibold">東京都練馬区</h5>
+                <p class="text-sm text-gray-400">旭丘一丁目町会</p>
+              </div>
+            </div>
+            <p class="text-gray-400 text-sm">
+              AIと共に築く新しい地域コミュニティ。すべての世代が参加しやすい町会活動を目指しています。
+            </p>
+          </div>
+          <div>
+            <h6 class="font-semibold mb-4">基本情報</h6>
+            <div class="space-y-2 text-sm text-gray-400">
+              <p>〒179-0071</p>
+              <p>東京都練馬区旭丘1丁目</p>
+              <p>TEL: 03-3950-4842（旭丘地域集会所）</p>
+              <p>Email: block1@asahigaoka-nerima.tokyo</p>
+            </div>
+          </div>
+          <div>
+            <h6 class="font-semibold mb-4">リンク</h6>
+            <div class="space-y-2 text-sm">
+              <a
+                href="privacy.html"
+                class="text-gray-400 hover:text-white transition-colors block"
+                >プライバシーポリシー</a
+              >
+              <a
+                href="sitemap.html"
+                class="text-gray-400 hover:text-white transition-colors block"
+                >サイトマップ</a
+              >
+              <a
+                href="contact.html"
+                class="text-gray-400 hover:text-white transition-colors block"
+                >お問い合わせ</a
+              >
+              <a
+                href="access.html"
+                class="text-gray-400 hover:text-white transition-colors block"
+                >アクセス</a
+              >
+            </div>
+          </div>
+          <div>
+            <h6 class="font-semibold mb-4">SNS</h6>
+            <div class="flex space-x-3">
+              <a
+                href="https://www.facebook.com/b1.asahigaoka"
+                target="_blank"
+                class="w-8 h-8 flex items-center justify-center bg-gray-800 rounded hover:bg-gray-700 transition-colors"
+              >
+                <i class="ri-facebook-fill"></i>
+              </a>
+              <a
+                href="https://x.com/b1_asahigaoka"
+                target="_blank"
+                class="w-8 h-8 flex items-center justify-center bg-gray-800 rounded hover:bg-gray-700 transition-colors"
+              >
+                <i class="ri-twitter-x-line"></i>
+              </a>
+              <a
+                href="https://line.me/R/ti/p/@619ynqur"
+                target="_blank"
+                class="w-8 h-8 flex items-center justify-center bg-gray-800 rounded hover:bg-gray-700 transition-colors"
+              >
+                <i class="ri-line-fill"></i>
+              </a>
+            </div>
+          </div>
+        </div>
+        <div
+          class="border-t border-gray-800 mt-8 pt-8 text-center text-sm text-gray-400"
+        >
+          <p>&copy; 2025 東京都練馬区旭丘一丁目町会. All rights reserved.</p>
+        </div>
+      </div>
+    </footer>
+
+    <script id="mobile-menu-script">
+      document.addEventListener("DOMContentLoaded", function () {
+        const mobileMenuBtn = document.getElementById("mobile-menu-btn");
+        const mobileMenu = document.getElementById("mobile-menu");
+        mobileMenuBtn.addEventListener("click", function () {
+          mobileMenu.classList.toggle("hidden");
+        });
+      });
+    </script>
+
+    <script>
+      window.difyChatbotConfig = {
+        token: 't7gW8m8CMAZ2rcNw',
+        baseUrl: 'http://top-overly-pup.ngrok-free.app',
+        inputs: {
+          // You can define the inputs from the Start node here
+          // key is the variable name
+          // e.g.
+          // name: "NAME"
+        },
+        systemVariables: {
+          // user_id: 'YOU CAN DEFINE USER ID HERE',
+          // conversation_id: 'YOU CAN DEFINE CONVERSATION ID HERE, IT MUST BE A VALID UUID',
+        },
+        userVariables: {
+          // avatar_url: 'YOU CAN DEFINE USER AVATAR URL HERE',
+          // name: 'YOU CAN DEFINE USER NAME HERE',
+        },
+      }
+    </script>
+    <script
+      src="http://top-overly-pup.ngrok-free.app/embed.min.js"
+      id="t7gW8m8CMAZ2rcNw"
+      defer
+    ></script>
+    <style>
+      #dify-chatbot-bubble-button {
+        background-color: #1C64F2 !important;
+      }
+      #dify-chatbot-bubble-window {
+        width: 24rem !important;
+        height: 40rem !important;
+      }
+    </style>
+    <script src="js/template.js"></script>
+  </body>
+</html>

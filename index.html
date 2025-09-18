@@ -80,8 +80,8 @@
           </div>
           <div class="hidden md:flex items-center space-x-8">
             <a
-              href="#"
-              class="text-gray-700 hover:text-primary transition-colors"
+              href="index.html"
+              class="text-primary font-semibold hover:text-primary transition-colors"
               >ホーム</a
             >
             <a
@@ -98,6 +98,11 @@
               href="town.html"
               class="text-gray-700 hover:text-primary transition-colors"
               >町会について</a
+            >
+            <a
+              href="antidisaster_index.html"
+              class="text-gray-700 hover:text-primary transition-colors"
+              >災害特集</a
             >
             <a
               href="contact.html"
@@ -115,8 +120,8 @@
         <div class="md:hidden mt-4 hidden" id="mobile-menu">
           <div class="flex flex-col space-y-3 py-4 border-t">
             <a
-              href="#"
-              class="text-gray-700 hover:text-primary transition-colors"
+              href="index.html"
+              class="text-primary font-semibold hover:text-primary transition-colors"
               >ホーム</a
             >
             <a
@@ -133,6 +138,11 @@
               href="town.html"
               class="text-gray-700 hover:text-primary transition-colors"
               >町会について</a
+            >
+            <a
+              href="antidisaster_index.html"
+              class="text-gray-700 hover:text-primary transition-colors"
+              >災害特集</a
             >
             <a
               href="contact.html"
@@ -199,7 +209,64 @@
         </div>
       </div>
     </section>
-    
+
+    <section class="py-16 bg-white">
+      <div class="max-w-6xl mx-auto px-6">
+        <div class="grid lg:grid-cols-2 gap-10 items-center">
+          <div>
+            <span class="inline-flex items-center px-4 py-2 rounded-full bg-primary/10 text-primary font-semibold text-sm">NEW</span>
+            <h3 class="text-3xl font-bold text-gray-900 mt-4">
+              災害特集ページが公開されました
+            </h3>
+            <p class="text-gray-700 mt-4 leading-relaxed">
+              避難所・防災設備・家庭備蓄・行動マニュアルをまとめた「旭丘一丁目 災害特集」を公開しました。
+              町会が集約した最新情報をテーマごとに整理し、すぐに活用できるチェックリストも掲載しています。
+            </p>
+            <div class="mt-6 flex flex-wrap gap-3 text-sm text-gray-600">
+              <span class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-gray-100">
+                <i class="ri-route-line text-primary"></i>避難ルートと福祉避難所
+              </span>
+              <span class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-gray-100">
+                <i class="ri-tools-line text-primary"></i>防災倉庫・AEDの使い方
+              </span>
+              <span class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-gray-100">
+                <i class="ri-archive-stack-line text-primary"></i>家庭備蓄とローリングストック
+              </span>
+              <span class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-gray-100">
+                <i class="ri-alarm-warning-line text-primary"></i>発災後72時間の行動
+              </span>
+            </div>
+            <div class="mt-8 flex flex-col sm:flex-row gap-4">
+              <a
+                href="antidisaster_index.html"
+                class="inline-flex items-center justify-center px-8 py-4 rounded-button bg-primary text-white font-semibold shadow-lg hover:bg-blue-600 transition-colors"
+              >
+                災害特集を見る
+                <i class="ri-arrow-right-line ml-2"></i>
+              </a>
+              <a
+                href="https://line.me/R/ti/p/@619ynqur"
+                target="_blank"
+                class="inline-flex items-center justify-center px-8 py-4 rounded-button border border-primary text-primary font-semibold hover:bg-primary/5"
+              >
+                訓練情報を受け取る
+              </a>
+            </div>
+          </div>
+          <div class="relative">
+            <div class="absolute inset-0 rounded-3xl bg-primary/20 blur-2xl"></div>
+            <div class="relative overflow-hidden rounded-3xl shadow-xl border border-white/60">
+              <img
+                src="images/antidisaster-overview.png"
+                alt="防災会議の様子"
+                class="w-full h-full object-cover"
+              />
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
     <!-- 練馬区旭丘というまちセクション -->
     <section class="py-16 bg-gradient-to-b from-white to-[#F0F7FF]">
       <div class="max-w-6xl mx-auto px-6">
@@ -731,71 +798,6 @@
         </div>
       </div>
     </footer>
-    <div class="fixed bottom-6 right-6 z-50">
-      <button
-        class="w-16 h-16 bg-primary text-white rounded-full shadow-lg hover:bg-blue-600 transition-all duration-300 flex items-center justify-center"
-        id="ai-chat-btn"
-      >
-        <i class="ri-robot-line text-2xl"></i>
-      </button>
-    </div>
-    <div
-      class="fixed bottom-24 right-6 w-80 bg-white rounded-xl shadow-2xl border hidden z-50"
-      id="ai-chat-window"
-    >
-      <div class="bg-primary text-white p-4 rounded-t-xl">
-        <div class="flex items-center justify-between">
-          <div class="flex items-center space-x-2">
-            <div
-              class="w-8 h-8 flex items-center justify-center bg-white/20 rounded-full"
-            >
-              <i class="ri-robot-line"></i>
-            </div>
-            <div>
-              <h6 class="font-semibold">町会 AI アシスタント</h6>
-              <p class="text-xs opacity-90">オンライン</p>
-            </div>
-          </div>
-          <button
-            class="w-6 h-6 flex items-center justify-center hover:bg-white/20 rounded"
-            id="close-chat"
-          >
-            <i class="ri-close-line"></i>
-          </button>
-        </div>
-      </div>
-      <div class="h-80 p-4 overflow-y-auto" id="chat-messages">
-        <div class="flex items-start space-x-2 mb-4">
-          <div
-            class="w-8 h-8 flex items-center justify-center bg-primary/10 rounded-full flex-shrink-0"
-          >
-            <i class="ri-robot-line text-primary text-sm"></i>
-          </div>
-          <div class="bg-gray-100 p-3 rounded-lg max-w-xs">
-            <p class="text-sm">
-              こんにちは！町会 AI
-              アシスタントです。町会活動や地域情報について、お気軽にお尋ねください。
-            </p>
-          </div>
-        </div>
-      </div>
-      <div class="p-4 border-t">
-        <div class="flex space-x-2">
-          <input
-            type="text"
-            placeholder="メッセージを入力..."
-            class="flex-1 px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
-            id="chat-input"
-          />
-          <button
-            class="w-10 h-10 flex items-center justify-center bg-primary text-white rounded-lg hover:bg-blue-600 transition-colors"
-            id="send-message"
-          >
-            <i class="ri-send-plane-line"></i>
-          </button>
-        </div>
-      </div>
-    </div>
     <script id="mobile-menu-script">
       document.addEventListener("DOMContentLoaded", function () {
         const mobileMenuBtn = document.getElementById("mobile-menu-btn");
@@ -805,56 +807,42 @@
         });
       });
     </script>
-    <script id="ai-chat-script">
-      document.addEventListener("DOMContentLoaded", function () {
-        const aiChatBtn = document.getElementById("ai-chat-btn");
-        const aiChatWindow = document.getElementById("ai-chat-window");
-        const closeChatBtn = document.getElementById("close-chat");
-        const chatInput = document.getElementById("chat-input");
-        const sendMessageBtn = document.getElementById("send-message");
-        const chatMessages = document.getElementById("chat-messages");
-        aiChatBtn.addEventListener("click", function () {
-          aiChatWindow.classList.toggle("hidden");
-        });
-        closeChatBtn.addEventListener("click", function () {
-          aiChatWindow.classList.add("hidden");
-        });
-        function sendMessage() {
-          const message = chatInput.value.trim();
-          if (message) {
-            const userMessageDiv = document.createElement("div");
-            userMessageDiv.className = "flex justify-end mb-4";
-            userMessageDiv.innerHTML = `
-      <div class="bg-primary text-white p-3 rounded-lg max-w-xs">
-      <p class="text-sm">${message}</p>
-      </div>
-      `;
-            chatMessages.appendChild(userMessageDiv);
-            setTimeout(() => {
-              const aiResponseDiv = document.createElement("div");
-              aiResponseDiv.className = "flex items-start space-x-2 mb-4";
-              aiResponseDiv.innerHTML = `
-      <div class="w-8 h-8 flex items-center justify-center bg-primary/10 rounded-full flex-shrink-0">
-      <i class="ri-robot-line text-primary text-sm"></i>
-      </div>
-      <div class="bg-gray-100 p-3 rounded-lg max-w-xs">
-      <p class="text-sm">ご質問ありがとうございます。町会の活動についてお答えします。詳細は担当者にお繋ぎすることも可能です。</p>
-      </div>
-      `;
-              chatMessages.appendChild(aiResponseDiv);
-              chatMessages.scrollTop = chatMessages.scrollHeight;
-            }, 1000);
-            chatInput.value = "";
-            chatMessages.scrollTop = chatMessages.scrollHeight;
-          }
-        }
-        sendMessageBtn.addEventListener("click", sendMessage);
-        chatInput.addEventListener("keypress", function (e) {
-          if (e.key === "Enter") {
-            sendMessage();
-          }
-        });
-      });
+
+  
+    <script>
+      window.difyChatbotConfig = {
+        token: 't7gW8m8CMAZ2rcNw',
+        baseUrl: 'http://top-overly-pup.ngrok-free.app',
+        inputs: {
+          // You can define the inputs from the Start node here
+          // key is the variable name
+          // e.g.
+          // name: "NAME"
+        },
+        systemVariables: {
+          // user_id: 'YOU CAN DEFINE USER ID HERE',
+          // conversation_id: 'YOU CAN DEFINE CONVERSATION ID HERE, IT MUST BE A VALID UUID',
+        },
+        userVariables: {
+          // avatar_url: 'YOU CAN DEFINE USER AVATAR URL HERE',
+          // name: 'YOU CAN DEFINE USER NAME HERE',
+        },
+      }
     </script>
-  </body>
+    <script
+      src="http://top-overly-pup.ngrok-free.app/embed.min.js"
+      id="t7gW8m8CMAZ2rcNw"
+      defer
+    ></script>
+    <style>
+      #dify-chatbot-bubble-button {
+        background-color: #1C64F2 !important;
+      }
+      #dify-chatbot-bubble-window {
+        width: 24rem !important;
+        height: 40rem !important;
+      }
+    </style>
+
+</body>
 </html>

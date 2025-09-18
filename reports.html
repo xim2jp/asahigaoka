@@ -93,6 +93,11 @@
               >町会について</a
             >
             <a
+              href="antidisaster_index.html"
+              class="text-gray-700 hover:text-primary transition-colors"
+              >災害特集</a
+            >
+            <a
               href="contact.html"
               class="text-gray-700 hover:text-primary transition-colors"
               >お問い合わせ</a
@@ -126,6 +131,11 @@
               href="town.html"
               class="text-gray-700 hover:text-primary transition-colors"
               >町会について</a
+            >
+            <a
+              href="antidisaster_index.html"
+              class="text-gray-700 hover:text-primary transition-colors"
+              >災害特集</a
             >
             <a
               href="contact.html"
@@ -611,74 +621,43 @@
       </div>
     </footer>
 
-    <!-- AIチャットボット -->
-    <div class="fixed bottom-6 right-6 z-50">
-      <button
-        class="w-16 h-16 bg-primary text-white rounded-full shadow-lg hover:bg-blue-600 transition-all duration-300 flex items-center justify-center"
-        id="ai-chat-btn"
-      >
-        <i class="ri-robot-line text-2xl"></i>
-      </button>
-    </div>
-    <div
-      class="fixed bottom-24 right-6 w-80 bg-white rounded-xl shadow-2xl border hidden z-50"
-      id="ai-chat-window"
-    >
-      <div class="bg-primary text-white p-4 rounded-t-xl">
-        <div class="flex items-center justify-between">
-          <div class="flex items-center space-x-2">
-            <div
-              class="w-8 h-8 flex items-center justify-center bg-white/20 rounded-full"
-            >
-              <i class="ri-robot-line"></i>
-            </div>
-            <div>
-              <h6 class="font-semibold">町会 AI アシスタント</h6>
-              <p class="text-xs opacity-90">オンライン</p>
-            </div>
-          </div>
-          <button
-            class="w-6 h-6 flex items-center justify-center hover:bg-white/20 rounded"
-            id="close-chat"
-          >
-            <i class="ri-close-line"></i>
-          </button>
-        </div>
-      </div>
-      <div class="h-80 p-4 overflow-y-auto" id="chat-messages">
-        <div class="flex items-start space-x-2 mb-4">
-          <div
-            class="w-8 h-8 flex items-center justify-center bg-primary/10 rounded-full flex-shrink-0"
-          >
-            <i class="ri-robot-line text-primary text-sm"></i>
-          </div>
-          <div class="bg-gray-100 p-3 rounded-lg max-w-xs">
-            <p class="text-sm">
-              こんにちは！町会 AI
-              アシスタントです。町会活動や地域情報について、お気軽にお尋ねください。
-            </p>
-          </div>
-        </div>
-      </div>
-      <div class="p-4 border-t">
-        <div class="flex space-x-2">
-          <input
-            type="text"
-            placeholder="メッセージを入力..."
-            class="flex-1 px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
-            id="chat-input"
-          />
-          <button
-            class="w-10 h-10 flex items-center justify-center bg-primary text-white rounded-lg hover:bg-blue-600 transition-colors"
-            id="send-message"
-          >
-            <i class="ri-send-plane-line"></i>
-          </button>
-        </div>
-      </div>
-    </div>
-
     <!-- JavaScript -->
     <script src="js/template.js"></script>
-  </body>
+  
+    <script>
+      window.difyChatbotConfig = {
+        token: 't7gW8m8CMAZ2rcNw',
+        baseUrl: 'http://top-overly-pup.ngrok-free.app',
+        inputs: {
+          // You can define the inputs from the Start node here
+          // key is the variable name
+          // e.g.
+          // name: "NAME"
+        },
+        systemVariables: {
+          // user_id: 'YOU CAN DEFINE USER ID HERE',
+          // conversation_id: 'YOU CAN DEFINE CONVERSATION ID HERE, IT MUST BE A VALID UUID',
+        },
+        userVariables: {
+          // avatar_url: 'YOU CAN DEFINE USER AVATAR URL HERE',
+          // name: 'YOU CAN DEFINE USER NAME HERE',
+        },
+      }
+    </script>
+    <script
+      src="http://top-overly-pup.ngrok-free.app/embed.min.js"
+      id="t7gW8m8CMAZ2rcNw"
+      defer
+    ></script>
+    <style>
+      #dify-chatbot-bubble-button {
+        background-color: #1C64F2 !important;
+      }
+      #dify-chatbot-bubble-window {
+        width: 24rem !important;
+        height: 40rem !important;
+      }
+    </style>
+
+</body>
 </html>

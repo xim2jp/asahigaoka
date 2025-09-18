@@ -100,6 +100,11 @@
               >町会について</a
             >
             <a
+              href="antidisaster_index.html"
+              class="text-gray-700 hover:text-primary transition-colors"
+              >災害特集</a
+            >
+            <a
               href="contact.html"
               class="text-gray-700 hover:text-primary transition-colors"
               >お問い合わせ</a
@@ -133,6 +138,11 @@
               href="town.html"
               class="text-primary hover:text-primary transition-colors"
               >町会について</a
+            >
+            <a
+              href="antidisaster_index.html"
+              class="text-gray-700 hover:text-primary transition-colors"
+              >災害特集</a
             >
             <a
               href="contact.html"
@@ -837,5 +847,41 @@
         });
       });
     </script>
-  </body>
+  
+    <script>
+      window.difyChatbotConfig = {
+        token: 't7gW8m8CMAZ2rcNw',
+        baseUrl: 'http://top-overly-pup.ngrok-free.app',
+        inputs: {
+          // You can define the inputs from the Start node here
+          // key is the variable name
+          // e.g.
+          // name: "NAME"
+        },
+        systemVariables: {
+          // user_id: 'YOU CAN DEFINE USER ID HERE',
+          // conversation_id: 'YOU CAN DEFINE CONVERSATION ID HERE, IT MUST BE A VALID UUID',
+        },
+        userVariables: {
+          // avatar_url: 'YOU CAN DEFINE USER AVATAR URL HERE',
+          // name: 'YOU CAN DEFINE USER NAME HERE',
+        },
+      }
+    </script>
+    <script
+      src="http://top-overly-pup.ngrok-free.app/embed.min.js"
+      id="t7gW8m8CMAZ2rcNw"
+      defer
+    ></script>
+    <style>
+      #dify-chatbot-bubble-button {
+        background-color: #1C64F2 !important;
+      }
+      #dify-chatbot-bubble-window {
+        width: 24rem !important;
+        height: 40rem !important;
+      }
+    </style>
+
+</body>
 </html>
