@@ -8,12 +8,15 @@
 - 地域コミュニティの強化と情報共有の活性化
 
 ### 1.2 スコープ
+
 本システムは以下のコンポーネントで構成される：
+
 1. **管理ダッシュボード** - 町会スタッフ向けの記事管理インターフェース
-2. **Webサイト** - 公開ページ（TOP、最新記事、カレンダー表示等）
-3. **LINE統合** - LINE Official Accountへの記事配信とカレンダーUI
-4. **X統合** - X（旧Twitter）への自動投稿
-5. **API層** - AWS Lambda/API Gatewayでの動的処理
+2. **AIアシスタント** - チャットでのWebサイト更新支援機能（新規）
+3. **Webサイト** - 公開ページ（TOP、最新記事、カレンダー表示等）
+4. **LINE統合** - LINE Official Accountへの記事配信とカレンダーUI
+5. **X統合** - X（旧Twitter）への自動投稿
+6. **API層** - AWS Lambda/API Gatewayでの動的処理
 
 ### 1.3 対象ユーザー
 - **管理ユーザー（町会スタッフ）** - 記事作成・編集・公開
@@ -55,7 +58,46 @@
 - 画像の最適化（リサイズ等）
 - アイキャッチ画像の推奨サイズ案内
 
-#### 2.1.5 管理画面アーキテクチャ（SPA実装）
+#### 2.1.5 知識ベース管理（Dify Knowledge API連携）（新規）
+
+管理画面から町会情報の資料をアップロードし、Dify の Knowledge Base に登録する機能。
+
+- **資料アップロード**
+  - PDF、Word（.docx）、テキストファイル等をアップロード
+  - ドラッグ＆ドロップ対応
+  - 複数ファイル一括アップロード
+
+- **テキスト抽出処理**
+  - Lambda でファイルからテキストを抽出
+  - PDF: PyPDF2 or pdfplumber
+  - Word: python-docx
+  - テキストファイル: 直接読み込み
+
+- **QA形式への変換**
+  - 抽出したテキストを QA（Question & Answer）形式に自動変換
+  - Claude API を使用して「想定される質問」と「回答」のペアを生成
+  - 例：
+    - Q: 「次のイベントはいつですか？」
+    - A: 「次回の餅つき大会は12月15日（日）10:00から開催予定です。」
+
+- **Dify Knowledge API 連携**
+  - 変換した QA データを Dify Knowledge API に登録
+  - Dify 内部でベクトルDB が自動構築される
+  - API エンドポイント: `POST /v1/datasets/{dataset_id}/documents`
+
+- **登録済み資料の管理**
+  - 資料一覧表示（ファイル名、登録日時、ステータス）
+  - 資料の削除（Dify Knowledge API から削除）
+  - 資料の再インデックス（更新時）
+
+- **ステータス表示**
+  - アップロード中：「処理中...」
+  - テキスト抽出中：「テキスト抽出中...」
+  - QA変換中：「QA形式に変換中...」
+  - Dify登録中：「Knowledge Base に登録中...」
+  - 完了：「登録完了」
+
+#### 2.1.6 管理画面アーキテクチャ（SPA実装）
 
 管理画面は `/admin` フォルダ以下に配置される静的ファイルベースのSPA（Single Page Application）で実装される：
 
@@ -148,9 +190,62 @@
 - LINE内でのURL遷移
 
 #### 2.3.3 グループチャット対応
+
 - 子育てグループへの配信
 - 防災グループへの配信
 - イベント企画グループへの配信
+
+#### 2.3.4 AI自動応答機能（RAG システム - Dify 実装）（新規）
+
+公式LINEアカウントへの一般ユーザーからの問い合わせに、Dify のノーコードツールで構築した RAG システムで自動応答する機能。
+
+- **基本機能**
+  - ユーザーからのメッセージを受信（LINE Webhook）
+  - Lambda が Dify API を呼び出し
+  - Dify が Knowledge Base を検索して回答を生成
+  - LINE Message API 経由で自動返信
+
+- **RAG システムの仕組み（Dify ベース）**
+  - **知識ベース構築**：Dify Knowledge API を使用してベクトルDB を自動構築
+  - **ベクトル検索**：Dify 内部でエンベディング化と類似度検索を実行
+  - **回答生成**：Dify のノーコードツールで設定した LLM（Claude 等）が回答を生成
+
+- **フロー**
+  ```
+  LINE ユーザー
+    ↓ (メッセージ送信)
+  LINE Message API (Webhook)
+    ↓
+  AWS Lambda (line-webhook-handler)
+    ↓
+  Dify API (Chat Completion)
+    ↓ (Knowledge Base 検索 + 回答生成)
+  Lambda (応答受信)
+    ↓
+  LINE Message API (Reply)
+    ↓
+  LINE ユーザー (回答受信)
+  ```
+
+- **対応可能な質問例**
+  - 「次のイベントはいつですか？」
+  - 「ゴミ出しのルールを教えてください」
+  - 「防災訓練の日程を教えて」
+  - 「町会費の支払い方法は？」
+
+- **応答できない場合の処理**
+  - Dify で設定したフォールバックメッセージを返却
+  - 例：「申し訳ございません、その質問には回答できません。詳しくは町会事務局までお問い合わせください。」
+  - 管理画面に未回答の質問をログとして記録（今後のFAQ追加に活用）
+
+- **会話履歴の記録**
+  - LINE ユーザーID、質問内容、回答内容、タイムスタンプを記録
+  - Dify Conversation API で会話履歴を管理
+  - 改善のためのフィードバック収集（オプション）
+
+- **セキュリティ・プライバシー**
+  - 個人情報を含む質問には応答しない（Dify プロンプト設定で制御）
+  - 会話履歴は匿名化して保存
 
 ### 2.4 X（Twitter）統合機能（新規）
 
@@ -161,9 +256,69 @@
 - 投稿スケジュール設定対応
 
 #### 2.4.2 投稿管理
+
 - 投稿予約機能
 - 投稿履歴表示
 - 投稿のキャンセル機能
+
+### 2.5 AIアシスタント機能（新規）
+
+管理画面でAIチャット機能を提供し、ユーザーが自然言語で静的なHTMLの更新を依頼可能にする。
+
+#### 2.5.1 AIチャット基本機能
+
+- **チャット UI**
+  - 管理画面の右側またはモーダルウィンドウに「AIアシスタント」チャット欄を配置
+  - メッセージ入力欄とチャット履歴表示
+  - 過去のチャット会話を保存・表示
+
+- **自然言語処理**
+  - 日本語での指示・依頼をAIが理解
+  - 例：「TOPページのお知らせセクションの背景色を青から緑に変更してください」
+  - 複数ターンの会話に対応（文脈理解）
+
+#### 2.5.2 HTML生成・提案機能
+
+- **コード生成**
+  - ユーザーの依頼内容を理解し、対応する静的HTMLファイルを生成
+  - 必要に応じてCSSやJavaScriptも提案
+
+- **差分表示・プレビュー**
+  - 現在のコードと変更後のコードの差分を表示
+  - 変更内容を画面上でプレビュー表示
+
+#### 2.5.3 確認・承認フロー
+
+- **変更内容の確認**
+  - 提案されたコード変更をユーザーが確認
+  - 承認ボタンで実際にファイルを更新
+  - キャンセルで却下
+
+- **ファイル更新実行**
+  - 承認後、AWS Lambda にリクエストを送信
+  - 対象ファイルをリポジトリに更新（GitHub, S3等）
+
+#### 2.5.4 履歴・ログ管理
+
+- **チャット履歴保存**
+  - AI との会話履歴を記録
+  - 過去の依頼内容や実施内容を参照可能
+
+- **変更履歴**
+  - ファイル更新時のバージョン管理
+  - 変更前後の内容を記録
+  - ロールバック機能対応
+
+#### 2.5.5 AI機能の制約
+
+- **対象ファイル制限**
+  - 更新可能な対象ファイルを明確に制限
+  - 例：`/index.html`, `/css/*.css`, `/js/*.js` など
+
+- **セキュリティ**
+  - 危険なコードの生成を防ぐ
+  - AI生成コードの検証・サニタイズ
+  - 非編集権限ユーザーは AIアシスタント機能を使用禁止
 
 ---
 
@@ -185,6 +340,7 @@
 - 計画メンテナンス：月1回、夜間実施
 
 ### 3.4 セキュリティ
+
 - SSL/TLS暗号化（HTTPS）
 - 管理画面へのアクセス認証
   - ユーザー認証（ID/パスワード）
@@ -194,6 +350,15 @@
 - CSRF対策
 - SQLインジェクション対策
 - XSS対策
+
+- **AI機能関連のセキュリティ**
+  - AI生成コードの検証・サニタイズ（危険なコード、外部スクリプト注入の防止）
+  - ファイル更新権限の厳格化（管理者のみがAI提案を承認可能）
+  - AIチャット履歴の暗号化保存
+  - AIプロンプトインジェクション対策
+  - 対象ファイルのホワイトリスト管理（許可ファイルのみ更新可能）
+  - ファイル変更時の変更ログ記録と追跡
+  - 変更内容のレビュー・承認プロセス
 
 ### 3.5 運用・保守性
 
@@ -236,7 +401,7 @@
 ├──────────────┬────────────────┬────────────────┬─────────┤
 │  Webサイト   │  管理画面SPA   │ LINE Official  │ X API   │
 │ （/index）   │  （/admin）    │   Account      │（Twitter）
-│HTML/CSS/JS   │HTML/CSS/JS     │                │         │
+│HTML/CSS/JS   │ + AI チャット  │                │         │
 └──────────────┴────────────────┴────────────────┴─────────┘
       ↓               ↓                    ↓          ↓
 ┌──────────────────────────────────────────────────────────┐
@@ -246,19 +411,23 @@
 │  - 画像アップロード（/api/media）                        │
 │  - LINE配信処理（/api/line）                            │
 │  - X投稿処理（/api/x）                                 │
+│  - AIチャット処理（/api/ai/chat）     ──→ Claude API   │
+│  - ファイル変更提案（/api/ai/changes）                   │
 │  - 検索・フィルタリング（/api/search）                   │
 └──────────────────────────────────────────────────────────┘
               ↓
 ┌──────────────────────────────────────────────────────────┐
 │         記事データベース（無料クラウドサービス）             │
 │  - Firebase Firestore / Supabase / Airtable             │
-│  - テーブル: articles, users, categories, media         │
+│  - テーブル: articles, users, categories, media,        │
+│    ai_chat_history, file_change_history                 │
 └──────────────────────────────────────────────────────────┘
               ↓
 ┌──────────────────────────────────────────────────────────┐
 │        ストレージ（AWS S3 / Firebase Storage）             │
 │  - アイキャッチ画像                                       │
 │  - 媒体ファイル                                           │
+│  - Webサイト静的ファイル（管理画面から更新）              │
 └──────────────────────────────────────────────────────────┘
 ```
 
@@ -273,6 +442,7 @@
 | データベース | 無料クラウドサービス | Firebase Firestore / Supabase 推奨 |
 | SNS連携 | LINE Messaging API + X API v2 | 公式 API 使用 |
 | ストレージ | AWS S3 / Firebase Storage | 画像・ファイル保管 |
+| AI / LLM | Claude API（Anthropic） | 自然言語処理、コード生成に使用 |
 
 ### 4.3 外部サービス連携
 
@@ -284,6 +454,7 @@
 | AWS Lambda | バックエンド | 従量課金（無料枠有） |
 | AWS API Gateway | API提供 | 従量課金 |
 | AWS S3 | 画像ストレージ | 従量課金（無料枠有） |
+| Claude API（Anthropic） | AI チャット、コード生成 | 従量課金 |
 
 ### 4.4 管理画面SPA詳細設計
 
@@ -308,6 +479,8 @@
 │       ├── dashboard.js    # ダッシュボード
 │       ├── editor.js       # 記事エディタ
 │       ├── medialist.js    # メディア管理
+│       ├── aiassistant.js  # AIアシスタントチャット欄
+│       ├── aichanges.js    # AI提案内容の差分・承認UI
 │       └── settings.js     # 設定画面
 ├── images/
 │   ├── logo.svg            # ロゴ
@@ -379,6 +552,211 @@ sessionStorage:
 - **バンドルサイズ**: 外部ライブラリの最小化（Vanilla JS推奨）
 - **API最適化**: 不要なリクエストの排除、データのページング
 
+#### 4.4.7 AIアシスタント実装フロー（Cursor Agent + GitHub + Netlify）
+
+AIチャット機能でのHTML更新は、以下の複雑なワークフローを採用：
+
+**フロー全体：**
+
+```
+①ユーザープロンプト入力
+   ↓
+②管理画面 → Lambda (/api/ai/chat)
+   ↓
+③Lambda：プロンプト + 現在のリポジトリコードを取得
+   ↓
+④Lambda → ECS タスク起動（プロンプト付き）
+   ↓
+⑤ECS：リポジトリをクローン
+   ↓
+⑥ECS：Cursor Agent 実行（プロンプト通りにコード修正）
+   ↓
+⑦ECS：git commit + git push（feature ブランチへ）
+   ↓
+⑧GitHub：PR 作成（gh-pages ブランチへのマージ予定）
+   ↓
+⑨PR作成時点で gh-pages へ自動マージ
+   ↓
+⑩Netlify プレビュー サイト デプロイ（gh-pages から）
+   ↓
+⑪管理画面に通知：「PR作成、Netlify プレビュー可能」
+   ↓
+⑫ユーザーが Netlify で変更内容をレビュー
+   ↓
+⑬管理画面から「適用」ボタンをクリック
+   ↓
+⑭Lambda：main ブランチへのマージを実行
+   ↓
+⑮GitHub Actions (deploy.yml) トリガー
+   ↓
+⑯GitHub Actions：S3 へのデプロイ実行
+   ↓
+⑰本番環境に反映完了
+```
+
+**詳細な技術スタック：**
+
+| コンポーネント | 技術 | 役割 |
+|-------------|------|------|
+| 管理画面（SPA） | Vanilla JavaScript | ユーザープロンプト入力、AI提案の確認・承認 |
+| API Gateway | AWS | REST API エンドポイント |
+| Lambda（メイン） | Python/Node.js | ECS タスク起動、GitHub マージ処理、データベース管理 |
+| ECS（タスク） | Docker コンテナ | Cursor Agent 実行環境 |
+| Cursor Agent | Node.js ベース | リポジトリクローン、コード修正、commit/push |
+| GitHub（リポジトリ） | Git | ソース管理、ブランチ戦略 |
+| GitHub Actions | YAML (deploy.yml) | S3 へのデプロイ自動化 |
+| Netlify | CI/CD | gh-pages からのプレビューサイト自動デプロイ |
+| AWS S3 | 静的ホスティング | 本番環境 （index.html, /admin, その他静的ファイル） |
+| Claude API | LLM | AI コード生成の補助（Cursor Agent が呼び出す） |
+
+**ブランチ戦略：**
+
+```
+main ブランチ
+  ↓（本番・マージ可能な状態）
+
+gh-pages ブランチ
+  ↓（Netlify プレビュー用）
+
+feature ブランチ（自動生成、一時的）
+  ↓（PR作成時点で gh-pages へマージ）
+  ↓（ユーザーが「適用」で main へマージ）
+```
+
+**Cursor Agent（ECS 内部）の動作：**
+
+1. **リポジトリクローン**
+   - GitHub トークンでプライベートリポジトリをクローン
+   - 最新の main ブランチから新しい feature ブランチを作成
+
+2. **コード修正**
+   - ユーザープロンプトに従い、Cursor Agent が該当ファイル（HTML/CSS/JS）を修正
+   - 修正内容を画面に表示（差分表示）
+
+3. **git 操作**
+   ```bash
+   git checkout -b feature/ai-change-{timestamp}
+   # ファイル修正
+   git add .
+   git commit -m "AI: {プロンプト要約}"
+   git push origin feature/ai-change-{timestamp}
+   ```
+
+4. **PR 作成**
+   - GitHub CLI (`gh pr create`) で gh-pages へのマージを指定
+   - PR 説明に修正内容を自動記載
+
+5. **gh-pages への自動マージ**
+   - PR 作成時に GitHub Actions または Lambda が即座にマージ
+
+**Lambda（AI チャット処理）の実装詳細：**
+
+```python
+# AWS Lambda 関数構成例
+
+def lambda_handler(event, context):
+    user_prompt = event['message']
+    user_id = event['user_id']
+
+    # 1. 現在のリポジトリコードを取得（S3 or GitHub から）
+    repo_code = fetch_latest_repo_code()
+
+    # 2. Cursor Agent 用のプロンプトを構築
+    cursor_prompt = build_cursor_prompt(user_prompt, repo_code)
+
+    # 3. ECS タスクを起動
+    ecs_response = start_ecs_task(
+        task_definition='cursor-agent-task',
+        overrides={
+            'environment': [
+                {'name': 'USER_PROMPT', 'value': cursor_prompt},
+                {'name': 'GITHUB_TOKEN', 'value': get_github_token()},
+                {'name': 'AI_SESSION_ID', 'value': session_id}
+            ]
+        }
+    )
+
+    # 4. ECS タスク実行状況をデータベースに記録
+    save_ai_session(user_id, user_prompt, ecs_response['taskArn'])
+
+    # 5. 管理画面にフィードバック（非同期）
+    return {
+        'status': 'processing',
+        'session_id': session_id,
+        'message': 'ECS タスクで修正を処理中です...'
+    }
+
+def merge_to_main(event, context):
+    """ユーザーが「適用」を押した時のハンドラー"""
+    change_id = event['change_id']
+    user_id = event['user_id']
+
+    # 1. 承認権限チェック（admin のみ）
+    if not is_admin(user_id):
+        raise PermissionError("管理者のみが承認できます")
+
+    # 2. feature ブランチから main へマージ
+    pr_number = get_pr_number_from_change(change_id)
+    merge_pr_to_main(pr_number)
+
+    # 3. GitHub Actions 起動を待つ
+    # (deploy.yml が自動的に実行される)
+
+    return {
+        'status': 'merged',
+        'pr_number': pr_number,
+        'message': 'main ブランチへマージしました。GitHub Actions でデプロイが実行中です。'
+    }
+```
+
+**GitHub Actions（deploy.yml）の流れ：**
+
+```yaml
+name: Deploy to S3
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Build
+        run: |
+          # 必要なビルド処理
+          echo "Building..."
+
+      - name: Deploy to S3
+        run: |
+          aws s3 sync . s3://asahigaoka-website --delete
+
+      - name: Cloudfront Cache Invalidation
+        run: |
+          aws cloudfront create-invalidation \
+            --distribution-id ${{ secrets.CLOUDFRONT_DISTRIBUTION_ID }} \
+            --paths "/*"
+```
+
+**管理画面での表示フロー：**
+
+1. ユーザーが AI チャット欄でプロンプント入力
+2. ECS タスク起動中：「処理中...」表示
+3. ECS 完了 & PR 作成：「Netlify プレビューを確認する」ボタン表示
+4. ユーザーが Netlify でレビュー確認後、管理画面に戻る
+5. 「適用」ボタンをクリック → main マージ → S3 デプロイ
+6. デプロイ完了通知：「本番環境に反映されました」
+
+**セキュリティ・権限管理：**
+
+- ECS 内 Cursor Agent：GitHub トークンは Lambda から環境変数で注入（シークレット管理）
+- main へのマージ：Lambda が権限チェック（`is_admin()` で管理者のみ）
+- PR 作成：Cursor Agent が使用する GitHub トークンは read-only に制限可能
+- S3 デプロイ：GitHub Actions が AWS 認証情報を使用（IAM ロール）
+
 ---
 
 ## 5. データベース仕様
@@ -422,6 +800,60 @@ sessionStorage:
 | name | String | ユーザー名 | ○ |
 | role | String | 権限（admin/editor） | ○ |
 | created_at | Timestamp | 作成日時 | ○ |
+
+### 5.4 AIチャット履歴テーブル（AI_Chat_History）
+
+| カラム | データ型 | 説明 | 必須 |
+|-------|--------|------|------|
+| id | String | チャットセッションID（UUID） | ○ |
+| user_id | String | ユーザーID（外部キー） | ○ |
+| message_type | String | メッセージ種別（user/assistant） | ○ |
+| content | Text | メッセージ内容 | ○ |
+| created_at | Timestamp | メッセージ送信時刻 | ○ |
+
+### 5.5 ファイル変更履歴テーブル（File_Change_History）
+
+| カラム | データ型 | 説明 | 必須 |
+|-------|--------|------|------|
+| id | String | 変更ID（UUID） | ○ |
+| user_id | String | 承認したユーザーID | ○ |
+| file_path | String | 変更対象ファイルパス | ○ |
+| change_type | String | 変更種別（create/update/delete） | ○ |
+| old_content | Text | 変更前の内容 | × |
+| new_content | Text | 変更後の内容 | ○ |
+| ai_request_id | String | 対応するAIチャットセッションID | × |
+| status | String | ステータス（pending/approved/rejected） | ○ |
+| created_at | Timestamp | 変更リクエスト時刻 | ○ |
+| approved_at | Timestamp | 承認時刻 | × |
+
+### 5.6 知識ベースドキュメント管理テーブル（Knowledge_Documents）
+
+| カラム | データ型 | 説明 | 必須 |
+|-------|--------|------|------|
+| id | String | ドキュメントID（UUID） | ○ |
+| file_name | String | ファイル名 | ○ |
+| file_type | String | ファイル形式（pdf/docx/txt） | ○ |
+| file_url | String | S3等のファイル保存先URL | ○ |
+| dify_document_id | String | Dify の Document ID | ○ |
+| dify_dataset_id | String | Dify の Dataset ID | ○ |
+| status | String | processing/completed/failed | ○ |
+| uploaded_by | String | アップロードしたユーザーID | ○ |
+| qa_count | Integer | 生成されたQAペア数 | × |
+| created_at | Timestamp | アップロード日時 | ○ |
+| indexed_at | Timestamp | Dify登録完了日時 | × |
+
+### 5.7 LINE会話履歴テーブル（LINE_Conversations）
+
+| カラム | データ型 | 説明 | 必須 |
+|-------|--------|------|------|
+| id | String | 会話ID（UUID） | ○ |
+| line_user_id | String | LINE ユーザーID（匿名化） | ○ |
+| message_type | String | user/assistant | ○ |
+| content | Text | メッセージ内容 | ○ |
+| dify_conversation_id | String | Dify の Conversation ID | × |
+| response_time_ms | Integer | 応答時間（ミリ秒） | × |
+| is_fallback | Boolean | フォールバック応答フラグ | ○ |
+| created_at | Timestamp | 送信時刻 | ○ |
 
 ---
 
@@ -536,11 +968,48 @@ Response: { results: [], count: 5 }
 ### 6.3 LINE連携API
 
 #### 6.3.1 LINE配信実行
+
 ```
-POST /line/send
+POST /api/line/send
 Body: { article_id, target_group: "all" | "group_name" }
 Auth: 必須
 Response: { sent_count: 100, success: true }
+```
+
+#### 6.3.2 LINE Webhook（ユーザーメッセージ受信）
+
+```
+POST /api/line/webhook
+Content-Type: application/json
+X-Line-Signature: {signature}
+
+Request Body (LINE Platform):
+{
+  "events": [
+    {
+      "type": "message",
+      "replyToken": "xxx",
+      "source": {
+        "userId": "U1234567890abcdef",
+        "type": "user"
+      },
+      "message": {
+        "type": "text",
+        "id": "100001",
+        "text": "次のイベントはいつですか？"
+      }
+    }
+  ]
+}
+
+処理フロー:
+1. LINE署名検証
+2. Dify API呼び出し（Chat Completion）
+3. Dify応答を受信
+4. LINE Reply API で返信
+5. 会話履歴をデータベースに記録
+
+Response: 200 OK（LINE Platform へ）
 ```
 
 ### 6.4 X連携API
@@ -552,6 +1021,220 @@ Body: { article_id, schedule_time: "optional" }
 Auth: 必須
 Response: { tweet_id, posted_at }
 ```
+
+### 6.5 AIアシスタント API
+
+#### 6.5.1 AIチャットメッセージ送信
+
+```
+POST /api/ai/chat
+Authorization: Bearer {token}
+Content-Type: application/json
+
+Request:
+{
+  "session_id": "optional (新規の場合は生成)",
+  "message": "TOPページのお知らせセクションの背景色を青から緑に変更してください"
+}
+
+Response: 200 OK
+{
+  "session_id": "session_12345",
+  "response": "了解しました。TOPページのお知らせセクションの背景色を青から緑に変更します。\n変更内容は以下の通りです...",
+  "proposed_changes": {
+    "file_path": "/index.html",
+    "old_code": "...",
+    "new_code": "..."
+  },
+  "timestamp": "2025-11-13T10:30:00Z"
+}
+```
+
+#### 6.5.2 AIチャット履歴取得
+
+```
+GET /api/ai/chat/history?session_id={session_id}
+Authorization: Bearer {token}
+
+Response: 200 OK
+{
+  "session_id": "session_12345",
+  "messages": [
+    {
+      "type": "user",
+      "content": "TOPページのお知らせセクションの背景色を青から緑に変更してください",
+      "timestamp": "2025-11-13T10:30:00Z"
+    },
+    {
+      "type": "assistant",
+      "content": "了解しました。変更内容は...",
+      "timestamp": "2025-11-13T10:30:05Z"
+    }
+  ]
+}
+```
+
+#### 6.5.3 ファイル変更提案の承認
+
+```
+POST /api/ai/changes/approve
+Authorization: Bearer {token}
+Content-Type: application/json
+
+Request:
+{
+  "change_id": "change_abc123",
+  "approved": true
+}
+
+Response: 200 OK
+{
+  "success": true,
+  "file_path": "/index.html",
+  "message": "ファイルが更新されました",
+  "change_history_id": "history_xyz789"
+}
+```
+
+#### 6.5.4 ファイル変更提案のキャンセル
+
+```
+POST /api/ai/changes/reject
+Authorization: Bearer {token}
+Content-Type: application/json
+
+Request:
+{
+  "change_id": "change_abc123",
+  "reason": "修正が不要です"
+}
+
+Response: 200 OK
+{
+  "success": true,
+  "message": "提案がキャンセルされました"
+}
+```
+
+#### 6.5.5 変更履歴取得
+
+```
+GET /api/ai/changes/history?limit=20&offset=0
+Authorization: Bearer {token}
+
+Response: 200 OK
+{
+  "total": 50,
+  "changes": [
+    {
+      "id": "history_xyz789",
+      "file_path": "/index.html",
+      "status": "approved",
+      "user_name": "田中太郎",
+      "approved_at": "2025-11-13T10:35:00Z",
+      "old_content": "...",
+      "new_content": "..."
+    }
+  ]
+}
+```
+
+### 6.6 知識ベース管理API（Dify Knowledge連携）
+
+#### 6.6.1 資料アップロード
+
+```
+POST /api/knowledge/upload
+Authorization: Bearer {token}
+Content-Type: multipart/form-data
+
+Request:
+- file: (ファイル) PDF/Word/テキストファイル
+- dataset_id: Dify Dataset ID（オプション、デフォルトを使用）
+
+Response: 202 Accepted
+{
+  "document_id": "doc_abc123",
+  "status": "processing",
+  "message": "ファイルを処理中です..."
+}
+
+処理フロー:
+1. ファイルを S3 にアップロード
+2. Lambda でテキスト抽出
+3. Claude API で QA 形式に変換
+4. Dify Knowledge API に登録
+5. データベースに記録
+```
+
+#### 6.6.2 登録済み資料一覧取得
+
+```
+GET /api/knowledge/documents?limit=20&offset=0
+Authorization: Bearer {token}
+
+Response: 200 OK
+{
+  "total": 10,
+  "documents": [
+    {
+      "id": "doc_abc123",
+      "file_name": "町会規約.pdf",
+      "file_type": "pdf",
+      "status": "completed",
+      "qa_count": 25,
+      "uploaded_by": "田中太郎",
+      "created_at": "2025-11-13T10:00:00Z",
+      "indexed_at": "2025-11-13T10:05:00Z"
+    }
+  ]
+}
+```
+
+#### 6.6.3 資料削除
+
+```
+DELETE /api/knowledge/documents/{document_id}
+Authorization: Bearer {token}
+
+Response: 200 OK
+{
+  "success": true,
+  "message": "資料を削除しました"
+}
+
+処理フロー:
+1. Dify Knowledge API から削除
+2. S3 ファイルを削除
+3. データベースから削除
+```
+
+#### 6.6.4 Dify API 連携（内部処理）
+
+**Dify Knowledge API エンドポイント**:
+- `POST https://api.dify.ai/v1/datasets/{dataset_id}/documents`
+- `DELETE https://api.dify.ai/v1/datasets/{dataset_id}/documents/{document_id}`
+
+**Dify Chat Completion API**:
+- `POST https://api.dify.ai/v1/chat-messages`
+- Request:
+  ```json
+  {
+    "inputs": {},
+    "query": "ユーザーの質問",
+    "response_mode": "blocking",
+    "conversation_id": "optional",
+    "user": "line_user_id"
+  }
+  ```
+- Response:
+  ```json
+  {
+    "answer": "AI の回答",
+    "conversation_id": "conv_123",
+    "message_id": "msg_456"
+  }
+  ```
 
 ---
 
@@ -642,6 +1325,45 @@ Response: { tweet_id, posted_at }
 - アップロード済み画像一覧（グリッド表示）
 - 各画像：サムネイル、ファイル名、サイズ、削除ボタン
 - 画像プレビュー（クリックで拡大表示）
+
+**AIアシスタント欄（全画面で利用可能）**
+
+- **配置**
+  - 管理画面の右側に常に表示（または折り畳み可能なサイドパネル）
+  - 幅：250～400px（レスポンシブで調整）
+  - 表示/非表示のトグルボタン
+
+- **UI構成**
+  - **ヘッダー**：「AIアシスタント」タイトル + 最小化/閉じるボタン
+
+  - **チャット履歴エリア**（スクロール可能）
+    - ユーザーメッセージ：右側に配置、背景色：青系
+    - AIメッセージ：左側に配置、背景色：灰色系
+    - タイムスタンプ表示
+    - 前回のセッション履歴を表示可能（セッション選択ドロップダウン）
+
+  - **メッセージ入力エリア**
+    - テキストボックス：複数行対応、プレースホルダー「Webサイトの変更を依頼してください...」
+    - 送信ボタン（Enter キーでも送信可）
+    - 送信中はローディング表示
+
+  - **AI提案内容の表示**（チャット下に展開）
+    - **差分表示**：現在のコード vs 提案コード
+    - **プレビュー**：「プレビューを見る」ボタンで変更後の見た目を表示
+    - **アクション**：「承認」「却下」ボタン
+
+  - **変更履歴タブ**
+    - 過去の承認・却下された変更を一覧表示
+    - 各行：実施日時、ファイル名、変更者、承認ステータス
+
+- **機能**
+  - セッション切り替え：ドロップダウンで過去のチャット会話を選択
+  - クリアボタン：現在のセッション履歴をクリア
+  - エクスポート：チャット履歴をJSON形式でダウンロード
+
+- **セキュリティ表示**
+  - AIアシスタントが「管理者のみが変更を承認できます」という注意表示
+  - 危険性が高いコード提案の場合、警告メッセージを表示
 
 ---
 
