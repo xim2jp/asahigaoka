@@ -117,6 +117,7 @@ resource "aws_cloudfront_distribution" "website" {
     default_ttl            = 3600
     max_ttl                = 86400
     compress               = true
+
   }
 
   custom_error_response {
