@@ -159,7 +159,7 @@ class ArticlesManager {
    * 記事を表示
    */
   displayArticles() {
-    const articlesContainer = document.querySelector('.articles-table tbody');
+    const articlesContainer = document.querySelector('table.table tbody');
     if (!articlesContainer) {
       console.warn('テーブルコンテナが見つかりません');
       return;

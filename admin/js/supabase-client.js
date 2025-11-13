@@ -123,8 +123,12 @@ class SupabaseClient {
 
       let query = this.client
         .from('articles')
-        .select('*,author:users(name)')
-        .eq('status', status);
+        .select('*,author:users(id,name)');
+
+      // status が 'all' でない場合のみフィルタリング
+      if (status !== 'all') {
+        query = query.eq('status', status);
+      }
 
       if (category) {
         query = query.eq('category', category);

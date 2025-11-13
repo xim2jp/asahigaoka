@@ -117,17 +117,17 @@
                     <div class="search-box" style="flex: 1;">
                         <input type="text" class="form-control" placeholder="記事を検索...">
                     </div>
-                    <select class="form-control" style="width: 200px;">
-                        <option value="">すべてのカテゴリ</option>
+                    <select class="form-control" style="width: 200px;" data-filter="category">
+                        <option value="all">すべてのカテゴリ</option>
                         <option value="notice">お知らせ</option>
                         <option value="event">イベント情報</option>
-                        <option value="disaster">防災・防犯</option>
-                        <option value="child">子育て支援</option>
-                        <option value="shop">商店街情報</option>
-                        <option value="report">活動レポート</option>
+                        <option value="disaster_safety">防災・防犯</option>
+                        <option value="child_support">子育て支援</option>
+                        <option value="shopping_info">商店街情報</option>
+                        <option value="activity_report">活動レポート</option>
                     </select>
-                    <select class="form-control" style="width: 150px;">
-                        <option value="">すべてのステータス</option>
+                    <select class="form-control" style="width: 150px;" data-filter="status">
+                        <option value="all">すべてのステータス</option>
                         <option value="published">公開中</option>
                         <option value="draft">下書き</option>
                     </select>
@@ -157,166 +157,7 @@
                             </tr>
                         </thead>
                         <tbody>
-                            <tr>
-                                <td data-label="選択"><input type="checkbox" class="item-checkbox"></td>
-                                <td data-label="タイトル">餅つき大会のお知らせ</td>
-                                <td data-label="カテゴリ"><span class="badge badge-info">イベント</span></td>
-                                <td data-label="作成者">田中太郎</td>
-                                <td data-label="ステータス"><span class="badge badge-success">公開中</span></td>
-                                <td data-label="公開日時">2025/11/13 10:00</td>
-                                <td data-label="LINE">✅</td>
-                                <td data-label="X">✅</td>
-                                <td data-label="操作">
-                                    <div class="table-actions">
-                                        <a href="article-edit.html" class="btn btn-sm btn-outline">編集</a>
-                                        <button class="btn btn-sm btn-danger">削除</button>
-                                    </div>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td data-label="選択"><input type="checkbox" class="item-checkbox"></td>
-                                <td data-label="タイトル">防災訓練実施について</td>
-                                <td data-label="カテゴリ"><span class="badge badge-danger">防災・防犯</span></td>
-                                <td data-label="作成者">佐藤花子</td>
-                                <td data-label="ステータス"><span class="badge badge-success">公開中</span></td>
-                                <td data-label="公開日時">2025/11/12 14:30</td>
-                                <td data-label="LINE">✅</td>
-                                <td data-label="X">❌</td>
-                                <td data-label="操作">
-                                    <div class="table-actions">
-                                        <a href="article-edit.html" class="btn btn-sm btn-outline">編集</a>
-                                        <button class="btn btn-sm btn-danger">削除</button>
-                                    </div>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td data-label="選択"><input type="checkbox" class="item-checkbox"></td>
-                                <td data-label="タイトル">子育て支援イベント開催</td>
-                                <td data-label="カテゴリ"><span class="badge badge-warning">子育て支援</span></td>
-                                <td data-label="作成者">鈴木一郎</td>
-                                <td data-label="ステータス"><span class="badge badge-warning">下書き</span></td>
-                                <td data-label="公開日時">-</td>
-                                <td data-label="LINE">❌</td>
-                                <td data-label="X">❌</td>
-                                <td data-label="操作">
-                                    <div class="table-actions">
-                                        <a href="article-edit.html" class="btn btn-sm btn-outline">編集</a>
-                                        <button class="btn btn-sm btn-danger">削除</button>
-                                    </div>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td data-label="選択"><input type="checkbox" class="item-checkbox"></td>
-                                <td data-label="タイトル">商店街セール情報</td>
-                                <td data-label="カテゴリ"><span class="badge badge-info">商店街情報</span></td>
-                                <td data-label="作成者">田中太郎</td>
-                                <td data-label="ステータス"><span class="badge badge-success">公開中</span></td>
-                                <td data-label="公開日時">2025/11/10 09:00</td>
-                                <td data-label="LINE">✅</td>
-                                <td data-label="X">✅</td>
-                                <td data-label="操作">
-                                    <div class="table-actions">
-                                        <a href="article-edit.html" class="btn btn-sm btn-outline">編集</a>
-                                        <button class="btn btn-sm btn-danger">削除</button>
-                                    </div>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td data-label="選択"><input type="checkbox" class="item-checkbox"></td>
-                                <td data-label="タイトル">町会活動レポート10月号</td>
-                                <td data-label="カテゴリ"><span class="badge badge-info">活動レポート</span></td>
-                                <td data-label="作成者">佐藤花子</td>
-                                <td data-label="ステータス"><span class="badge badge-success">公開中</span></td>
-                                <td data-label="公開日時">2025/11/09 15:00</td>
-                                <td data-label="LINE">✅</td>
-                                <td data-label="X">✅</td>
-                                <td data-label="操作">
-                                    <div class="table-actions">
-                                        <a href="article-edit.html" class="btn btn-sm btn-outline">編集</a>
-                                        <button class="btn btn-sm btn-danger">削除</button>
-                                    </div>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td data-label="選択"><input type="checkbox" class="item-checkbox"></td>
-                                <td data-label="タイトル">ゴミ出しルール変更のお知らせ</td>
-                                <td data-label="カテゴリ"><span class="badge badge-info">お知らせ</span></td>
-                                <td data-label="作成者">鈴木一郎</td>
-                                <td data-label="ステータス"><span class="badge badge-success">公開中</span></td>
-                                <td data-label="公開日時">2025/11/08 11:00</td>
-                                <td data-label="LINE">✅</td>
-                                <td data-label="X">❌</td>
-                                <td data-label="操作">
-                                    <div class="table-actions">
-                                        <a href="article-edit.html" class="btn btn-sm btn-outline">編集</a>
-                                        <button class="btn btn-sm btn-danger">削除</button>
-                                    </div>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td data-label="選択"><input type="checkbox" class="item-checkbox"></td>
-                                <td data-label="タイトル">年末年始のお知らせ</td>
-                                <td data-label="カテゴリ"><span class="badge badge-info">お知らせ</span></td>
-                                <td data-label="作成者">田中太郎</td>
-                                <td data-label="ステータス"><span class="badge badge-warning">下書き</span></td>
-                                <td data-label="公開日時">-</td>
-                                <td data-label="LINE">❌</td>
-                                <td data-label="X">❌</td>
-                                <td data-label="操作">
-                                    <div class="table-actions">
-                                        <a href="article-edit.html" class="btn btn-sm btn-outline">編集</a>
-                                        <button class="btn btn-sm btn-danger">削除</button>
-                                    </div>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td data-label="選択"><input type="checkbox" class="item-checkbox"></td>
-                                <td data-label="タイトル">新年会の開催について</td>
-                                <td data-label="カテゴリ"><span class="badge badge-info">イベント</span></td>
-                                <td data-label="作成者">佐藤花子</td>
-                                <td data-label="ステータス"><span class="badge badge-warning">下書き</span></td>
-                                <td data-label="公開日時">-</td>
-                                <td data-label="LINE">❌</td>
-                                <td data-label="X">❌</td>
-                                <td data-label="操作">
-                                    <div class="table-actions">
-                                        <a href="article-edit.html" class="btn btn-sm btn-outline">編集</a>
-                                        <button class="btn btn-sm btn-danger">削除</button>
-                                    </div>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td data-label="選択"><input type="checkbox" class="item-checkbox"></td>
-                                <td data-label="タイトル">防犯パトロール実施報告</td>
-                                <td data-label="カテゴリ"><span class="badge badge-danger">防災・防犯</span></td>
-                                <td data-label="作成者">鈴木一郎</td>
-                                <td data-label="ステータス"><span class="badge badge-success">公開中</span></td>
-                                <td data-label="公開日時">2025/11/05 16:00</td>
-                                <td data-label="LINE">✅</td>
-                                <td data-label="X">✅</td>
-                                <td data-label="操作">
-                                    <div class="table-actions">
-                                        <a href="article-edit.html" class="btn btn-sm btn-outline">編集</a>
-                                        <button class="btn btn-sm btn-danger">削除</button>
-                                    </div>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td data-label="選択"><input type="checkbox" class="item-checkbox"></td>
-                                <td data-label="タイトル">子育てサークル参加者募集</td>
-                                <td data-label="カテゴリ"><span class="badge badge-warning">子育て支援</span></td>
-                                <td data-label="作成者">田中太郎</td>
-                                <td data-label="ステータス"><span class="badge badge-success">公開中</span></td>
-                                <td data-label="公開日時">2025/11/03 10:00</td>
-                                <td data-label="LINE">✅</td>
-                                <td data-label="X">✅</td>
-                                <td data-label="操作">
-                                    <div class="table-actions">
-                                        <a href="article-edit.html" class="btn btn-sm btn-outline">編集</a>
-                                        <button class="btn btn-sm btn-danger">削除</button>
-                                    </div>
-                                </td>
-                            </tr>
+                            <!-- 実データはJavaScriptで動的に挿入される -->
                         </tbody>
                     </table>
                 </div>
