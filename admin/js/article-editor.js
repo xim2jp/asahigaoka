@@ -16,8 +16,11 @@ class ArticleEditor {
    * 初期化
    */
   async init() {
+    console.log('🚀 ArticleEditor 初期化開始');
     await this.checkAuthentication();
+    console.log('✅ 認証チェック完了');
     this.setupEventListeners();
+    console.log('✅ イベントリスナー設定完了');
 
     // URLパラメータから記事IDを取得
     const urlParams = new URLSearchParams(window.location.search);
@@ -57,16 +60,22 @@ class ArticleEditor {
    * イベントリスナーを設定
    */
   setupEventListeners() {
+    console.log('📝 イベントリスナー設定中...');
+
     // 保存ボタン
     const saveBtn = document.querySelector('[data-action="save"]');
+    console.log('保存ボタン:', saveBtn);
     if (saveBtn) {
       saveBtn.addEventListener('click', () => this.saveArticle());
+      console.log('✅ 保存ボタンにリスナー設定');
     }
 
     // 公開ボタン
     const publishBtn = document.querySelector('[data-action="publish"]');
+    console.log('公開ボタン:', publishBtn);
     if (publishBtn) {
       publishBtn.addEventListener('click', () => this.publishArticle());
+      console.log('✅ 公開ボタンにリスナー設定');
     }
 
     // キャンセルボタン
@@ -149,10 +158,14 @@ class ArticleEditor {
    * 記事を保存（下書き）
    */
   async saveArticle() {
+    console.log('💾 saveArticle メソッド実行');
+
     const title = document.querySelector('#title').value.trim();
     const content = document.querySelector('#content').value.trim();
     const excerpt = document.querySelector('#excerpt').value.trim();
     const category = document.querySelector('#category').value;
+
+    console.log('フォーム入力値:', { title, content, excerpt, category });
 
     // バリデーション
     if (!title) {
@@ -166,6 +179,7 @@ class ArticleEditor {
     }
 
     try {
+      console.log('🔄 Supabaseに送信中...');
       const articleData = {
         title,
         content,
