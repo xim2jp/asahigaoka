@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>デバッグテスト</title>
+    <style>
+        body {
+            font-family: monospace;
+            padding: 20px;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        .test-box {
+            border: 1px solid #ddd;
+            padding: 15px;
+            margin-bottom: 15px;
+            border-radius: 4px;
+            background: #f9f9f9;
+        }
+        .success { color: green; }
+        .error { color: red; }
+        button {
+            padding: 10px 20px;
+            margin: 5px;
+            cursor: pointer;
+        }
+        pre {
+            background: #f0f0f0;
+            padding: 10px;
+            border-radius: 4px;
+            overflow-x: auto;
+        }
+    </style>
+</head>
+<body>
+    <h1>CMS デバッグテスト</h1>
+
+    <div class="test-box">
+        <h2>1. Supabase接続テスト</h2>
+        <button onclick="testSupabaseConnection()">接続テスト実行</button>
+        <div id="test1-result"></div>
+    </div>
+
+    <div class="test-box">
+        <h2>2. ユーザー認証テスト</h2>
+        <button onclick="testAuthentication()">認証テスト実行</button>
+        <div id="test2-result"></div>
+    </div>
+
+    <div class="test-box">
+        <h2>3. 記事作成テスト</h2>
+        <button onclick="testCreateArticle()">記事作成テスト実行</button>
+        <div id="test3-result"></div>
+    </div>
+
+    <div class="test-box">
+        <h2>4. コンソール出力</h2>
+        <pre id="console-output"></pre>
+    </div>
+
+    <!-- Supabase JS SDK (CDN) -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+    <!-- Supabase クライアント初期化 -->
+    <script src="js/supabase-client.js"></script>
+
+    <script>
+        // コンソール出力をキャプチャ
+        const consoleOutput = document.getElementById('console-output');
+        const originalLog = console.log;
+        const originalError = console.error;
+
+        console.log = function(...args) {
+            originalLog.apply(console, args);
+            consoleOutput.textContent += args.join(' ') + '\n';
+        };
+
+        console.error = function(...args) {
+            originalError.apply(console, args);
+            consoleOutput.textContent += '❌ ERROR: ' + args.join(' ') + '\n';
+        };
+
+        // テスト1: Supabase接続テスト
+        async function testSupabaseConnection() {
+            const result = document.getElementById('test1-result');
+            result.innerHTML = '検査中...';
+
+            try {
+                console.log('=== Supabase接続テスト開始 ===');
+                console.log('supabaseClient:', window.supabaseClient);
+                console.log('supabaseClient.client:', window.supabaseClient?.client);
+
+                if (!window.supabaseClient || !window.supabaseClient.client) {
+                    throw new Error('Supabaseクライアントが初期化されていません');
+                }
+
+                // 簡単なクエリテスト
+                const testResult = await supabaseClient.client
+                    .from('articles')
+                    .select('count')
+                    .limit(1);
+
+                console.log('記事テーブルアクセス成功:', testResult);
+                result.innerHTML = '<span class="success">✅ Supabase接続成功</span><pre>' + JSON.stringify(testResult, null, 2) + '</pre>';
+            } catch (error) {
+                console.error('接続エラー:', error.message);
+                result.innerHTML = '<span class="error">❌ エラー: ' + error.message + '</span>';
+            }
+        }
+
+        // テスト2: ユーザー認証テスト
+        async function testAuthentication() {
+            const result = document.getElementById('test2-result');
+            result.innerHTML = '検査中...';
+
+            try {
+                console.log('=== ユーザー認証テスト開始 ===');
+
+                const user = await supabaseClient.getCurrentUser();
+                console.log('現在のユーザー:', user);
+
+                if (!user) {
+                    throw new Error('ユーザーが認証されていません');
+                }
+
+                const role = await supabaseClient.getUserRole(user.id);
+                console.log('ユーザーロール:', role);
+
+                result.innerHTML = `<span class="success">✅ 認証成功</span><pre>
+Email: ${user.email}
+ID: ${user.id}
+Role: ${role}
+                </pre>`;
+            } catch (error) {
+                console.error('認証エラー:', error.message);
+                result.innerHTML = '<span class="error">❌ エラー: ' + error.message + '</span>';
+            }
+        }
+
+        // テスト3: 記事作成テスト
+        async function testCreateArticle() {
+            const result = document.getElementById('test3-result');
+            result.innerHTML = '検査中...';
+
+            try {
+                console.log('=== 記事作成テスト開始 ===');
+
+                const user = await supabaseClient.getCurrentUser();
+                if (!user) {
+                    throw new Error('ユーザーが認証されていません。テスト2を実行してください');
+                }
+
+                const testArticle = {
+                    title: 'デバッグテスト記事 ' + new Date().toISOString(),
+                    content: 'これはデバッグテスト用の記事です。',
+                    excerpt: 'テスト',
+                    category: 'notice'
+                };
+
+                console.log('作成するデータ:', testArticle);
+
+                const createResult = await supabaseClient.createArticle(testArticle);
+
+                console.log('記事作成結果:', createResult);
+
+                if (createResult.success) {
+                    result.innerHTML = `<span class="success">✅ 記事作成成功</span><pre>${JSON.stringify(createResult.data, null, 2)}</pre>`;
+                } else {
+                    throw new Error(createResult.error);
+                }
+            } catch (error) {
+                console.error('記事作成エラー:', error.message);
+                result.innerHTML = '<span class="error">❌ エラー: ' + error.message + '</span>';
+            }
+        }
+
+        // 初期表示
+        console.log('デバッグページ読み込み完了');
+        console.log('Supabaseクライアント:', window.supabaseClient);
+    </script>
+</body>
+</html>
