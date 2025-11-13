@@ -126,7 +126,11 @@ class ArticleEditor {
 
       // フォームにデータを設定
       document.querySelector('#title').value = this.currentArticle.title || '';
-      document.querySelector('#content').value = this.currentArticle.content || '';
+      // content は contenteditable div なので textContent を使用
+      const contentDiv = document.querySelector('.editor-content');
+      if (contentDiv) {
+        contentDiv.textContent = this.currentArticle.content || '';
+      }
       document.querySelector('#excerpt').value = this.currentArticle.excerpt || '';
       document.querySelector('#category').value = this.currentArticle.category || 'notice';
 
@@ -161,7 +165,9 @@ class ArticleEditor {
     console.log('💾 saveArticle メソッド実行');
 
     const title = document.querySelector('#title').value.trim();
-    const content = document.querySelector('#content').value.trim();
+    // content は contenteditable div なので textContent を使用
+    const contentDiv = document.querySelector('.editor-content');
+    const content = contentDiv ? contentDiv.textContent.trim() : '';
     const excerpt = document.querySelector('#excerpt').value.trim();
     const category = document.querySelector('#category').value;
 
