@@ -71,9 +71,10 @@ CREATE INDEX idx_articles_line_published ON public.articles(line_published);
 CREATE INDEX idx_articles_x_published ON public.articles(x_published);
 
 -- フルテキスト検索インデックス
-CREATE INDEX idx_articles_search ON public.articles USING gin(
-  to_tsvector('japanese', title || ' ' || content)
-);
+-- 注: Supabaseでは日本語設定がデフォルトで利用できないため、
+-- アプリケーション側でILIKE検索を実装
+-- 単純なインデックスのみを使用
+CREATE INDEX idx_articles_title ON public.articles(title);
 
 COMMENT ON TABLE public.articles IS '記事管理テーブル';
 COMMENT ON COLUMN public.articles.category IS 'カテゴリ分類';
@@ -228,17 +229,18 @@ EXECUTE FUNCTION update_updated_at_column();
 -- 注: Supabase Auth経由で users テーブルに挿入する
 -- このスクリプトでは手動で実施するか、アプリケーションから実施
 
--- テストカテゴリデータ
-INSERT INTO public.articles (title, content, excerpt, category, author, status)
-VALUES (
-  'テスト記事',
-  'これはテスト記事です。',
-  'テスト記事の抜粋',
-  'notice',
-  (SELECT id FROM public.users LIMIT 1),
-  'draft'
-)
-ON CONFLICT DO NOTHING;
+-- テストカテゴリデータ（ユーザー作成後に実行）
+-- 注: usersテーブルにレコードがない場合はスキップ
+-- INSERT INTO public.articles (title, content, excerpt, category, author, status)
+-- VALUES (
+--   'テスト記事',
+--   'これはテスト記事です。',
+--   'テスト記事の抜粋',
+--   'notice',
+--   (SELECT id FROM public.users LIMIT 1),
+--   'draft'
+-- )
+-- ON CONFLICT DO NOTHING;
 
 -- ==========================================
 -- End of Schema

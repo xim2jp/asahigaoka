@@ -150,16 +150,83 @@
         </p>
     </div>
 
-    <script src="js/app.js"></script>
-    <script>
-        // ログインフォームのモック処理
-        document.querySelector('form').addEventListener('submit', function(e) {
-            e.preventDefault();
-            const email = document.querySelector('#email').value;
-            const password = document.querySelector('#password').value;
+    <!-- Supabase JS SDK (CDN) -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
-            // モックアップなので、どんな入力でもダッシュボードへ遷移
-            window.location.href = 'index.html';
+    <!-- Supabase クライアント初期化 -->
+    <script src="js/supabase-client.js"></script>
+
+    <!-- ログイン処理 -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const form = document.querySelector('form');
+            const submitBtn = form.querySelector('[type="submit"]');
+            const emailInput = document.querySelector('#email');
+            const passwordInput = document.querySelector('#password');
+            const rememberCheckbox = document.querySelector('#remember');
+
+            // 保存されたメールアドレスを復元
+            const savedEmail = localStorage.getItem('asahigaoka_saved_email');
+            if (savedEmail) {
+                emailInput.value = savedEmail;
+                rememberCheckbox.checked = true;
+            }
+
+            form.addEventListener('submit', async function(e) {
+                e.preventDefault();
+
+                const email = emailInput.value.trim();
+                const password = passwordInput.value;
+
+                if (!email || !password) {
+                    alert('メールアドレスとパスワードを入力してください');
+                    return;
+                }
+
+                // UI フィードバック
+                submitBtn.disabled = true;
+                submitBtn.textContent = 'ログイン中...';
+
+                try {
+                    // Supabase にログイン
+                    const result = await supabaseClient.signIn(email, password);
+
+                    if (result.success) {
+                        // メールアドレスを保存（チェックボックスが有効な場合）
+                        if (rememberCheckbox.checked) {
+                            localStorage.setItem('asahigaoka_saved_email', email);
+                        } else {
+                            localStorage.removeItem('asahigaoka_saved_email');
+                        }
+
+                        // ユーザーロール を取得
+                        const role = await supabaseClient.getUserRole(result.user.id);
+
+                        // ロール情報をセッションに保存
+                        localStorage.setItem('asahigaoka_user_role', role);
+
+                        // ダッシュボード へリダイレクト
+                        console.log('✅ ログイン成功:', email);
+                        window.location.href = 'index.html';
+                    } else {
+                        // ログイン失敗
+                        alert('ログインに失敗しました。\n' + result.error);
+                        console.error('ログインエラー:', result.error);
+                    }
+                } catch (error) {
+                    console.error('予期しないエラー:', error);
+                    alert('予期しないエラーが発生しました: ' + error.message);
+                } finally {
+                    submitBtn.disabled = false;
+                    submitBtn.textContent = 'ログイン';
+                }
+            });
+
+            // パスワード忘れたリンク（将来実装）
+            document.querySelector('.forgot-password').addEventListener('click', function(e) {
+                e.preventDefault();
+                alert('パスワード リセット機能は準備中です。\n管理者にお問い合わせください。');
+            });
         });
     </script>
 </body>

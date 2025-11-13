@@ -401,35 +401,62 @@
         </main>
     </div>
 
-    <script src="js/app.js"></script>
-    <script>
-        // 画像プレビュー
-        document.getElementById('featured-image').addEventListener('change', function(e) {
-            const file = e.target.files[0];
-            const preview = document.getElementById('image-preview');
+    <!-- Supabase JS SDK (CDN) -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
-            if (file) {
-                const reader = new FileReader();
-                reader.onload = function(e) {
-                    preview.src = e.target.result;
-                    preview.classList.add('show');
-                };
-                reader.readAsDataURL(file);
-            } else {
-                preview.classList.remove('show');
-            }
-        });
+    <!-- Supabase クライアント初期化 -->
+    <script src="js/supabase-client.js"></script>
+
+    <!-- 管理画面共通機能 -->
+    <script src="js/app.js"></script>
+
+    <!-- 記事編集機能 -->
+    <script src="js/article-editor.js"></script>
+
+    <!-- UIサポート機能 -->
+    <script>
+        // 画像プレビュー（ローカルプレビュー）
+        const featuredImageInput = document.getElementById('featured-image');
+        if (featuredImageInput) {
+            featuredImageInput.addEventListener('change', function(e) {
+                const file = e.target.files[0];
+                const preview = document.getElementById('image-preview');
+
+                if (file) {
+                    const reader = new FileReader();
+                    reader.onload = function(e) {
+                        preview.src = e.target.result;
+                        preview.classList.add('show');
+                    };
+                    reader.readAsDataURL(file);
+                } else {
+                    preview.classList.remove('show');
+                }
+            });
+        }
 
         // 文字数カウント
-        document.getElementById('excerpt').addEventListener('input', function() {
-            const length = this.value.length;
-            this.nextElementSibling.textContent = `${length} / 100 文字`;
-        });
+        const excerptElement = document.getElementById('excerpt');
+        if (excerptElement) {
+            excerptElement.addEventListener('input', function() {
+                const length = this.value.length;
+                const counter = this.nextElementSibling;
+                if (counter) {
+                    counter.textContent = `${length} / 500 文字`;
+                }
+            });
+        }
 
-        document.getElementById('x-message').addEventListener('input', function() {
-            const length = this.value.length;
-            this.nextElementSibling.textContent = `${length} / 280 文字`;
-        });
+        const xMessageElement = document.getElementById('x-message');
+        if (xMessageElement) {
+            xMessageElement.addEventListener('input', function() {
+                const length = this.value.length;
+                const counter = this.nextElementSibling;
+                if (counter) {
+                    counter.textContent = `${length} / 280 文字`;
+                }
+            });
+        }
 
         // タグ削除
         document.querySelectorAll('.tag-close').forEach(close => {
@@ -439,24 +466,27 @@
         });
 
         // タグ追加（Enter キー）
-        document.querySelector('.tag-input input').addEventListener('keypress', function(e) {
-            if (e.key === 'Enter') {
-                e.preventDefault();
-                if (this.value.trim()) {
-                    const tag = document.createElement('span');
-                    tag.className = 'tag';
-                    tag.innerHTML = `${this.value} <span class="tag-close">×</span>`;
-                    this.parentElement.insertBefore(tag, this);
+        const tagInput = document.querySelector('.tag-input input');
+        if (tagInput) {
+            tagInput.addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    e.preventDefault();
+                    if (this.value.trim()) {
+                        const tag = document.createElement('span');
+                        tag.className = 'tag';
+                        tag.innerHTML = `${this.value} <span class="tag-close">×</span>`;
+                        this.parentElement.insertBefore(tag, this);
 
-                    // 新しいタグの削除ボタンにイベントリスナーを追加
-                    tag.querySelector('.tag-close').addEventListener('click', function() {
-                        this.parentElement.remove();
-                    });
+                        // 新しいタグの削除ボタンにイベントリスナーを追加
+                        tag.querySelector('.tag-close').addEventListener('click', function() {
+                            this.parentElement.remove();
+                        });
 
-                    this.value = '';
+                        this.value = '';
+                    }
                 }
-            }
-        });
+            });
+        }
     </script>
 </body>
 </html>
