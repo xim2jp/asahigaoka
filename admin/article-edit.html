@@ -384,18 +384,18 @@
 
                 <!-- アクションボタン -->
                 <div class="btn-group" style="margin-top: 30px;">
-                    <button type="submit" class="btn btn-primary btn-lg">
-                        💾 保存して公開
-                    </button>
-                    <button type="button" class="btn btn-secondary btn-lg">
+                    <button type="button" data-action="save" class="btn btn-secondary btn-lg">
                         📝 下書き保存
+                    </button>
+                    <button type="button" data-action="publish" class="btn btn-primary btn-lg">
+                        💾 保存して公開
                     </button>
                     <button type="button" class="btn btn-outline btn-lg">
                         👁️ プレビュー
                     </button>
-                    <a href="articles.html" class="btn btn-outline btn-lg">
+                    <button type="button" data-action="cancel" class="btn btn-outline btn-lg">
                         キャンセル
-                    </a>
+                    </button>
                 </div>
             </form>
         </main>
