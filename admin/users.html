@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ユーザー管理 - 旭丘一丁目町会 管理画面</title>
+    <link rel="stylesheet" href="css/admin.css">
+    <link rel="stylesheet" href="css/responsive.css">
+</head>
+<body>
+    <!-- ヘッダー -->
+    <header class="admin-header">
+        <div class="header-content">
+            <button class="mobile-menu-toggle">☰</button>
+            <a href="index.html" class="logo">🏘️ 旭丘一丁目町会</a>
+
+            <nav class="header-nav">
+                <a href="index.html">ダッシュボード</a>
+                <a href="articles.html">記事管理</a>
+                <a href="users.html" class="active">ユーザー管理</a>
+                <a href="#">設定</a>
+            </nav>
+
+            <div class="user-menu">
+                <span class="user-name">田中太郎</span>
+                <div class="user-avatar">田</div>
+                <a href="login.html" class="btn btn-sm btn-outline">ログアウト</a>
+            </div>
+        </div>
+    </header>
+
+    <div class="admin-layout">
+        <!-- サイドバー -->
+        <aside class="sidebar">
+            <ul class="sidebar-menu">
+                <li>
+                    <a href="index.html">
+                        <span class="icon">📊</span>
+                        ダッシュボード
+                    </a>
+                </li>
+                <li>
+                    <a href="articles.html">
+                        <span class="icon">📝</span>
+                        記事管理
+                    </a>
+                </li>
+                <li>
+                    <a href="article-edit.html">
+                        <span class="icon">✏️</span>
+                        新規記事作成
+                    </a>
+                </li>
+                <li>
+                    <a href="#">
+                        <span class="icon">📷</span>
+                        メディア管理
+                    </a>
+                </li>
+                <li>
+                    <a href="users.html" class="active">
+                        <span class="icon">👥</span>
+                        ユーザー管理
+                    </a>
+                </li>
+                <li>
+                    <a href="#">
+                        <span class="icon">📱</span>
+                        LINE配信
+                    </a>
+                </li>
+                <li>
+                    <a href="#">
+                        <span class="icon">🐦</span>
+                        X投稿
+                    </a>
+                </li>
+                <li>
+                    <a href="#">
+                        <span class="icon">⚙️</span>
+                        設定
+                    </a>
+                </li>
+            </ul>
+        </aside>
+
+        <!-- メインコンテンツ -->
+        <main class="main-content">
+            <div class="toolbar">
+                <div>
+                    <h1 class="page-title">ユーザー管理</h1>
+                </div>
+                <div>
+                    <button class="btn btn-primary" data-modal="add-user-modal">
+                        ➕ 新規ユーザー追加
+                    </button>
+                </div>
+            </div>
+
+            <!-- ユーザー一覧 -->
+            <div class="card">
+                <div class="card-header">
+                    <h2 class="card-title">登録ユーザー一覧</h2>
+                </div>
+
+                <div class="table-wrapper table-responsive">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>名前</th>
+                                <th>メールアドレス</th>
+                                <th>権限</th>
+                                <th>最終ログイン</th>
+                                <th>登録日</th>
+                                <th>ステータス</th>
+                                <th>操作</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td data-label="ID">001</td>
+                                <td data-label="名前">
+                                    <div style="display: flex; align-items: center; gap: 10px;">
+                                        <div class="user-avatar">田</div>
+                                        田中太郎
+                                    </div>
+                                </td>
+                                <td data-label="メール">admin@example.com</td>
+                                <td data-label="権限"><span class="badge badge-danger">管理者</span></td>
+                                <td data-label="最終ログイン">2025/11/13 10:30</td>
+                                <td data-label="登録日">2025/01/01</td>
+                                <td data-label="ステータス"><span class="badge badge-success">有効</span></td>
+                                <td data-label="操作">
+                                    <div class="table-actions">
+                                        <button class="btn btn-sm btn-outline" data-modal="edit-user-modal">編集</button>
+                                        <button class="btn btn-sm btn-danger">削除</button>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td data-label="ID">002</td>
+                                <td data-label="名前">
+                                    <div style="display: flex; align-items: center; gap: 10px;">
+                                        <div class="user-avatar" style="background-color: var(--info-color);">佐</div>
+                                        佐藤花子
+                                    </div>
+                                </td>
+                                <td data-label="メール">sato@example.com</td>
+                                <td data-label="権限"><span class="badge badge-info">編集者</span></td>
+                                <td data-label="最終ログイン">2025/11/12 15:20</td>
+                                <td data-label="登録日">2025/02/15</td>
+                                <td data-label="ステータス"><span class="badge badge-success">有効</span></td>
+                                <td data-label="操作">
+                                    <div class="table-actions">
+                                        <button class="btn btn-sm btn-outline" data-modal="edit-user-modal">編集</button>
+                                        <button class="btn btn-sm btn-danger">削除</button>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td data-label="ID">003</td>
+                                <td data-label="名前">
+                                    <div style="display: flex; align-items: center; gap: 10px;">
+                                        <div class="user-avatar" style="background-color: var(--warning-color);">鈴</div>
+                                        鈴木一郎
+                                    </div>
+                                </td>
+                                <td data-label="メール">suzuki@example.com</td>
+                                <td data-label="権限"><span class="badge badge-info">編集者</span></td>
+                                <td data-label="最終ログイン">2025/11/10 09:00</td>
+                                <td data-label="登録日">2025/03/20</td>
+                                <td data-label="ステータス"><span class="badge badge-success">有効</span></td>
+                                <td data-label="操作">
+                                    <div class="table-actions">
+                                        <button class="btn btn-sm btn-outline" data-modal="edit-user-modal">編集</button>
+                                        <button class="btn btn-sm btn-danger">削除</button>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td data-label="ID">004</td>
+                                <td data-label="名前">
+                                    <div style="display: flex; align-items: center; gap: 10px;">
+                                        <div class="user-avatar" style="background-color: var(--secondary-color);">山</div>
+                                        山田次郎
+                                    </div>
+                                </td>
+                                <td data-label="メール">yamada@example.com</td>
+                                <td data-label="権限"><span class="badge badge-info">編集者</span></td>
+                                <td data-label="最終ログイン">2025/11/08 14:00</td>
+                                <td data-label="登録日">2025/04/10</td>
+                                <td data-label="ステータス"><span class="badge badge-warning">無効</span></td>
+                                <td data-label="操作">
+                                    <div class="table-actions">
+                                        <button class="btn btn-sm btn-outline" data-modal="edit-user-modal">編集</button>
+                                        <button class="btn btn-sm btn-danger">削除</button>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td data-label="ID">005</td>
+                                <td data-label="名前">
+                                    <div style="display: flex; align-items: center; gap: 10px;">
+                                        <div class="user-avatar" style="background-color: var(--accent-color);">高</div>
+                                        高橋美咲
+                                    </div>
+                                </td>
+                                <td data-label="メール">takahashi@example.com</td>
+                                <td data-label="権限"><span class="badge badge-danger">管理者</span></td>
+                                <td data-label="最終ログイン">2025/11/13 08:30</td>
+                                <td data-label="登録日">2025/05/01</td>
+                                <td data-label="ステータス"><span class="badge badge-success">有効</span></td>
+                                <td data-label="操作">
+                                    <div class="table-actions">
+                                        <button class="btn btn-sm btn-outline" data-modal="edit-user-modal">編集</button>
+                                        <button class="btn btn-sm btn-danger">削除</button>
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- ユーザー統計 -->
+            <div class="stat-cards" style="margin-top: 30px;">
+                <div class="stat-card">
+                    <div class="stat-card-header">
+                        <span class="stat-card-title">総ユーザー数</span>
+                        <div class="stat-card-icon" style="background: #e8f5e9; color: #4caf50;">👥</div>
+                    </div>
+                    <div class="stat-card-value">5</div>
+                    <div class="stat-card-change">管理者: 2名 / 編集者: 3名</div>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-card-header">
+                        <span class="stat-card-title">有効ユーザー</span>
+                        <div class="stat-card-icon" style="background: #e3f2fd; color: #2196f3;">✅</div>
+                    </div>
+                    <div class="stat-card-value">4</div>
+                    <div class="stat-card-change">80% アクティブ</div>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-card-header">
+                        <span class="stat-card-title">今日のログイン</span>
+                        <div class="stat-card-icon" style="background: #fff3e0; color: #ff9800;">📅</div>
+                    </div>
+                    <div class="stat-card-value">2</div>
+                    <div class="stat-card-change">田中太郎、高橋美咲</div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- 新規ユーザー追加モーダル -->
+    <div id="add-user-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title">新規ユーザー追加</h2>
+                <button class="modal-close">&times;</button>
+            </div>
+
+            <form>
+                <div class="form-group">
+                    <label for="new-name" class="form-label">名前 *</label>
+                    <input type="text" id="new-name" class="form-control" placeholder="山田太郎" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="new-email" class="form-label">メールアドレス *</label>
+                    <input type="email" id="new-email" class="form-control" placeholder="yamada@example.com" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="new-password" class="form-label">パスワード *</label>
+                    <input type="password" id="new-password" class="form-control" placeholder="8文字以上" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="new-role" class="form-label">権限 *</label>
+                    <select id="new-role" class="form-control" required>
+                        <option value="">権限を選択</option>
+                        <option value="admin">管理者</option>
+                        <option value="editor">編集者</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label>
+                        <input type="checkbox" checked>
+                        ユーザーを有効にする
+                    </label>
+                </div>
+
+                <div class="btn-group" style="margin-top: 20px;">
+                    <button type="submit" class="btn btn-primary">追加</button>
+                    <button type="button" class="btn btn-outline modal-close">キャンセル</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- ユーザー編集モーダル -->
+    <div id="edit-user-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title">ユーザー情報編集</h2>
+                <button class="modal-close">&times;</button>
+            </div>
+
+            <form>
+                <div class="form-group">
+                    <label for="edit-name" class="form-label">名前 *</label>
+                    <input type="text" id="edit-name" class="form-control" value="田中太郎" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="edit-email" class="form-label">メールアドレス *</label>
+                    <input type="email" id="edit-email" class="form-control" value="admin@example.com" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="edit-password" class="form-label">新しいパスワード（変更する場合のみ）</label>
+                    <input type="password" id="edit-password" class="form-control" placeholder="変更しない場合は空欄">
+                </div>
+
+                <div class="form-group">
+                    <label for="edit-role" class="form-label">権限 *</label>
+                    <select id="edit-role" class="form-control" required>
+                        <option value="admin" selected>管理者</option>
+                        <option value="editor">編集者</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label>
+                        <input type="checkbox" checked>
+                        ユーザーを有効にする
+                    </label>
+                </div>
+
+                <div class="alert alert-info">
+                    <strong>最終ログイン:</strong> 2025年11月13日 10:30<br>
+                    <strong>登録日:</strong> 2025年1月1日
+                </div>
+
+                <div class="btn-group" style="margin-top: 20px;">
+                    <button type="submit" class="btn btn-primary">更新</button>
+                    <button type="button" class="btn btn-outline modal-close">キャンセル</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script src="js/app.js"></script>
+</body>
+</html>

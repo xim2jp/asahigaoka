@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ダッシュボード - 旭丘一丁目町会 管理画面</title>
+    <link rel="stylesheet" href="css/admin.css">
+    <link rel="stylesheet" href="css/responsive.css">
+</head>
+<body>
+    <!-- ヘッダー -->
+    <header class="admin-header">
+        <div class="header-content">
+            <button class="mobile-menu-toggle">☰</button>
+            <a href="index.html" class="logo">🏘️ 旭丘一丁目町会</a>
+
+            <nav class="header-nav">
+                <a href="index.html" class="active">ダッシュボード</a>
+                <a href="articles.html">記事管理</a>
+                <a href="users.html">ユーザー管理</a>
+                <a href="#">設定</a>
+            </nav>
+
+            <div class="user-menu">
+                <span class="user-name">田中太郎</span>
+                <div class="user-avatar">田</div>
+                <a href="login.html" class="btn btn-sm btn-outline">ログアウト</a>
+            </div>
+        </div>
+    </header>
+
+    <div class="admin-layout">
+        <!-- サイドバー -->
+        <aside class="sidebar">
+            <ul class="sidebar-menu">
+                <li>
+                    <a href="index.html" class="active">
+                        <span class="icon">📊</span>
+                        ダッシュボード
+                    </a>
+                </li>
+                <li>
+                    <a href="articles.html">
+                        <span class="icon">📝</span>
+                        記事管理
+                    </a>
+                </li>
+                <li>
+                    <a href="article-edit.html">
+                        <span class="icon">✏️</span>
+                        新規記事作成
+                    </a>
+                </li>
+                <li>
+                    <a href="#">
+                        <span class="icon">📷</span>
+                        メディア管理
+                    </a>
+                </li>
+                <li>
+                    <a href="users.html">
+                        <span class="icon">👥</span>
+                        ユーザー管理
+                    </a>
+                </li>
+                <li>
+                    <a href="#">
+                        <span class="icon">📱</span>
+                        LINE配信
+                    </a>
+                </li>
+                <li>
+                    <a href="#">
+                        <span class="icon">🐦</span>
+                        X投稿
+                    </a>
+                </li>
+                <li>
+                    <a href="#">
+                        <span class="icon">⚙️</span>
+                        設定
+                    </a>
+                </li>
+            </ul>
+        </aside>
+
+        <!-- メインコンテンツ -->
+        <main class="main-content">
+            <h1 class="page-title">ダッシュボード</h1>
+
+            <!-- アラート表示エリア -->
+            <div class="alert alert-success">
+                ようこそ、田中太郎さん。最終ログイン: 2025年11月13日 10:30
+            </div>
+
+            <!-- 統計カード -->
+            <div class="stat-cards">
+                <div class="stat-card">
+                    <div class="stat-card-header">
+                        <span class="stat-card-title">総記事数</span>
+                        <div class="stat-card-icon" style="background: #e8f5e9; color: #4caf50;">📄</div>
+                    </div>
+                    <div class="stat-card-value">156</div>
+                    <div class="stat-card-change">前月比 +12件</div>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-card-header">
+                        <span class="stat-card-title">今月の記事</span>
+                        <div class="stat-card-icon" style="background: #fff3e0; color: #ff9800;">✍️</div>
+                    </div>
+                    <div class="stat-card-value">24</div>
+                    <div class="stat-card-change">前月比 +8件</div>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-card-header">
+                        <span class="stat-card-title">LINE配信数</span>
+                        <div class="stat-card-icon" style="background: #e8f5e9; color: #00b900;">💬</div>
+                    </div>
+                    <div class="stat-card-value">18</div>
+                    <div class="stat-card-change">今月の配信</div>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-card-header">
+                        <span class="stat-card-title">X投稿数</span>
+                        <div class="stat-card-icon" style="background: #e3f2fd; color: #1da1f2;">🐦</div>
+                    </div>
+                    <div class="stat-card-value">32</div>
+                    <div class="stat-card-change">今月の投稿</div>
+                </div>
+            </div>
+
+            <!-- 最新記事とクイックアクション -->
+            <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 20px;">
+                <!-- 最新記事 -->
+                <div class="card">
+                    <div class="card-header">
+                        <h2 class="card-title">最新の記事</h2>
+                    </div>
+                    <div class="table-wrapper">
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>タイトル</th>
+                                    <th>カテゴリ</th>
+                                    <th>ステータス</th>
+                                    <th>更新日</th>
+                                    <th>操作</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>餅つき大会のお知らせ</td>
+                                    <td><span class="badge badge-info">イベント</span></td>
+                                    <td><span class="badge badge-success">公開中</span></td>
+                                    <td>2025/11/13</td>
+                                    <td>
+                                        <div class="table-actions">
+                                            <a href="article-edit.html" class="btn btn-sm btn-outline">編集</a>
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>防災訓練実施について</td>
+                                    <td><span class="badge badge-danger">防災・防犯</span></td>
+                                    <td><span class="badge badge-success">公開中</span></td>
+                                    <td>2025/11/12</td>
+                                    <td>
+                                        <div class="table-actions">
+                                            <a href="article-edit.html" class="btn btn-sm btn-outline">編集</a>
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>子育て支援イベント開催</td>
+                                    <td><span class="badge badge-warning">子育て支援</span></td>
+                                    <td><span class="badge badge-warning">下書き</span></td>
+                                    <td>2025/11/11</td>
+                                    <td>
+                                        <div class="table-actions">
+                                            <a href="article-edit.html" class="btn btn-sm btn-outline">編集</a>
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>商店街セール情報</td>
+                                    <td><span class="badge badge-info">商店街情報</span></td>
+                                    <td><span class="badge badge-success">公開中</span></td>
+                                    <td>2025/11/10</td>
+                                    <td>
+                                        <div class="table-actions">
+                                            <a href="article-edit.html" class="btn btn-sm btn-outline">編集</a>
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>町会活動レポート10月号</td>
+                                    <td><span class="badge badge-info">活動レポート</span></td>
+                                    <td><span class="badge badge-success">公開中</span></td>
+                                    <td>2025/11/09</td>
+                                    <td>
+                                        <div class="table-actions">
+                                            <a href="article-edit.html" class="btn btn-sm btn-outline">編集</a>
+                                        </div>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div style="margin-top: 15px;">
+                        <a href="articles.html" class="btn btn-primary">すべての記事を見る</a>
+                    </div>
+                </div>
+
+                <!-- クイックアクション -->
+                <div>
+                    <div class="card">
+                        <div class="card-header">
+                            <h2 class="card-title">クイックアクション</h2>
+                        </div>
+                        <div style="display: flex; flex-direction: column; gap: 10px;">
+                            <a href="article-edit.html" class="btn btn-primary btn-block">
+                                ✏️ 新規記事作成
+                            </a>
+                            <a href="#" class="btn btn-secondary btn-block">
+                                📱 LINE配信
+                            </a>
+                            <a href="#" class="btn btn-secondary btn-block">
+                                🐦 X投稿
+                            </a>
+                            <a href="#" class="btn btn-outline btn-block">
+                                📷 画像アップロード
+                            </a>
+                            <a href="users.html" class="btn btn-outline btn-block">
+                                👥 ユーザー管理
+                            </a>
+                        </div>
+                    </div>
+
+                    <!-- 下書き記事 -->
+                    <div class="card" style="margin-top: 20px;">
+                        <div class="card-header">
+                            <h2 class="card-title">下書き記事</h2>
+                        </div>
+                        <ul style="list-style: none; padding: 0;">
+                            <li style="padding: 10px 0; border-bottom: 1px solid var(--border-color);">
+                                <a href="article-edit.html" style="color: var(--text-primary); text-decoration: none;">
+                                    📄 子育て支援イベント開催
+                                    <br>
+                                    <small style="color: var(--text-secondary);">更新: 2日前</small>
+                                </a>
+                            </li>
+                            <li style="padding: 10px 0; border-bottom: 1px solid var(--border-color);">
+                                <a href="article-edit.html" style="color: var(--text-primary); text-decoration: none;">
+                                    📄 年末年始のお知らせ
+                                    <br>
+                                    <small style="color: var(--text-secondary);">更新: 5日前</small>
+                                </a>
+                            </li>
+                            <li style="padding: 10px 0;">
+                                <a href="article-edit.html" style="color: var(--text-primary); text-decoration: none;">
+                                    📄 新年会の開催について
+                                    <br>
+                                    <small style="color: var(--text-secondary);">更新: 1週間前</small>
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 今月のカレンダー（簡易版） -->
+            <div class="card" style="margin-top: 20px;">
+                <div class="card-header">
+                    <h2 class="card-title">今月のイベントカレンダー</h2>
+                </div>
+                <div style="padding: 20px; background: var(--bg-secondary); border-radius: 4px;">
+                    <p style="text-align: center; color: var(--text-secondary);">
+                        📅 カレンダー表示機能は実装予定です
+                    </p>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script src="js/app.js"></script>
+</body>
+</html>

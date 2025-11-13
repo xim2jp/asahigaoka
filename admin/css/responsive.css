@@ -1,0 +1,352 @@
+/* レスポンシブデザイン */
+
+/* タブレット (768px - 1024px) */
+@media (max-width: 1024px) {
+    .admin-layout {
+        flex-direction: column;
+    }
+
+    .sidebar {
+        width: 100%;
+        border-right: none;
+        border-bottom: 1px solid var(--border-color);
+        display: none;
+    }
+
+    .sidebar.mobile-show {
+        display: block;
+    }
+
+    .main-content {
+        padding: 20px;
+    }
+
+    .stat-cards {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .modal-content {
+        width: 95%;
+    }
+}
+
+/* スマートフォン (768px以下) */
+@media (max-width: 768px) {
+    /* ヘッダー */
+    .header-content {
+        padding: 10px 15px;
+    }
+
+    .header-nav {
+        display: none;
+        position: absolute;
+        top: 100%;
+        left: 0;
+        right: 0;
+        background-color: white;
+        box-shadow: var(--shadow);
+        flex-direction: column;
+        padding: 10px 0;
+    }
+
+    .header-nav.mobile-show {
+        display: flex;
+    }
+
+    .header-nav a {
+        padding: 12px 20px;
+        border-radius: 0;
+    }
+
+    .mobile-menu-toggle {
+        display: block;
+    }
+
+    /* サイドバー */
+    .sidebar {
+        position: fixed;
+        top: 60px;
+        left: -250px;
+        width: 250px;
+        height: calc(100vh - 60px);
+        background-color: white;
+        box-shadow: 2px 0 5px rgba(0,0,0,0.1);
+        transition: left 0.3s;
+        z-index: 99;
+    }
+
+    .sidebar.mobile-show {
+        left: 0;
+    }
+
+    /* メインコンテンツ */
+    .main-content {
+        padding: 15px;
+    }
+
+    .page-title {
+        font-size: 20px;
+    }
+
+    /* カード */
+    .card {
+        padding: 15px;
+    }
+
+    /* 統計カード */
+    .stat-cards {
+        grid-template-columns: 1fr;
+    }
+
+    /* テーブル */
+    .table-wrapper {
+        overflow-x: auto;
+    }
+
+    .table {
+        font-size: 14px;
+    }
+
+    .table th,
+    .table td {
+        padding: 8px;
+    }
+
+    /* 小画面でのテーブル表示改善 */
+    @media (max-width: 480px) {
+        .table-responsive {
+            display: block;
+        }
+
+        .table-responsive thead {
+            display: none;
+        }
+
+        .table-responsive tbody,
+        .table-responsive tr,
+        .table-responsive td {
+            display: block;
+        }
+
+        .table-responsive tr {
+            margin-bottom: 10px;
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            padding: 10px;
+        }
+
+        .table-responsive td {
+            padding: 5px 0;
+            border: none;
+            position: relative;
+            padding-left: 120px;
+        }
+
+        .table-responsive td::before {
+            content: attr(data-label);
+            position: absolute;
+            left: 0;
+            font-weight: 600;
+            color: var(--text-secondary);
+        }
+    }
+
+    /* ボタングループ */
+    .btn-group {
+        flex-direction: column;
+    }
+
+    .btn-group .btn {
+        width: 100%;
+    }
+
+    /* ツールバー */
+    .toolbar {
+        flex-direction: column;
+        gap: 10px;
+    }
+
+    .toolbar-left,
+    .toolbar-right {
+        width: 100%;
+        justify-content: space-between;
+    }
+
+    .search-box {
+        flex: 1;
+    }
+
+    /* フォーム */
+    .form-row {
+        display: block;
+    }
+
+    .form-row .form-group {
+        margin-bottom: 15px;
+    }
+
+    /* エディタツールバー */
+    .editor-toolbar {
+        flex-wrap: wrap;
+    }
+
+    /* ページネーション */
+    .pagination {
+        flex-wrap: wrap;
+    }
+
+    .pagination a,
+    .pagination span {
+        padding: 6px 10px;
+        font-size: 14px;
+    }
+
+    /* モーダル */
+    .modal-content {
+        padding: 15px;
+    }
+
+    .modal-title {
+        font-size: 18px;
+    }
+}
+
+/* 小型スマートフォン (480px以下) */
+@media (max-width: 480px) {
+    .logo {
+        font-size: 16px;
+    }
+
+    .user-menu {
+        gap: 5px;
+    }
+
+    .user-name {
+        display: none;
+    }
+
+    .stat-card {
+        padding: 15px;
+    }
+
+    .stat-card-value {
+        font-size: 24px;
+    }
+
+    .btn {
+        font-size: 13px;
+        padding: 8px 16px;
+    }
+
+    .btn-sm {
+        font-size: 12px;
+        padding: 5px 10px;
+    }
+
+    .card-title {
+        font-size: 16px;
+    }
+
+    /* エディタ画面でのレイアウト調整 */
+    .editor-container {
+        margin: 0 -15px;
+    }
+
+    .editor-content {
+        min-height: 200px;
+        font-size: 14px;
+    }
+
+    /* アラート */
+    .alert {
+        font-size: 14px;
+        padding: 10px 12px;
+    }
+}
+
+/* 横向きスマートフォン対応 */
+@media (max-width: 768px) and (orientation: landscape) {
+    .admin-header {
+        position: relative;
+    }
+
+    .sidebar {
+        top: 0;
+        height: 100vh;
+    }
+
+    .main-content {
+        min-height: calc(100vh - 60px);
+    }
+
+    .stat-cards {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+/* プリント対応 */
+@media print {
+    .admin-header,
+    .sidebar,
+    .btn,
+    .pagination,
+    .toolbar,
+    .mobile-menu-toggle {
+        display: none !important;
+    }
+
+    .main-content {
+        padding: 0;
+        margin: 0;
+    }
+
+    .card {
+        box-shadow: none;
+        border: 1px solid #ddd;
+        break-inside: avoid;
+    }
+
+    body {
+        background: white;
+    }
+}
+
+/* ダークモード対応（将来的な拡張用） */
+@media (prefers-color-scheme: dark) {
+    /* ダークモード時の配色を定義可能 */
+}
+
+/* タッチデバイス対応 */
+@media (hover: none) and (pointer: coarse) {
+    /* タッチデバイス用の調整 */
+    .btn,
+    .sidebar-menu a,
+    .header-nav a {
+        min-height: 44px;
+        display: flex;
+        align-items: center;
+    }
+
+    .form-control {
+        min-height: 44px;
+        font-size: 16px; /* iOSのズーム防止 */
+    }
+}
+
+/* アクセシビリティ：動きを減らす */
+@media (prefers-reduced-motion: reduce) {
+    * {
+        animation-duration: 0.01s !important;
+        transition-duration: 0.01s !important;
+    }
+}
+
+/* 高解像度ディスプレイ対応 */
+@media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
+    /* Retinaディスプレイ等での調整 */
+    .card,
+    .btn,
+    .form-control {
+        border-width: 0.5px;
+    }
+}

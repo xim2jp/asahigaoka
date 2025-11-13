@@ -1,0 +1,462 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>記事編集 - 旭丘一丁目町会 管理画面</title>
+    <link rel="stylesheet" href="css/admin.css">
+    <link rel="stylesheet" href="css/responsive.css">
+    <style>
+        .tab-nav {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            border-bottom: 2px solid var(--border-color);
+        }
+        .tab-button {
+            padding: 10px 20px;
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 14px;
+            color: var(--text-secondary);
+            border-bottom: 2px solid transparent;
+            margin-bottom: -2px;
+            transition: all 0.3s;
+        }
+        .tab-button.active {
+            color: var(--primary-color);
+            border-bottom-color: var(--primary-color);
+        }
+        .tab-content {
+            display: none;
+        }
+        .tab-content.active {
+            display: block;
+        }
+        .image-preview {
+            max-width: 300px;
+            max-height: 200px;
+            margin-top: 10px;
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            display: none;
+        }
+        .image-preview.show {
+            display: block;
+        }
+        .tag-input {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 5px;
+            padding: 5px;
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            min-height: 44px;
+        }
+        .tag {
+            background: var(--primary-color);
+            color: white;
+            padding: 5px 10px;
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            font-size: 13px;
+        }
+        .tag-close {
+            cursor: pointer;
+            font-size: 16px;
+        }
+        .tag-input input {
+            border: none;
+            outline: none;
+            flex: 1;
+            min-width: 100px;
+        }
+        @media (max-width: 768px) {
+            .form-row {
+                display: block;
+            }
+            .form-row .form-group {
+                margin-bottom: 15px;
+            }
+            .editor-toolbar {
+                overflow-x: auto;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- ヘッダー -->
+    <header class="admin-header">
+        <div class="header-content">
+            <button class="mobile-menu-toggle">☰</button>
+            <a href="index.html" class="logo">🏘️ 旭丘一丁目町会</a>
+
+            <nav class="header-nav">
+                <a href="index.html">ダッシュボード</a>
+                <a href="articles.html" class="active">記事管理</a>
+                <a href="users.html">ユーザー管理</a>
+                <a href="#">設定</a>
+            </nav>
+
+            <div class="user-menu">
+                <span class="user-name">田中太郎</span>
+                <div class="user-avatar">田</div>
+                <a href="login.html" class="btn btn-sm btn-outline">ログアウト</a>
+            </div>
+        </div>
+    </header>
+
+    <div class="admin-layout">
+        <!-- サイドバー -->
+        <aside class="sidebar">
+            <ul class="sidebar-menu">
+                <li>
+                    <a href="index.html">
+                        <span class="icon">📊</span>
+                        ダッシュボード
+                    </a>
+                </li>
+                <li>
+                    <a href="articles.html">
+                        <span class="icon">📝</span>
+                        記事管理
+                    </a>
+                </li>
+                <li>
+                    <a href="article-edit.html" class="active">
+                        <span class="icon">✏️</span>
+                        新規記事作成
+                    </a>
+                </li>
+                <li>
+                    <a href="#">
+                        <span class="icon">📷</span>
+                        メディア管理
+                    </a>
+                </li>
+                <li>
+                    <a href="users.html">
+                        <span class="icon">👥</span>
+                        ユーザー管理
+                    </a>
+                </li>
+                <li>
+                    <a href="#">
+                        <span class="icon">📱</span>
+                        LINE配信
+                    </a>
+                </li>
+                <li>
+                    <a href="#">
+                        <span class="icon">🐦</span>
+                        X投稿
+                    </a>
+                </li>
+                <li>
+                    <a href="#">
+                        <span class="icon">⚙️</span>
+                        設定
+                    </a>
+                </li>
+            </ul>
+        </aside>
+
+        <!-- メインコンテンツ -->
+        <main class="main-content">
+            <h1 class="page-title">新規記事作成</h1>
+
+            <form>
+                <!-- タブナビゲーション -->
+                <div class="tab-nav">
+                    <button type="button" class="tab-button active" data-tab="basic">基本情報</button>
+                    <button type="button" class="tab-button" data-tab="content">コンテンツ</button>
+                    <button type="button" class="tab-button" data-tab="sns">SNS配信設定</button>
+                    <button type="button" class="tab-button" data-tab="seo">SEO設定</button>
+                </div>
+
+                <!-- 基本情報タブ -->
+                <div id="basic" class="tab-content active">
+                    <div class="card">
+                        <div class="card-header">
+                            <h2 class="card-title">基本情報</h2>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="title" class="form-label">記事タイトル *</label>
+                            <input type="text" id="title" class="form-control" placeholder="記事のタイトルを入力" required>
+                        </div>
+
+                        <div class="form-row" style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+                            <div class="form-group">
+                                <label for="category" class="form-label">カテゴリ *</label>
+                                <select id="category" class="form-control" required>
+                                    <option value="">カテゴリを選択</option>
+                                    <option value="notice">お知らせ</option>
+                                    <option value="event">イベント情報</option>
+                                    <option value="disaster">防災・防犯</option>
+                                    <option value="child">子育て支援</option>
+                                    <option value="shop">商店街情報</option>
+                                    <option value="report">活動レポート</option>
+                                </select>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="status" class="form-label">ステータス *</label>
+                                <select id="status" class="form-control" required>
+                                    <option value="draft">下書き</option>
+                                    <option value="published">公開</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="excerpt" class="form-label">抜粋（SNS配信用）</label>
+                            <textarea id="excerpt" class="form-control" rows="3" placeholder="記事の概要を簡潔に入力（100文字程度）"></textarea>
+                            <small style="color: var(--text-secondary);">0 / 100 文字</small>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="tags" class="form-label">タグ</label>
+                            <div class="tag-input">
+                                <span class="tag">防災 <span class="tag-close">×</span></span>
+                                <span class="tag">お知らせ <span class="tag-close">×</span></span>
+                                <input type="text" placeholder="タグを追加...">
+                            </div>
+                        </div>
+
+                        <div class="form-row" style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+                            <div class="form-group">
+                                <label for="publish-date" class="form-label">公開日時</label>
+                                <input type="datetime-local" id="publish-date" class="form-control">
+                            </div>
+
+                            <div class="form-group">
+                                <label for="featured-image" class="form-label">アイキャッチ画像</label>
+                                <input type="file" id="featured-image" class="form-control" accept="image/*">
+                                <img class="image-preview" id="image-preview" src="" alt="プレビュー">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- コンテンツタブ -->
+                <div id="content" class="tab-content">
+                    <div class="card">
+                        <div class="card-header">
+                            <h2 class="card-title">記事内容</h2>
+                        </div>
+
+                        <div class="editor-container">
+                            <div class="editor-toolbar">
+                                <button type="button" class="editor-btn" data-command="bold" title="太字"><strong>B</strong></button>
+                                <button type="button" class="editor-btn" data-command="italic" title="斜体"><em>I</em></button>
+                                <button type="button" class="editor-btn" data-command="underline" title="下線"><u>U</u></button>
+                                <button type="button" class="editor-btn" data-command="strikethrough" title="取り消し線"><s>S</s></button>
+                                <span style="border-left: 1px solid #ddd; margin: 0 5px;"></span>
+                                <button type="button" class="editor-btn" data-command="h1" title="見出し1">H1</button>
+                                <button type="button" class="editor-btn" data-command="h2" title="見出し2">H2</button>
+                                <button type="button" class="editor-btn" data-command="h3" title="見出し3">H3</button>
+                                <span style="border-left: 1px solid #ddd; margin: 0 5px;"></span>
+                                <button type="button" class="editor-btn" data-command="ul" title="箇条書き">☰</button>
+                                <button type="button" class="editor-btn" data-command="ol" title="番号付きリスト">1.</button>
+                                <span style="border-left: 1px solid #ddd; margin: 0 5px;"></span>
+                                <button type="button" class="editor-btn" data-command="link" title="リンク">🔗</button>
+                                <button type="button" class="editor-btn" data-command="image" title="画像">🖼️</button>
+                                <span style="border-left: 1px solid #ddd; margin: 0 5px;"></span>
+                                <button type="button" class="editor-btn" data-command="undo" title="元に戻す">↶</button>
+                                <button type="button" class="editor-btn" data-command="redo" title="やり直し">↷</button>
+                            </div>
+                            <div class="editor-content" contenteditable="true">
+                                <h2>記事のタイトル</h2>
+                                <p>ここに記事の本文を入力してください。</p>
+                                <p>リッチテキストエディタを使用して、<strong>太字</strong>、<em>斜体</em>、<u>下線</u>などの装飾を追加できます。</p>
+                                <ul>
+                                    <li>箇条書きアイテム1</li>
+                                    <li>箇条書きアイテム2</li>
+                                    <li>箇条書きアイテム3</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- SNS配信設定タブ -->
+                <div id="sns" class="tab-content">
+                    <div class="card">
+                        <div class="card-header">
+                            <h2 class="card-title">LINE配信設定</h2>
+                        </div>
+
+                        <div class="form-group">
+                            <label>
+                                <input type="checkbox" id="line-enabled">
+                                LINEに配信する
+                            </label>
+                        </div>
+
+                        <div class="form-row" style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+                            <div class="form-group">
+                                <label for="line-schedule" class="form-label">配信タイミング</label>
+                                <select id="line-schedule" class="form-control">
+                                    <option value="immediate">即座に配信</option>
+                                    <option value="scheduled">予約配信</option>
+                                </select>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="line-datetime" class="form-label">配信日時</label>
+                                <input type="datetime-local" id="line-datetime" class="form-control">
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="line-message" class="form-label">配信メッセージ</label>
+                            <textarea id="line-message" class="form-control" rows="4" placeholder="LINE配信用のメッセージを入力"></textarea>
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-header">
+                            <h2 class="card-title">X（Twitter）投稿設定</h2>
+                        </div>
+
+                        <div class="form-group">
+                            <label>
+                                <input type="checkbox" id="x-enabled">
+                                Xに投稿する
+                            </label>
+                        </div>
+
+                        <div class="form-row" style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+                            <div class="form-group">
+                                <label for="x-schedule" class="form-label">投稿タイミング</label>
+                                <select id="x-schedule" class="form-control">
+                                    <option value="immediate">即座に投稿</option>
+                                    <option value="scheduled">予約投稿</option>
+                                </select>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="x-datetime" class="form-label">投稿日時</label>
+                                <input type="datetime-local" id="x-datetime" class="form-control">
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="x-message" class="form-label">投稿内容</label>
+                            <textarea id="x-message" class="form-control" rows="4" placeholder="X投稿用のメッセージを入力（280文字以内）" maxlength="280"></textarea>
+                            <small style="color: var(--text-secondary);">0 / 280 文字</small>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="x-hashtags" class="form-label">ハッシュタグ</label>
+                            <input type="text" id="x-hashtags" class="form-control" placeholder="#旭丘一丁目 #町会" value="#旭丘一丁目">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- SEO設定タブ -->
+                <div id="seo" class="tab-content">
+                    <div class="card">
+                        <div class="card-header">
+                            <h2 class="card-title">SEO設定</h2>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="meta-title" class="form-label">メタタイトル</label>
+                            <input type="text" id="meta-title" class="form-control" placeholder="検索結果に表示されるタイトル">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="meta-description" class="form-label">メタディスクリプション</label>
+                            <textarea id="meta-description" class="form-control" rows="3" placeholder="検索結果に表示される説明文"></textarea>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="slug" class="form-label">スラッグ（URL）</label>
+                            <input type="text" id="slug" class="form-control" placeholder="article-url-slug">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- アクションボタン -->
+                <div class="btn-group" style="margin-top: 30px;">
+                    <button type="submit" class="btn btn-primary btn-lg">
+                        💾 保存して公開
+                    </button>
+                    <button type="button" class="btn btn-secondary btn-lg">
+                        📝 下書き保存
+                    </button>
+                    <button type="button" class="btn btn-outline btn-lg">
+                        👁️ プレビュー
+                    </button>
+                    <a href="articles.html" class="btn btn-outline btn-lg">
+                        キャンセル
+                    </a>
+                </div>
+            </form>
+        </main>
+    </div>
+
+    <script src="js/app.js"></script>
+    <script>
+        // 画像プレビュー
+        document.getElementById('featured-image').addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            const preview = document.getElementById('image-preview');
+
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    preview.src = e.target.result;
+                    preview.classList.add('show');
+                };
+                reader.readAsDataURL(file);
+            } else {
+                preview.classList.remove('show');
+            }
+        });
+
+        // 文字数カウント
+        document.getElementById('excerpt').addEventListener('input', function() {
+            const length = this.value.length;
+            this.nextElementSibling.textContent = `${length} / 100 文字`;
+        });
+
+        document.getElementById('x-message').addEventListener('input', function() {
+            const length = this.value.length;
+            this.nextElementSibling.textContent = `${length} / 280 文字`;
+        });
+
+        // タグ削除
+        document.querySelectorAll('.tag-close').forEach(close => {
+            close.addEventListener('click', function() {
+                this.parentElement.remove();
+            });
+        });
+
+        // タグ追加（Enter キー）
+        document.querySelector('.tag-input input').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                if (this.value.trim()) {
+                    const tag = document.createElement('span');
+                    tag.className = 'tag';
+                    tag.innerHTML = `${this.value} <span class="tag-close">×</span>`;
+                    this.parentElement.insertBefore(tag, this);
+
+                    // 新しいタグの削除ボタンにイベントリスナーを追加
+                    tag.querySelector('.tag-close').addEventListener('click', function() {
+                        this.parentElement.remove();
+                    });
+
+                    this.value = '';
+                }
+            }
+        });
+    </script>
+</body>
+</html>
