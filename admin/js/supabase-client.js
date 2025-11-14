@@ -317,10 +317,12 @@ class SupabaseClient {
       const userId = this.currentUser?.id;
       if (!userId) throw new Error('ユーザーが認証されていません');
 
-      // ファイル名の生成（タイムスタンプ + UUID）
+      // ファイル名の生成（タイムスタンプ + ランダム + 拡張子）
+      // Supabase Storage は日本語や特殊文字をサポートしないため、安全な形式に変換
       const timestamp = Date.now();
       const random = Math.random().toString(36).substr(2, 9);
-      const fileName = `${timestamp}-${random}-${file.name}`;
+      const ext = file.name.substring(file.name.lastIndexOf('.')).toLowerCase();
+      const fileName = `${timestamp}-${random}${ext}`;
 
       // ファイルをストレージにアップロード
       const { data: uploadData, error: uploadError } = await this.client.storage
@@ -648,10 +650,12 @@ class SupabaseClient {
       // ファイル情報から file_type を判定
       const fileType = this.getFileType(file);
 
-      // ファイル名の生成（タイムスタンプ + ランダム）
+      // ファイル名の生成（タイムスタンプ + ランダム + 拡張子）
+      // Supabase Storage は日本語や特殊文字をサポートしないため、安全な形式に変換
       const timestamp = Date.now();
       const random = Math.random().toString(36).substr(2, 9);
-      const fileName = `${timestamp}-${random}-${file.name}`;
+      const ext = file.name.substring(file.name.lastIndexOf('.')).toLowerCase();
+      const fileName = `${timestamp}-${random}${ext}`;
 
       // ファイルをストレージにアップロード
       const { data: uploadData, error: uploadError } = await this.client.storage
