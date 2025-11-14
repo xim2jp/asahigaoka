@@ -107,7 +107,7 @@
                     <table class="table">
                         <thead>
                             <tr>
-                                <th>ID</th>
+                                <th>No</th>
                                 <th>名前</th>
                                 <th>メールアドレス</th>
                                 <th>権限</th>
@@ -119,7 +119,7 @@
                         </thead>
                         <tbody>
                             <tr>
-                                <td data-label="ID">001</td>
+                                <td data-label="No">001</td>
                                 <td data-label="名前">
                                     <div style="display: flex; align-items: center; gap: 10px;">
                                         <div class="user-avatar">田</div>
@@ -139,7 +139,7 @@
                                 </td>
                             </tr>
                             <tr>
-                                <td data-label="ID">002</td>
+                                <td data-label="No">002</td>
                                 <td data-label="名前">
                                     <div style="display: flex; align-items: center; gap: 10px;">
                                         <div class="user-avatar" style="background-color: var(--info-color);">佐</div>
@@ -159,7 +159,7 @@
                                 </td>
                             </tr>
                             <tr>
-                                <td data-label="ID">003</td>
+                                <td data-label="No">003</td>
                                 <td data-label="名前">
                                     <div style="display: flex; align-items: center; gap: 10px;">
                                         <div class="user-avatar" style="background-color: var(--warning-color);">鈴</div>
@@ -179,7 +179,7 @@
                                 </td>
                             </tr>
                             <tr>
-                                <td data-label="ID">004</td>
+                                <td data-label="No">004</td>
                                 <td data-label="名前">
                                     <div style="display: flex; align-items: center; gap: 10px;">
                                         <div class="user-avatar" style="background-color: var(--secondary-color);">山</div>
@@ -199,7 +199,7 @@
                                 </td>
                             </tr>
                             <tr>
-                                <td data-label="ID">005</td>
+                                <td data-label="No">005</td>
                                 <td data-label="名前">
                                     <div style="display: flex; align-items: center; gap: 10px;">
                                         <div class="user-avatar" style="background-color: var(--accent-color);">高</div>
@@ -355,6 +355,12 @@
         </div>
     </div>
 
+    <!-- Supabase SDK -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+    <!-- アプリケーションスクリプト -->
+    <script src="js/supabase-client.js"></script>
     <script src="js/app.js"></script>
+    <script src="js/users.js"></script>
 </body>
 </html>

@@ -319,7 +319,10 @@
 | password_hash | String | ○ | ハッシュ化パスワード |
 | name | String | ○ | ユーザー名 |
 | role | String | ○ | admin / editor |
+| is_active | Boolean | ○ | ユーザーの有効・無効状態（デフォルト: true） |
+| last_login_at | Timestamp | × | 最後のログイン時刻 |
 | created_at | Timestamp | ○ | 作成日時 |
+| updated_at | Timestamp | ○ | 更新日時 |
 
 ### 3.3 AI チャット履歴テーブル（ai_chat_history）
 

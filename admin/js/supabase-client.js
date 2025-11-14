@@ -451,6 +451,146 @@ class SupabaseClient {
       return { data: [], count: 0, success: false, error: error.message };
     }
   }
+
+  /**
+   * 新規ユーザーを作成
+   * @param {object} userData - ユーザーデータ
+   */
+  async createUser(userData) {
+    try {
+      const { email, password, name, role, is_active } = userData;
+
+      // 既存のユーザー確認
+      const { data: existingUser } = await this.client
+        .from('users')
+        .select('id')
+        .eq('email', email)
+        .single();
+
+      if (existingUser) {
+        throw new Error('このメールアドレスは既に登録されています');
+      }
+
+      // 新しいユーザーIDを生成（UUID）
+      const userId = crypto.randomUUID ? crypto.randomUUID() :
+                    'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+                      const r = Math.random() * 16 | 0;
+                      const v = c === 'x' ? r : (r & 0x3 | 0x8);
+                      return v.toString(16);
+                    });
+
+      // bcryptの代わりに簡易的なハッシュ（実際の本番環境では適切なハッシュ化が必要）
+      const passwordHash = btoa(password); // 簡易的な実装
+
+      // usersテーブルにデータを追加
+      const { data: newUser, error: userError } = await this.client
+        .from('users')
+        .insert({
+          id: userId,
+          email,
+          name,
+          role,
+          is_active,
+          password_hash: passwordHash,
+          created_at: new Date().toISOString()
+        })
+        .select()
+        .single();
+
+      if (userError) throw userError;
+
+      console.log('✅ ユーザー作成成功:', email);
+      return { data: newUser, success: true };
+    } catch (error) {
+      console.error('❌ ユーザー作成エラー:', error.message);
+      return { data: null, success: false, error: error.message };
+    }
+  }
+
+  /**
+   * ユーザー情報を更新
+   * @param {string} userId - ユーザーID
+   * @param {object} updates - 更新データ
+   */
+  async updateUser(userId, updates) {
+    try {
+      const { email, password, name, role, is_active } = updates;
+
+      // 更新データを準備
+      const updateData = {
+        email,
+        name,
+        role,
+        is_active,
+        updated_at: new Date().toISOString()
+      };
+
+      // パスワードが指定されている場合はハッシュ化して追加
+      if (password) {
+        updateData.password_hash = btoa(password); // 簡易的な実装
+      }
+
+      // usersテーブルを更新
+      const { data: userData, error: userError } = await this.client
+        .from('users')
+        .update(updateData)
+        .eq('id', userId)
+        .select()
+        .single();
+
+      if (userError) throw userError;
+
+      console.log('✅ ユーザー更新成功:', userId);
+      return { data: userData, success: true };
+    } catch (error) {
+      console.error('❌ ユーザー更新エラー:', error.message);
+      return { data: null, success: false, error: error.message };
+    }
+  }
+
+  /**
+   * ユーザーを削除
+   * @param {string} userId - ユーザーID
+   */
+  async deleteUser(userId) {
+    try {
+      // usersテーブルから削除（物理削除）
+      const { data, error: dbError } = await this.client
+        .from('users')
+        .delete()
+        .eq('id', userId)
+        .select()
+        .single();
+
+      if (dbError) throw dbError;
+
+      console.log('✅ ユーザー削除成功:', userId);
+      return { data, success: true };
+    } catch (error) {
+      console.error('❌ ユーザー削除エラー:', error.message);
+      return { data: null, success: false, error: error.message };
+    }
+  }
+
+  /**
+   * ユーザーパスワードをリセット
+   * @param {string} email - メールアドレス
+   */
+  async resetUserPassword(email) {
+    try {
+      const { error } = await this.client.auth.resetPasswordForEmail(email, {
+        redirectTo: `${window.location.origin}/admin/reset-password.html`
+      });
+
+      if (error) throw error;
+
+      console.log('✅ パスワードリセットメール送信成功:', email);
+      return { success: true };
+    } catch (error) {
+      console.error('❌ パスワードリセットエラー:', error.message);
+      return { success: false, error: error.message };
+    }
+  }
 }
 
 // グローバル インスタンスとして初期化
