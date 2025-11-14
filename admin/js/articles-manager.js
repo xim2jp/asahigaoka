@@ -94,13 +94,16 @@ class ArticlesManager {
    */
   async loadArticles() {
     try {
+      console.log('📝 記事読み込み開始...');
       const result = await supabaseClient.getArticles({
         status: 'all',
         limit: 1000,
         offset: 0
       });
 
+      console.log('📝 getArticles結果:', result);
       this.articles = result.data || [];
+      console.log('📝 記事配列:', this.articles);
       this.applyFilters();
 
       console.log('✅ 記事読み込み完了:', this.articles.length, '件');
