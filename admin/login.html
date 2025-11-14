@@ -199,11 +199,16 @@
                             localStorage.removeItem('asahigaoka_saved_email');
                         }
 
-                        // ユーザーロール を取得
-                        const role = await supabaseClient.getUserRole(result.user.id);
+                        // ユーザー情報をlocalStorageに保存（認証状態を維持）
+                        localStorage.setItem('asahigaoka_user', JSON.stringify({
+                            id: result.user.id,
+                            email: result.user.email,
+                            name: result.user.name,
+                            role: result.user.role
+                        }));
 
                         // ロール情報をセッションに保存
-                        localStorage.setItem('asahigaoka_user_role', role);
+                        localStorage.setItem('asahigaoka_user_role', result.user.role);
 
                         // ダッシュボード へリダイレクト
                         console.log('✅ ログイン成功:', email);

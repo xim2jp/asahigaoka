@@ -108,6 +108,15 @@
                 </div>
             </div>
 
+            <!-- 成功メッセージ -->
+            <div id="success-message" style="display: none; margin-bottom: 20px; padding: 15px; background-color: #d4edda; border: 1px solid #c3e6cb; border-radius: 4px; color: #155724;">
+                <div style="display: flex; align-items: center; gap: 10px;">
+                    <span style="font-size: 20px;">✅</span>
+                    <span id="success-message-text"></span>
+                    <button type="button" style="margin-left: auto; background: none; border: none; color: #155724; cursor: pointer; font-size: 18px;" onclick="this.parentElement.parentElement.style.display='none';">×</button>
+                </div>
+            </div>
+
             <!-- フィルタ・検索 -->
             <div class="card">
                 <div class="card-header">
@@ -138,7 +147,7 @@
             <!-- 記事一覧テーブル -->
             <div class="card">
                 <div class="card-header">
-                    <h2 class="card-title">記事一覧（全156件）</h2>
+                    <h2 class="card-title">記事一覧</h2>
                 </div>
 
                 <div class="table-wrapper table-responsive">
@@ -148,16 +157,13 @@
                                 <th><input type="checkbox" id="select-all"></th>
                                 <th>タイトル</th>
                                 <th>カテゴリ</th>
-                                <th>作成者</th>
                                 <th>ステータス</th>
+                                <th>作成者</th>
                                 <th>公開日時</th>
-                                <th>LINE</th>
-                                <th>X</th>
                                 <th>操作</th>
                             </tr>
                         </thead>
                         <tbody>
-                            <!-- 実データはJavaScriptで動的に挿入される -->
                         </tbody>
                     </table>
                 </div>
@@ -174,15 +180,6 @@
 
                 <!-- ページネーション -->
                 <div class="pagination">
-                    <a href="#">前へ</a>
-                    <span class="active">1</span>
-                    <a href="#">2</a>
-                    <a href="#">3</a>
-                    <a href="#">4</a>
-                    <a href="#">5</a>
-                    <span>...</span>
-                    <a href="#">16</a>
-                    <a href="#">次へ</a>
                 </div>
             </div>
         </main>

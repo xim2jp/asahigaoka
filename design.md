@@ -157,7 +157,10 @@ firestore-root/
 │       ├── name: string
 │       ├── password_hash: string
 │       ├── role: string
-│       └── created_at: timestamp
+│       ├── is_active: boolean
+│       ├── last_login_at: timestamp
+│       ├── created_at: timestamp
+│       └── updated_at: timestamp
 ├── articles/
 │   └── {articleId}/
 │       ├── title: string

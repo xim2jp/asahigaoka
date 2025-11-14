@@ -21,6 +21,7 @@ class ArticlesManager {
    */
   async init() {
     await this.checkAuthentication();
+    this.checkSuccessMessage();
     this.setupEventListeners();
     await this.loadArticles();
   }
@@ -102,8 +103,6 @@ class ArticlesManager {
 
       this.articles = result.data || [];
       this.applyFilters();
-
-      console.log('✅ 記事読み込み完了:', this.articles.length, '件');
     } catch (error) {
       console.error('記事読み込みエラー:', error.message);
       this.showAlert('記事の読み込みに失敗しました', 'error');
@@ -159,7 +158,7 @@ class ArticlesManager {
    * 記事を表示
    */
   displayArticles() {
-    const articlesContainer = document.querySelector('table.table tbody');
+    const articlesContainer = document.querySelector('.table tbody');
     if (!articlesContainer) {
       console.warn('テーブルコンテナが見つかりません');
       return;
@@ -386,6 +385,40 @@ class ArticlesManager {
     if (!dateString) return '';
     const date = new Date(dateString);
     return date.toLocaleDateString('ja-JP');
+  }
+
+  /**
+   * 成功メッセージをチェックして表示
+   */
+  checkSuccessMessage() {
+    const message = localStorage.getItem('article_success_message');
+    const timestamp = localStorage.getItem('article_success_timestamp');
+
+    if (message && timestamp) {
+      // 10秒以内のメッセージのみ表示（古いメッセージは無視）
+      const messageTime = parseInt(timestamp);
+      const now = Date.now();
+      const elapsed = now - messageTime;
+
+      if (elapsed < 10000) {
+        const messageDiv = document.getElementById('success-message');
+        const messageText = document.getElementById('success-message-text');
+
+        if (messageDiv && messageText) {
+          messageText.textContent = message;
+          messageDiv.style.display = 'block';
+
+          // 5秒後に自動消去
+          setTimeout(() => {
+            messageDiv.style.display = 'none';
+          }, 5000);
+        }
+      }
+
+      // localStorage をクリア
+      localStorage.removeItem('article_success_message');
+      localStorage.removeItem('article_success_timestamp');
+    }
   }
 }
 
