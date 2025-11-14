@@ -32,12 +32,18 @@ class SupabaseClient {
   }
 
   /**
-   * 現在のユーザー情報を取得
+   * 現在のユーザー情報を取得（localStorageから）
    */
   async getCurrentUser() {
     try {
-      const { data: { user }, error } = await this.client.auth.getUser();
-      if (error) throw error;
+      // localStorageからユーザー情報を取得
+      const userJson = localStorage.getItem('asahigaoka_user');
+      if (!userJson) {
+        console.log('ユーザー情報がlocalStorageに保存されていません');
+        return null;
+      }
+
+      const user = JSON.parse(userJson);
       this.currentUser = user;
       return user;
     } catch (error) {
@@ -47,22 +53,58 @@ class SupabaseClient {
   }
 
   /**
-   * メール/パスワードでログイン
+   * メール/パスワードでログイン（独自の users テーブルから認証）
    * @param {string} email - メールアドレス
    * @param {string} password - パスワード
    */
   async signIn(email, password) {
     try {
-      const { data, error } = await this.client.auth.signInWithPassword({
-        email,
-        password
-      });
+      // users テーブルからユーザーを検索
+      const { data: users, error: searchError } = await this.client
+        .from('users')
+        .select('*')
+        .eq('email', email)
+        .single();
 
-      if (error) throw error;
+      if (searchError || !users) {
+        throw new Error('ユーザーが見つかりません');
+      }
 
-      this.currentUser = data.user;
+      // パスワードを検証（Base64 エンコードで比較）
+      const passwordHash = btoa(password);
+      if (users.password_hash !== passwordHash) {
+        throw new Error('パスワードが正しくありません');
+      }
+
+      // ユーザーが有効かチェック
+      if (!users.is_active) {
+        throw new Error('このユーザーは無効化されています。管理者にお問い合わせください');
+      }
+
+      // ログイン成功時は last_login_at を更新
+      await this.client
+        .from('users')
+        .update({ last_login_at: new Date().toISOString() })
+        .eq('id', users.id);
+
+      this.currentUser = {
+        id: users.id,
+        email: users.email,
+        user_metadata: {
+          name: users.name
+        }
+      };
+
       console.log('✅ ログイン成功:', email);
-      return { success: true, user: data.user };
+      return {
+        success: true,
+        user: {
+          id: users.id,
+          email: users.email,
+          name: users.name,
+          role: users.role
+        }
+      };
     } catch (error) {
       console.error('❌ ログインエラー:', error.message);
       return { success: false, error: error.message };
@@ -74,8 +116,9 @@ class SupabaseClient {
    */
   async signOut() {
     try {
-      const { error } = await this.client.auth.signOut();
-      if (error) throw error;
+      // localStorageからユーザー情報を削除
+      localStorage.removeItem('asahigaoka_user');
+      localStorage.removeItem('asahigaoka_user_role');
 
       this.currentUser = null;
       console.log('✅ ログアウト完了');
