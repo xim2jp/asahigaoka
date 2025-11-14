@@ -135,16 +135,13 @@ class SupabaseClient {
    */
   async getUserRole(userId) {
     try {
-      console.log('🔍 ロール取得中...userId:', userId);
       const { data, error } = await this.client
         .from('users')
         .select('role')
         .eq('id', userId)
         .single();
 
-      console.log('🔍 ロール取得結果:', { data, error });
       if (error) throw error;
-      console.log('✅ ロール:', data.role);
       return data.role;
     } catch (error) {
       console.error('❌ ロール取得エラー:', error.message);
@@ -167,8 +164,6 @@ class SupabaseClient {
         sortOrder = 'desc'
       } = options;
 
-      console.log('📚 記事取得開始:', { category, status, limit, offset });
-
       let query = this.client
         .from('articles')
         .select('*,author:users(id,name)');
@@ -182,12 +177,11 @@ class SupabaseClient {
         query = query.eq('category', category);
       }
 
+      // deleted_at が null のレコードのみ取得
       const { data, error, count } = await query
         .is('deleted_at', null)
-        .order(sortBy, { ascending: sortOrder === 'asc' })
+        .order(sortBy, { ascending: sortOrder === 'asc', nullsFirst: false })
         .range(offset, offset + limit - 1);
-
-      console.log('📚 記事取得結果:', { data, error, count });
       if (error) throw error;
       return { data, count, success: true };
     } catch (error) {
