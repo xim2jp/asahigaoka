@@ -148,23 +148,53 @@
 - **説明**: 記事削除
 - **Authorization**: Bearer Token 必須
 
-### 2.3 メディア API
+### 2.3 添付ファイル API
 
-#### `POST /api/media/upload`
-- **説明**: 画像アップロード
+#### `POST /api/attachments/upload`
+- **説明**: ファイルアップロード（画像、PDF、オフィス文書、テキストなど）
 - **Authorization**: Bearer Token 必須
 - **Content-Type**: multipart/form-data
+- **対応ファイル形式**:
+  - 画像: jpg, jpeg, png, gif, webp
+  - 文書: pdf, docx, xlsx, pptx, txt, md
+  - その他: zip
 - **Response**:
   ```json
   {
-    "url": "https://storage.../image.png",
-    "file_name": "image.png",
-    "size": 1024000
+    "id": "attachment_uuid",
+    "url": "https://storage.../filename.pdf",
+    "file_name": "document.pdf",
+    "file_type": "pdf",
+    "size": 1024000,
+    "uploaded_at": "2025-11-14T12:00:00Z"
   }
   ```
 
-#### `DELETE /api/media/{id}`
-- **説明**: 画像削除
+#### `GET /api/attachments`
+- **説明**: アップロード済みファイル一覧取得
+- **Query Parameters**:
+  - `file_type`: フィルタ (image, pdf, document, text)
+  - `limit`: 取得件数
+  - `offset`: オフセット
+- **Response**:
+  ```json
+  {
+    "attachments": [
+      {
+        "id": "uuid",
+        "file_name": "document.pdf",
+        "file_type": "pdf",
+        "size": 1024000,
+        "uploaded_by": "user_id",
+        "uploaded_at": "2025-11-14T12:00:00Z"
+      }
+    ],
+    "count": 10
+  }
+  ```
+
+#### `DELETE /api/attachments/{id}`
+- **説明**: ファイル削除（admin のみ）
 - **Authorization**: Bearer Token 必須
 
 ### 2.4 検索 API

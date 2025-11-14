@@ -55,7 +55,7 @@
 
 - **記事編集画面** (`/admin/article-edit.html`)
   - リッチテキストエディタ
-  - 画像アップロード
+  - 添付ファイルアップロード（画像・PDF・ドキュメント・テキスト等）
   - プレビュー機能
   - 自動保存（下書き）
 
@@ -93,7 +93,8 @@
 | users-crud | /api/users/* | ユーザー管理 |
 | articles-list | GET /api/articles | 記事一覧取得 |
 | articles-crud | /api/articles/* | 記事CRUD |
-| media-upload | POST /api/media/upload | 画像アップロード |
+| attachments-upload | POST /api/attachments/upload | 添付ファイルアップロード |
+| attachments-list | GET /api/attachments | 添付ファイル一覧取得 |
 
 **実装例（auth-login）**:
 ```python
@@ -170,13 +171,19 @@ firestore-root/
 │       ├── status: string
 │       ├── published_at: timestamp
 │       ├── created_at: timestamp
-│       └── updated_at: timestamp
-└── media/
-    └── {mediaId}/
+│       ├── updated_at: timestamp
+│       └── attachment_ids: array
+└── attachments/
+    └── {attachmentId}/
         ├── file_name: string
-        ├── file_url: string
-        ├── size: number
-        └── uploaded_at: timestamp
+        ├── file_type: string (image|document|text|archive)
+        ├── mime_type: string
+        ├── storage_path: string
+        ├── file_size: number
+        ├── uploaded_by: string (user_id)
+        ├── article_ids: array
+        ├── created_at: timestamp
+        └── updated_at: timestamp
 ```
 
 ### 2.4 セキュリティ実装
@@ -220,7 +227,7 @@ firestore-root/
 - [ ] 記事一覧画面実装
 - [ ] 記事編集画面実装
 - [ ] 記事CRUD API実装
-- [ ] 画像アップロード機能
+- [ ] 添付ファイルアップロード機能
 
 **Week 4: テスト・調整**
 - [ ] 統合テスト
@@ -257,7 +264,7 @@ firestore-root/
 
 - **記事からのX投稿**
   - 自動要約（280文字）
-  - 画像添付
+  - ファイル添付（対応形式: 画像）
   - 投稿履歴管理
 
 ### 3.3 技術実装詳細
@@ -400,7 +407,7 @@ def schedule_handler(event, context):
 - [ ] X Developer Account設定
 - [ ] X API認証実装
 - [ ] X投稿Lambda実装
-- [ ] 画像アップロード処理
+- [ ] ファイルアップロード処理
 
 **Week 3: 配信管理・テスト**
 - [ ] スケジュール配信実装
@@ -788,7 +795,7 @@ def reply_message(reply_token, text):
 │  記事系: articles-crud, articles-list           │
 │  SNS系: line-send, x-post, line-webhook         │
 │  AI系: knowledge-upload, ai-chat                │
-│  メディア系: media-upload                       │
+│  添付系: attachments-upload, attachments-list   │
 └─────────────────────────────────────────────────┘
                     ↓           ↓
 ┌──────────────────┐    ┌────────────────────────┐
