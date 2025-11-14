@@ -73,103 +73,186 @@ class Dashboard {
    */
   async loadDashboardData() {
     try {
-      // 記事統計
+      // 全記事を取得
       const articlesResult = await supabaseClient.getArticles({
-        status: 'published',
+        status: 'all',
         limit: 1000,
         offset: 0
       });
 
-      const totalArticles = articlesResult.count || 0;
+      const articles = articlesResult.data || [];
 
-      // カテゴリ別記事数
-      const categoryStats = {
-        notice: 0,
-        event: 0,
-        disaster_safety: 0,
-        child_support: 0,
-        shopping_info: 0,
-        activity_report: 0
-      };
+      // 統計情報を計算
+      const totalCount = articles.length;
+      const now = new Date();
+      const currentMonth = now.getFullYear() + '-' + String(now.getMonth() + 1).padStart(2, '0');
+      const monthlyCount = articles.filter(a => {
+        const createdDate = new Date(a.created_at);
+        return createdDate.toISOString().startsWith(currentMonth);
+      }).length;
+      const lineCount = articles.filter(a => a.line_published).length;
+      const xCount = articles.filter(a => a.x_published).length;
 
-      articlesResult.data?.forEach(article => {
-        if (categoryStats[article.category] !== undefined) {
-          categoryStats[article.category]++;
-        }
-      });
+      // 統計カードを更新
+      const statValues = document.querySelectorAll('.stat-card-value');
+      if (statValues.length >= 4) {
+        statValues[0].textContent = totalCount;
+        statValues[1].textContent = monthlyCount;
+        statValues[2].textContent = lineCount;
+        statValues[3].textContent = xCount;
+      }
 
-      // 統計情報を UI に反映
-      this.updateStatCards(totalArticles, categoryStats);
+      // 最新の published 記事を表示
+      const recentArticles = articles
+        .filter(a => a.status === 'published')
+        .sort((a, b) => new Date(b.updated_at) - new Date(a.updated_at))
+        .slice(0, 5);
+      this.displayLatestArticles(recentArticles);
 
-      // 最新の記事を表示
-      const recentArticles = articlesResult.data?.slice(0, 5) || [];
-      this.displayRecentArticles(recentArticles);
+      // 下書き記事を表示
+      this.displayDraftArticles(articles);
     } catch (error) {
       console.error('ダッシュボードデータ読み込みエラー:', error.message);
     }
   }
 
   /**
-   * 統計カードを更新
+   * 最新記事を表示
    */
-  updateStatCards(total, categoryStats) {
-    const statCards = document.querySelectorAll('.stat-card');
+  displayLatestArticles(articles) {
+    const tbody = document.querySelector('.table tbody');
+    if (!tbody) return;
 
-    if (statCards[0]) {
-      statCards[0].querySelector('.stat-card-value').textContent = total;
-    }
-
-    if (statCards[1]) {
-      statCards[1].querySelector('.stat-card-value').textContent =
-        categoryStats.event || 0;
-    }
-
-    if (statCards[2]) {
-      statCards[2].querySelector('.stat-card-value').textContent =
-        categoryStats.disaster_safety || 0;
-    }
-
-    if (statCards[3]) {
-      statCards[3].querySelector('.stat-card-value').textContent =
-        categoryStats.child_support || 0;
-    }
-  }
-
-  /**
-   * 最新の記事を表示
-   */
-  displayRecentArticles(articles) {
-    const articlesContainer = document.querySelector('.recent-items');
-    if (!articlesContainer) return;
-
-    articlesContainer.innerHTML = '';
+    tbody.innerHTML = '';
 
     if (articles.length === 0) {
-      articlesContainer.innerHTML =
-        '<p style="color: #999; text-align: center; padding: 20px;">記事がありません</p>';
+      tbody.innerHTML = `
+        <tr>
+          <td colspan="5" style="text-align: center; padding: 20px; color: #999;">
+            記事がありません
+          </td>
+        </tr>
+      `;
       return;
     }
 
     articles.forEach(article => {
-      const itemDiv = document.createElement('div');
-      itemDiv.className = 'recent-item';
-      itemDiv.innerHTML = `
-        <div class="recent-item-header">
-          <h3 class="recent-item-title">${this.escapeHtml(article.title)}</h3>
-          <span class="badge badge-${article.status}">
-            ${article.status === 'published' ? '公開中' : '下書き'}
-          </span>
-        </div>
-        <p class="recent-item-excerpt">${this.escapeHtml(article.excerpt || '')}</p>
-        <div class="recent-item-footer">
-          <span class="recent-item-author">${article.author?.name || '不明'}</span>
-          <span class="recent-item-date">
-            ${this.formatDate(article.published_at || article.created_at)}
-          </span>
-        </div>
+      const row = document.createElement('tr');
+      const categoryLabel = this.getCategoryLabel(article.category);
+      const categoryColor = this.getCategoryColor(article.category);
+      const updatedDate = new Date(article.updated_at).toLocaleDateString('ja-JP');
+
+      row.innerHTML = `
+        <td><strong>${this.escapeHtml(article.title)}</strong></td>
+        <td><span class="badge badge-${categoryColor}">${categoryLabel}</span></td>
+        <td><span class="badge badge-success">公開</span></td>
+        <td>${updatedDate}</td>
+        <td>
+          <div class="table-actions">
+            <a href="article-edit.html?id=${article.id}" class="btn btn-sm btn-outline">編集</a>
+          </div>
+        </td>
       `;
-      articlesContainer.appendChild(itemDiv);
+      tbody.appendChild(row);
     });
+  }
+
+  /**
+   * 下書き記事を表示
+   */
+  displayDraftArticles(articles) {
+    // 下書き記事リストを取得
+    let targetList = null;
+    const allCards = document.querySelectorAll('.card');
+    for (const card of allCards) {
+      if (card.textContent.includes('下書き記事')) {
+        targetList = card.querySelector('ul');
+        break;
+      }
+    }
+
+    if (!targetList) return;
+
+    targetList.innerHTML = '';
+
+    // draft 記事で、自分の記事（admin は全て）
+    let drafts = articles
+      .filter(a => a.status === 'draft')
+      .filter(a => this.userRole === 'admin' || a.author?.id === this.currentUser.id)
+      .sort((a, b) => new Date(b.updated_at) - new Date(a.updated_at));
+
+    if (drafts.length === 0) {
+      const li = document.createElement('li');
+      li.style.cssText = 'padding: 20px; text-align: center; color: #999;';
+      li.textContent = '下書き記事がありません';
+      targetList.appendChild(li);
+      return;
+    }
+
+    drafts.forEach((article, index) => {
+      const li = document.createElement('li');
+      const updatedDate = new Date(article.updated_at);
+      const relativeDate = this.getRelativeDate(updatedDate);
+
+      li.style.cssText = `padding: 10px 0;${index < drafts.length - 1 ? ' border-bottom: 1px solid var(--border-color);' : ''}`;
+      li.innerHTML = `
+        <a href="article-edit.html?id=${article.id}" style="color: var(--text-primary); text-decoration: none;">
+          📄 ${this.escapeHtml(article.title)}
+          <br>
+          <small style="color: var(--text-secondary);">更新: ${relativeDate}</small>
+        </a>
+      `;
+      targetList.appendChild(li);
+    });
+  }
+
+  /**
+   * カテゴリラベルを取得
+   */
+  getCategoryLabel(category) {
+    const labels = {
+      notice: 'お知らせ',
+      event: 'イベント',
+      disaster_safety: '防災・防犯',
+      child_support: '子育て支援',
+      shopping_info: '商店街',
+      activity_report: '活動レポート'
+    };
+    return labels[category] || category;
+  }
+
+  /**
+   * カテゴリの色を取得
+   */
+  getCategoryColor(category) {
+    const colors = {
+      notice: 'info',
+      event: 'success',
+      disaster_safety: 'danger',
+      child_support: 'primary',
+      shopping_info: 'warning',
+      activity_report: 'secondary'
+    };
+    return colors[category] || 'secondary';
+  }
+
+  /**
+   * 相対日時を取得
+   */
+  getRelativeDate(date) {
+    const now = new Date();
+    const diffMs = now - date;
+    const diffMins = Math.floor(diffMs / 60000);
+    const diffHours = Math.floor(diffMins / 60);
+    const diffDays = Math.floor(diffHours / 24);
+
+    if (diffMins < 1) return '今';
+    if (diffMins < 60) return `${diffMins}分前`;
+    if (diffHours < 24) return `${diffHours}時間前`;
+    if (diffDays < 7) return `${diffDays}日前`;
+    if (diffDays < 30) return `${Math.floor(diffDays / 7)}週間前`;
+
+    return date.toLocaleDateString('ja-JP');
   }
 
   /**
