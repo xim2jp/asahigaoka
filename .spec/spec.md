@@ -9,35 +9,41 @@
 │                       ユーザー層                             │
 ├──────────────┬────────────────┬────────────────┬───────────┤
 │  公開Web     │  管理画面SPA   │ LINE公式       │ X API     │
-│  サイト      │ + AIチャット   │ アカウント     │           │
-│              │ + 知識ベース管理│ + AI応答      │           │
+│  サイト      │ (Vanilla JS)   │ アカウント     │           │
+│              │ + ファイル管理 │ (未実装)       │ (未実装)  │
 └──────────────┴────────────────┴────────────────┴───────────┘
        ↓               ↓                  ↓           ↓
 ┌─────────────────────────────────────────────────────────────┐
-│            API Gateway + AWS Lambda 層                       │
-│  - 記事CRUD       - 認証           - AIチャット             │
-│  - メディア       - LINE配信       - LINE Webhook           │
-│  - X投稿          - 検索           - ECS起動                │
-│  - 知識ベース管理  - GitHub操作    - Dify API連携          │
+│            Supabase JS Client SDK                            │
+│  - 直接 Supabase API を呼び出し                             │
+│  - localStorage でセッション管理                            │
+│  - REST API形式で通信                                      │
 └─────────────────────────────────────────────────────────────┘
-       ↓               ↓            ↓           ↓
-┌──────────────┐ ┌──────────────┐ ┌──────────┐ ┌────────────┐
-│ Firestore/   │ │  AWS S3 /    │ │  Dify    │ │ ECS タスク│
-│ Supabase     │ │  Firebase    │ │ RAG/AI   │ │ (Cursor   │
-│ データベース  │ │  Storage     │ │ Platform │ │  Agent)   │
-└──────────────┘ └──────────────┘ └──────────┘ └────────────┘
-                                       ↓               ↓
-                              ┌────────────────┐ ┌──────────┐
-                              │ Vector DB      │ │ GitHub   │
-                              │ (Dify内蔵)    │ │Repository│
-                              └────────────────┘ └──────────┘
-                                                      ↓
-                                    ┌─────────────────┴────────────┐
-                                    ↓                              ↓
-                             ┌──────────────┐           ┌──────────────┐
-                             │  gh-pages    │           │  main        │
-                             │  (Netlify)   │           │  (S3 Deploy) │
-                             └──────────────┘           └──────────────┘
+       ↓               ↓            ↓
+┌──────────────────────────────────────────────────────────────┐
+│          Supabase (PostgreSQL + Storage)                     │
+│  - Database: articles, users, attachments テーブル          │
+│  - Storage: attachments, featured-images バケット           │
+│  - RLS ポリシー設定で行レベルセキュリティ実装               │
+└──────────────────────────────────────────────────────────────┘
+
+┌─────────────────────────────────────────────────────────────┐
+│    本番環境デプロイ                                         │
+├──────────────────────────┬────────────────────────────────┤
+│  Static Files:           │  S3 + CloudFront               │
+│  HTML, CSS, JS           │  - CloudFront: CDN キャッシュ   │
+│                          │  - SSL/TLS 暗号化              │
+└──────────────────────────┴────────────────────────────────┘
+
+┌─────────────────────────────────────────────────────────────┐
+│    外部サービス連携（今後実装）                            │
+├──────────────────┬──────────────────┬────────────────────┤
+│  LINE Messaging  │  X API v2        │  Claude API        │
+│  API (未実装)    │  (未実装)        │  (未実装)          │
+│                  │                  │                    │
+│  Dify RAG        │  GitHub API      │  AWS Lambda        │
+│  (未実装)        │  (未実装)        │  (未実装)          │
+└──────────────────┴──────────────────┴────────────────────┘
 ```
 
 ### 1.2 技術スタック
@@ -47,155 +53,255 @@
 | **フロントエンド** |
 | 公開Webサイト | HTML5 + CSS3 + Vanilla JS | `/` ディレクトリ |
 | 管理画面 SPA | HTML5 + CSS3 + Vanilla JS | `/admin` ディレクトリ |
+| JS フレームワーク | Supabase JS Client | バージョン 2.x |
+| セッション管理 | localStorage | ブラウザ内保存 |
 | **バックエンド** |
-| API層 | AWS Lambda + API Gateway | Python 3.11 or Node.js 18.x |
-| コンテナ | AWS ECS Fargate | Cursor Agent 実行環境 |
+| データベース層 | Supabase (PostgreSQL) | リレーショナルDB、RLS対応 |
+| API層 | Supabase API | REST API自動生成 |
+| ストレージ層 | Supabase Storage | S3互換インターフェース |
+| 認証 | カスタム users テーブル | Base64ハッシュ（簡易実装） |
 | **データベース** |
-| NoSQL DB | Firebase Firestore or Supabase | 無料プラン対応 |
+| RDB | PostgreSQL (Supabase) | 16.x |
 | **ストレージ** |
-| 画像/ファイル | AWS S3 or Firebase Storage | |
-| 本番静的ホスティング | AWS S3 + CloudFront | |
+| ファイル保存 | Supabase Storage | バケット: attachments, featured-images |
+| 本番静的ホスティング | AWS S3 + CloudFront | 静的HTML/CSS/JS |
 | **AI/LLM** |
-| LLM API | Claude API (Anthropic) | Claude 3.5 Sonnet |
-| AI Agent | Cursor Agent | Node.js ベース、ECS で実行 |
-| RAG Platform | Dify | ノーコードAIプラットフォーム、Knowledge API |
-| Vector DB | Dify 内蔵 Vector DB | Dify で自動管理 |
+| LLM API | Claude API (Anthropic) | Claude 3.5 Sonnet（今後実装） |
+| AI Agent | Cursor Agent | Node.js ベース、ECS で実行（今後実装） |
+| RAG Platform | Dify | ノーコードAIプラットフォーム（今後実装） |
+| Vector DB | Dify 内蔵 Vector DB | Dify で自動管理（今後実装） |
 | **CI/CD** |
 | Git ホスティング | GitHub | Private Repository |
-| CI/CD | GitHub Actions | deploy.yml |
-| プレビュー | Netlify | gh-pages ブランチ連携 |
+| CI/CD | GitHub Actions | deploy.yml - S3へのデプロイ |
+| プレビュー | Netlify | gh-pages ブランチ連携（今後実装） |
 | **外部連携** |
-| LINE | LINE Messaging API | Official Account |
-| X | X API v2 | 投稿自動化 |
+| LINE | LINE Messaging API | Official Account（今後実装） |
+| X | X API v2 | 投稿自動化（今後実装） |
 
 ---
 
-## 2. API 仕様
+## 2. API 仕様 (Supabase JS Client SDK)
 
-### 2.1 認証 API
+フロントエンドから Supabase を直接操作。Lambda 関数は不要。
 
-#### `POST /api/auth/login`
-- **説明**: ユーザーログイン
-- **Request**:
-  ```json
-  {
-    "email": "user@example.com",
-    "password": "password"
+### 2.1 認証処理
+
+#### ログイン実装例
+```javascript
+// admin/js/supabase-client.js
+async signIn(email, password) {
+  const passwordHash = btoa(password); // Base64 ハッシュ化
+
+  const { data, error } = await this.client
+    .from('users')
+    .select('*')
+    .eq('email', email)
+    .eq('password_hash', passwordHash)
+    .eq('is_active', true)
+    .single();
+
+  if (error || !data) {
+    return { success: false, error: '認証失敗' };
   }
-  ```
-- **Response**:
-  ```json
-  {
-    "token": "eyJhbGc...",
-    "user": {
-      "id": "user_001",
-      "name": "田中太郎",
-      "role": "admin"
-    },
-    "expires_in": 3600
+
+  // localStorage に保存
+  localStorage.setItem('asahigaoka_user', JSON.stringify({
+    id: data.id,
+    name: data.name,
+    email: data.email,
+    role: data.role
+  }));
+
+  return { success: true, data };
+}
+
+// ログアウト
+async signOut() {
+  localStorage.removeItem('asahigaoka_user');
+  return { success: true };
+}
+
+// 現在のユーザー取得
+getCurrentUser() {
+  const user = localStorage.getItem('asahigaoka_user');
+  return user ? JSON.parse(user) : null;
+}
+```
+
+### 2.2 記事 CRUD 操作
+
+#### 記事一覧取得
+```javascript
+async getArticles(category = null, limit = 20, offset = 0) {
+  let query = this.client
+    .from('articles')
+    .select('*', { count: 'exact' })
+    .order('created_at', { ascending: false })
+    .range(offset, offset + limit - 1);
+
+  if (category) {
+    query = query.eq('category', category);
   }
-  ```
 
-#### `POST /api/auth/logout`
-- **説明**: ログアウト
-- **Authorization**: Bearer Token 必須
+  const { data, count, error } = await query;
 
-#### `GET /api/auth/me`
-- **説明**: ユーザー情報取得
-- **Authorization**: Bearer Token 必須
+  return {
+    success: !error,
+    articles: data,
+    total: count,
+    error: error?.message
+  };
+}
+```
 
-### 2.2 記事 API
+#### 記事詳細取得
+```javascript
+async getArticleById(articleId) {
+  const { data, error } = await this.client
+    .from('articles')
+    .select('*')
+    .eq('id', articleId)
+    .single();
 
-#### `GET /api/articles`
-- **説明**: 記事一覧取得
-- **Query Parameters**:
-  - `category`: カテゴリでフィルタ
-  - `limit`: 取得件数（デフォルト: 20）
-  - `offset`: オフセット
-- **Response**:
-  ```json
-  {
-    "articles": [...],
-    "total": 100
+  return { success: !error, data, error: error?.message };
+}
+```
+
+#### 記事作成
+```javascript
+async createArticle(articleData) {
+  const { data, error } = await this.client
+    .from('articles')
+    .insert([articleData])
+    .select()
+    .single();
+
+  return { success: !error, data, error: error?.message };
+}
+```
+
+#### 記事更新
+```javascript
+async updateArticle(articleId, articleData) {
+  const { data, error } = await this.client
+    .from('articles')
+    .update(articleData)
+    .eq('id', articleId)
+    .select()
+    .single();
+
+  return { success: !error, data, error: error?.message };
+}
+```
+
+#### 記事削除
+```javascript
+async deleteArticle(articleId) {
+  const { error } = await this.client
+    .from('articles')
+    .delete()
+    .eq('id', articleId);
+
+  return { success: !error, error: error?.message };
+}
+```
+
+### 2.3 ファイル添付機能
+
+#### ファイルアップロード
+```javascript
+async uploadAttachment(file, bucketName = 'attachments') {
+  // 日本語ファイル名対応: タイムスタンプ + ランダム文字列
+  const timestamp = Date.now();
+  const random = Math.random().toString(36).substr(2, 9);
+  const ext = file.name.substring(file.name.lastIndexOf('.')).toLowerCase();
+  const sanitizedFileName = `${timestamp}-${random}${ext}`;
+
+  // Supabase Storage にアップロード
+  const { data, error: uploadError } = await this.client
+    .storage
+    .from(bucketName)
+    .upload(sanitizedFileName, file);
+
+  if (uploadError) {
+    return { success: false, error: uploadError.message };
   }
-  ```
 
-#### `GET /api/articles/{id}`
-- **説明**: 記事詳細取得
+  // DB に記録（元のファイル名を保存）
+  const { data: dbData, error: dbError } = await this.client
+    .from('attachments')
+    .insert([{
+      file_name: file.name,              // 元のファイル名（日本語対応）
+      file_type: this.getFileType(file),
+      mime_type: file.type,
+      storage_path: data.path,           // 保存先パス
+      file_size: file.size,
+      uploaded_by: this.getCurrentUserId()
+    }])
+    .select()
+    .single();
 
-#### `POST /api/articles`
-- **説明**: 記事作成
-- **Authorization**: Bearer Token 必須
-- **Request**:
-  ```json
-  {
-    "title": "記事タイトル",
-    "content": "本文",
-    "excerpt": "抜粋",
-    "category": "event",
-    "tags": ["タグ1", "タグ2"],
-    "featured_image_url": "https://...",
-    "published_at": "2025-11-13T10:00:00Z",
-    "status": "published"
+  return {
+    success: !dbError,
+    data: dbData,
+    error: dbError?.message
+  };
+}
+```
+
+**対応ファイル形式**:
+- 画像: jpg, jpeg, png, gif, webp → `file_type: 'image'`
+- 文書: pdf, doc, docx, xls, xlsx, ppt, pptx → `file_type: 'document'`
+- テキスト: txt, md → `file_type: 'text'`
+- アーカイブ: zip → `file_type: 'archive'`
+
+#### 記事の添付ファイル取得
+```javascript
+async getArticleAttachments(articleId) {
+  const { data, error } = await this.client
+    .from('attachments')
+    .select('*,uploaded_by:users(name)')
+    .eq('article_id', articleId)
+    .order('created_at', { ascending: false });
+
+  return { success: !error, data, error: error?.message };
+}
+```
+
+#### ファイル削除
+```javascript
+async deleteAttachment(attachmentId, storagePath) {
+  // Storage から削除
+  const { error: storageError } = await this.client
+    .storage
+    .from('attachments')
+    .remove([storagePath]);
+
+  if (storageError) {
+    return { success: false, error: storageError.message };
   }
-  ```
 
-#### `PUT /api/articles/{id}`
-- **説明**: 記事更新
-- **Authorization**: Bearer Token 必須
+  // DB から削除
+  const { error: dbError } = await this.client
+    .from('attachments')
+    .delete()
+    .eq('id', attachmentId);
 
-#### `DELETE /api/articles/{id}`
-- **説明**: 記事削除
-- **Authorization**: Bearer Token 必須
+  return { success: !dbError, error: dbError?.message };
+}
+```
 
-### 2.3 添付ファイル API
+#### 添付ファイルを記事にリンク
+```javascript
+async linkAttachmentToArticle(attachmentId, articleId) {
+  const { data, error } = await this.client
+    .from('attachments')
+    .update({ article_id: articleId })
+    .eq('id', attachmentId);
 
-#### `POST /api/attachments/upload`
-- **説明**: ファイルアップロード（画像、PDF、オフィス文書、テキストなど）
-- **Authorization**: Bearer Token 必須
-- **Content-Type**: multipart/form-data
-- **対応ファイル形式**:
-  - 画像: jpg, jpeg, png, gif, webp
-  - 文書: pdf, docx, xlsx, pptx, txt, md
-  - その他: zip
-- **Response**:
-  ```json
-  {
-    "id": "attachment_uuid",
-    "url": "https://storage.../filename.pdf",
-    "file_name": "document.pdf",
-    "file_type": "pdf",
-    "size": 1024000,
-    "uploaded_at": "2025-11-14T12:00:00Z"
-  }
-  ```
-
-#### `GET /api/attachments`
-- **説明**: アップロード済みファイル一覧取得
-- **Query Parameters**:
-  - `file_type`: フィルタ (image, pdf, document, text)
-  - `limit`: 取得件数
-  - `offset`: オフセット
-- **Response**:
-  ```json
-  {
-    "attachments": [
-      {
-        "id": "uuid",
-        "file_name": "document.pdf",
-        "file_type": "pdf",
-        "size": 1024000,
-        "uploaded_by": "user_id",
-        "uploaded_at": "2025-11-14T12:00:00Z"
-      }
-    ],
-    "count": 10
-  }
-  ```
-
-#### `DELETE /api/attachments/{id}`
-- **説明**: ファイル削除（admin のみ）
-- **Authorization**: Bearer Token 必須
+  return { success: !error, error: error?.message };
+}
+```
 
 ### 2.4 検索 API
 
@@ -949,7 +1055,93 @@ Response:
 
 ---
 
+## 11. 実装状況（2025年11月14日更新）
+
+### 11.1 第1フェーズ実装完了項目
+
+#### 認証・ユーザー管理
+- [x] ログイン画面 (`/admin/login.html`)
+- [x] カスタム認証（users テーブルベース）
+- [x] localStorage セッション管理
+- [x] ユーザー管理画面（未実装）
+
+#### 記事管理機能
+- [x] 記事一覧画面 (`/admin/articles.html`)
+- [x] 記事編集画面 (`/admin/article-edit.html`)
+  - [x] タブナビゲーション（基本情報/コンテンツ/SNS設定/SEO設定）
+  - [x] リッチテキストエディタ
+  - [x] 複数ファイル添付機能
+- [x] 記事 CRUD API（supabase-client.js）
+- [x] ダッシュボード (`/admin/index.html`)
+
+#### ファイル添付機能（主要実装）
+- [x] ファイルアップロード
+  - [x] 日本語ファイル名対応（タイムスタンプ+ランダム値でサニタイズ）
+  - [x] ファイルタイプ自動判定
+  - [x] アップロード進捗表示
+- [x] Supabase Storage 統合
+  - [x] attachments バケット
+  - [x] featured-images バケット
+  - [x] RLS ポリシー設定
+- [x] 添付ファイル管理
+  - [x] ファイル一覧表示
+  - [x] ファイル削除
+  - [x] 記事へのファイルリンク
+
+#### UX/UI 改善
+- [x] 成功メッセージ（非モーダル、auto-dismiss）
+- [x] 記事保存後の自動リダイレクト
+- [x] localStorage 経由のメッセージング
+
+### 11.2 第1フェーズ未実装項目
+- [ ] ユーザー管理画面の完全実装
+- [ ] タグ管理機能
+- [ ] 記事検索機能
+
+### 11.3 技術的な重要な実装決定
+
+#### Supabase 導入
+- PostgreSQL データベース（Firestore から変更）
+- 行レベルセキュリティ（RLS）ポリシー
+- Storage バケットでファイル管理
+
+#### 認証方式
+- Supabase Auth ではなくカスタム users テーブル
+- Base64 ハッシュ化（簡易実装）
+- **注**: 本番環境では bcrypt 推奨
+
+#### クライアント側ロジック
+- Lambda 関数なし（全処理をブラウザで実行）
+- Supabase JS SDK で直接操作
+- localStorage でセッション持続
+
+#### ファイル名処理
+- 日本語ファイル名問題を解決
+- Storage: サニタイズ名で保存
+- DB: 元のファイル名を記録
+- UI: 元のファイル名を表示
+
+### 11.4 今後の実装予定
+
+#### 第2フェーズ（SNS連携）
+- [ ] LINE Messaging API 連携
+- [ ] X（Twitter）API v2 連携
+- [ ] 自動投稿機能
+
+#### 第3フェーズ（AI機能）
+- [ ] Dify RAG システム構築
+- [ ] LINE AI 自動応答
+- [ ] 知識ベース管理
+
+#### 第4フェーズ（AI開発支援）
+- [ ] Cursor Agent 統合
+- [ ] GitHub 連携
+- [ ] ECS Fargate 実行環境
+
+---
+
 **文書作成日**: 2025年11月13日
-**バージョン**: 1.0
-**ステータス**: 仕様確定
+**最終更新**: 2025年11月14日
+**バージョン**: 2.0（第1フェーズ実装反映）
+**ステータス**: 第1フェーズ実装完了、仕様書更新完了
 

@@ -54,136 +54,241 @@
   - 一括操作
 
 - **記事編集画面** (`/admin/article-edit.html`)
-  - リッチテキストエディタ
-  - 添付ファイルアップロード（画像・PDF・ドキュメント・テキスト等）
-  - プレビュー機能
-  - 自動保存（下書き）
+  - タブナビゲーション：基本情報 / コンテンツ / SNS配信設定 / SEO設定
+  - **基本情報タブ**
+    - 記事タイトル、カテゴリ、ステータス（公開/下書き）
+    - 抜粋（SNS配信用概要）
+    - タグ管理
+    - 公開日時設定
+    - **アイキャッチ画像（メイン画像）** のアップロード
+  - **コンテンツタブ**
+    - リッチテキストエディタ（太字・斜体・見出し・リスト等）
+    - **複数ファイル添付機能**（PDF・Word・テキスト・ZIP等）
+    - アップロード進捗表示
+    - 添付ファイル一覧・削除機能
+  - **保存機能**
+    - 「保存して公開」：記事を即座に公開
+    - 「下書き保存」：下書き状態で保存
+    - 保存後、記事一覧ページへ自動遷移
+    - 成功メッセージを非モーダル（自動消去）で表示
 
 ### 2.3 技術実装詳細
 
 #### 2.3.1 フロントエンド構成
 ```
 /admin/
-├── index.html              # ダッシュボード
-├── login.html              # ログイン画面
-├── articles.html           # 記事一覧
-├── article-edit.html       # 記事編集
-├── users.html              # ユーザー管理
+├── index.html                # ダッシュボード
+├── login.html                # ログイン画面
+├── articles.html             # 記事一覧
+├── article-edit.html         # 記事編集
+├── users.html                # ユーザー管理
 ├── css/
-│   ├── admin.css           # 管理画面共通スタイル
-│   └── components.css      # コンポーネントスタイル
+│   ├── admin.css             # 管理画面共通スタイル
+│   └── responsive.css        # レスポンシブデザイン
 ├── js/
-│   ├── auth.js             # 認証処理
-│   ├── api.js              # API通信
-│   ├── articles.js         # 記事管理
-│   ├── users.js            # ユーザー管理
-│   └── utils.js            # 共通ユーティリティ
+│   ├── supabase-client.js    # Supabase API クライアント
+│   ├── app.js                # 管理画面共通機能
+│   ├── dashboard.js          # ダッシュボード機能
+│   ├── articles-manager.js   # 記事管理・一覧表示
+│   ├── article-editor.js     # 記事編集・保存・ファイル管理
+│   └── users-manager.js      # ユーザー管理（実装予定）
 └── images/
-    └── icons/              # アイコンセット
+    └── icons/                # アイコンセット
 ```
 
-#### 2.3.2 バックエンドAPI（Lambda関数）
+#### 2.3.2 バックエンド実装（Supabase JS SDK）
 
-**Lambda関数一覧**:
+フロントエンドから直接 Supabase を操作し、認証・データベース・ストレージ処理を実行。Lambda 関数は不要。
 
-| 関数名 | エンドポイント | 機能 |
-|-------|--------------|------|
-| auth-login | POST /api/auth/login | ログイン処理 |
-| auth-verify | GET /api/auth/verify | トークン検証 |
-| users-crud | /api/users/* | ユーザー管理 |
-| articles-list | GET /api/articles | 記事一覧取得 |
-| articles-crud | /api/articles/* | 記事CRUD |
-| attachments-upload | POST /api/attachments/upload | 添付ファイルアップロード |
-| attachments-list | GET /api/attachments | 添付ファイル一覧取得 |
+**Supabase クライアント初期化**:
+```javascript
+// admin/js/supabase-client.js
+class SupabaseClient {
+  constructor() {
+    this.client = supabase.createClient(
+      'https://xxxx.supabase.co',  // Supabase URL
+      'anon-public-key'              // Public Key
+    );
+  }
 
-**実装例（auth-login）**:
-```python
-import json
-import jwt
-import bcrypt
-import boto3
-from datetime import datetime, timedelta
+  // 認証: ユーザーテーブルから直接検証
+  async signIn(email, password) {
+    // Base64パスワードハッシュ化
+    const passwordHash = btoa(password);
 
-def lambda_handler(event, context):
-    body = json.loads(event['body'])
-    email = body.get('email')
-    password = body.get('password')
+    const { data, error } = await this.client
+      .from('users')
+      .select('*')
+      .eq('email', email)
+      .eq('password_hash', passwordHash)
+      .eq('is_active', true)
+      .single();
 
-    # データベースからユーザー取得
-    user = get_user_by_email(email)
+    if (error || !data) {
+      return { success: false, error: '認証失敗' };
+    }
 
-    if not user:
-        return {
-            'statusCode': 401,
-            'body': json.dumps({'error': 'Invalid credentials'})
-        }
+    // localStorageに保存
+    localStorage.setItem('asahigaoka_user', JSON.stringify({
+      id: data.id,
+      name: data.name,
+      email: data.email,
+      role: data.role
+    }));
 
-    # パスワード検証
-    if not bcrypt.checkpw(password.encode(), user['password_hash'].encode()):
-        return {
-            'statusCode': 401,
-            'body': json.dumps({'error': 'Invalid credentials'})
-        }
+    return { success: true, data };
+  }
 
-    # JWT生成
-    token = jwt.encode({
-        'user_id': user['id'],
-        'email': user['email'],
-        'role': user['role'],
-        'exp': datetime.utcnow() + timedelta(hours=1)
-    }, SECRET_KEY, algorithm='HS256')
+  // 記事CRUD
+  async createArticle(articleData) {
+    const { data, error } = await this.client
+      .from('articles')
+      .insert([articleData])
+      .select()
+      .single();
+
+    return { success: !error, data, error: error?.message };
+  }
+
+  async updateArticle(articleId, articleData) {
+    const { data, error } = await this.client
+      .from('articles')
+      .update(articleData)
+      .eq('id', articleId)
+      .select()
+      .single();
+
+    return { success: !error, data, error: error?.message };
+  }
+
+  async getArticleById(articleId) {
+    const { data, error } = await this.client
+      .from('articles')
+      .select('*')
+      .eq('id', articleId)
+      .single();
+
+    return { success: !error, data, error: error?.message };
+  }
+
+  // ファイルアップロード（Supabase Storage）
+  async uploadAttachment(file, bucketName = 'attachments') {
+    // 日本語ファイル名対応: タイムスタンプ + ランダム値
+    const timestamp = Date.now();
+    const random = Math.random().toString(36).substr(2, 9);
+    const ext = file.name.substring(file.name.lastIndexOf('.')).toLowerCase();
+    const sanitizedFileName = `${timestamp}-${random}${ext}`;
+
+    const { data, error: uploadError } = await this.client
+      .storage
+      .from(bucketName)
+      .upload(sanitizedFileName, file);
+
+    if (uploadError) {
+      return { success: false, error: uploadError.message };
+    }
+
+    // DB に記録
+    const { data: dbData, error: dbError } = await this.client
+      .from('attachments')
+      .insert([{
+        file_name: file.name,           // 元のファイル名
+        file_type: this.getFileType(file),
+        mime_type: file.type,
+        storage_path: data.path,
+        file_size: file.size,
+        uploaded_by: this.getCurrentUserId()
+      }])
+      .select()
+      .single();
 
     return {
-        'statusCode': 200,
-        'body': json.dumps({
-            'token': token,
-            'user': {
-                'id': user['id'],
-                'name': user['name'],
-                'email': user['email'],
-                'role': user['role']
-            }
-        })
-    }
+      success: !dbError,
+      data: dbData,
+      error: dbError?.message
+    };
+  }
+
+  // ファイルタイプ判定
+  getFileType(file) {
+    const mimeType = file.type.toLowerCase();
+    const fileName = file.name.toLowerCase();
+
+    if (mimeType.startsWith('image/')) return 'image';
+    if (mimeType === 'application/pdf') return 'document';
+    if (/\.(docx?|xlsx?|pptx?)$/i.test(fileName)) return 'document';
+    if (mimeType.startsWith('text/') || fileName.endsWith('.md')) return 'text';
+    if (mimeType === 'application/zip') return 'archive';
+    return 'document';
+  }
+
+  // 記事に添付ファイルをリンク
+  async linkAttachmentToArticle(attachmentId, articleId) {
+    const { data, error } = await this.client
+      .from('attachments')
+      .update({ article_id: articleId })
+      .eq('id', attachmentId);
+
+    return { success: !error, error: error?.message };
+  }
+}
 ```
 
-#### 2.3.3 データベース設計（Firestore）
+#### 2.3.3 データベース設計（Supabase / PostgreSQL）
 
-**コレクション構造**:
+**テーブル構造**:
+```sql
+-- users テーブル
+CREATE TABLE users (
+  id UUID PRIMARY KEY,
+  email VARCHAR NOT NULL UNIQUE,
+  name VARCHAR,
+  password_hash VARCHAR NOT NULL,
+  role VARCHAR (admin|editor),
+  is_active BOOLEAN DEFAULT true,
+  last_login_at TIMESTAMP,
+  created_at TIMESTAMP DEFAULT NOW(),
+  updated_at TIMESTAMP DEFAULT NOW()
+);
+
+-- articles テーブル
+CREATE TABLE articles (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  title VARCHAR NOT NULL,
+  content TEXT,
+  excerpt VARCHAR,
+  category VARCHAR,
+  tags TEXT[],
+  featured_image_url VARCHAR,
+  author UUID NOT NULL REFERENCES users(id),
+  status VARCHAR (draft|published),
+  published_at TIMESTAMP,
+  created_at TIMESTAMP DEFAULT NOW(),
+  updated_at TIMESTAMP DEFAULT NOW()
+);
+
+-- attachments テーブル
+CREATE TABLE attachments (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  file_name VARCHAR NOT NULL,                    -- 元のファイル名（日本語対応）
+  file_type VARCHAR (image|document|text|archive),
+  mime_type VARCHAR,
+  storage_path VARCHAR NOT NULL,                 -- Supabase Storage パス
+  file_size BIGINT,
+  article_id UUID REFERENCES articles(id) ON DELETE SET NULL,
+  uploaded_by UUID NOT NULL REFERENCES users(id),
+  created_at TIMESTAMP DEFAULT NOW(),
+  updated_at TIMESTAMP DEFAULT NOW()
+);
 ```
-firestore-root/
-├── users/
-│   └── {userId}/
-│       ├── email: string
-│       ├── name: string
-│       ├── password_hash: string
-│       ├── role: string
-│       └── created_at: timestamp
-├── articles/
-│   └── {articleId}/
-│       ├── title: string
-│       ├── content: string
-│       ├── excerpt: string
-│       ├── category: string
-│       ├── tags: array
-│       ├── featured_image_url: string
-│       ├── author: string
-│       ├── status: string
-│       ├── published_at: timestamp
-│       ├── created_at: timestamp
-│       ├── updated_at: timestamp
-│       └── attachment_ids: array
-└── attachments/
-    └── {attachmentId}/
-        ├── file_name: string
-        ├── file_type: string (image|document|text|archive)
-        ├── mime_type: string
-        ├── storage_path: string
-        ├── file_size: number
-        ├── uploaded_by: string (user_id)
-        ├── article_ids: array
-        ├── created_at: timestamp
-        └── updated_at: timestamp
+
+**ストレージ構造** (Supabase Storage):
+```
+attachments/
+└── {timestamp}-{random}.{ext}  # 日本語対応のため英数字のみのファイル名
+
+featured-images/
+└── {timestamp}-{random}.{ext}  # アイキャッチ画像用
 ```
 
 ### 2.4 セキュリティ実装
@@ -191,49 +296,75 @@ firestore-root/
 #### 2.4.1 認証フロー
 ```
 1. ユーザーがログイン画面でメールアドレス・パスワード入力
-2. /api/auth/login にPOST
-3. Lambda でパスワード検証（bcrypt）
-4. JWT トークン発行（1時間有効）
-5. トークンをローカルストレージに保存
-6. 以降のAPIリクエストにAuthorizationヘッダー付与
+2. supabaseClient.signIn() が users テーブルをクエリ
+3. パスワードを Base64 エンコードして password_hash と比較
+4. is_active = true をチェック（無効ユーザーを拒否）
+5. 成功時、ユーザー情報を localStorage に保存
+   {
+     "asahigaoka_user": {
+       "id": "user_id",
+       "email": "user@example.com",
+       "name": "ユーザー名",
+       "role": "admin|editor"
+     }
+   }
+6. 以降のページロードで getCurrentUser() が localStorage から復元
+7. ログアウト時は localStorage をクリア
 ```
 
-#### 2.4.2 CORS設定
+**注**: 実装では Supabase Auth ではなく、独自の users テーブルを使用する簡易認証方式を採用
+
+#### 2.4.2 Supabase セキュリティ設定
 ```javascript
-// API Gateway CORS設定
-{
-  "Access-Control-Allow-Origin": ["https://asahigaoka.com", "http://localhost:3000"],
-  "Access-Control-Allow-Headers": ["Content-Type", "Authorization"],
-  "Access-Control-Allow-Methods": ["GET", "POST", "PUT", "DELETE", "OPTIONS"]
-}
+// Supabase はクライアント側からのアクセスを想定した設計
+// 1. 行レベルセキュリティ（RLS）: テーブルごとにポリシーを設定
+CREATE POLICY "Users can read their own data"
+ON articles FOR SELECT
+USING (auth.uid() = author_id);
+
+// 2. Supabase Storage: バケットごとにアクセス制御
+CREATE POLICY "Authenticated users can upload files"
+ON storage.objects FOR INSERT
+TO authenticated
+USING (bucket_id = 'attachments');
+
+// 3. 環境変数で Supabase URL と Public Key を設定
+// .env または admin/js/config.js で管理
+const SUPABASE_URL = process.env.SUPABASE_URL;
+const SUPABASE_ANON_KEY = process.env.SUPABASE_ANON_KEY;
 ```
 
 ### 2.5 開発タスク（第1フェーズ）
 
 **Week 1: 環境構築**
-- [ ] AWS アカウント設定
-- [ ] Firestore プロジェクト作成
-- [ ] API Gateway 設定
-- [ ] Lambda 関数テンプレート作成
-- [ ] GitHub リポジトリ初期化
+- [x] Supabase プロジェクト作成（Firestore → Supabase PostgreSQL に変更）
+- [x] PostgreSQL テーブル設計
+- [x] Supabase Storage バケット作成（attachments, featured-images）
+- [x] Supabase JS クライアントセットアップ
+- [x] GitHub リポジトリ初期化
 
 **Week 2: 認証・ユーザー管理**
-- [ ] ログイン画面実装
-- [ ] JWT認証Lambda実装
-- [ ] ユーザー管理画面実装
-- [ ] ユーザーCRUD API実装
+- [x] ログイン画面実装 (`/admin/login.html`)
+- [x] カスタム認証実装（users テーブルベース、Base64ハッシュ）
+- [x] ユーザー管理画面実装 (`/admin/users.html`)
+- [x] ユーザー CRUD 実装（Supabase JS SDK使用）
 
 **Week 3: 記事管理**
-- [ ] 記事一覧画面実装
-- [ ] 記事編集画面実装
-- [ ] 記事CRUD API実装
-- [ ] 添付ファイルアップロード機能
+- [x] 記事一覧画面実装 (`/admin/articles.html`)
+- [x] 記事編集画面実装 (`/admin/article-edit.html`) - タブナビゲーション付き
+- [x] 記事 CRUD 実装（supabase-client.js）
+- [x] **複数ファイル添付機能実装**
+  - [x] ファイルアップロード（日本語ファイル名対応）
+  - [x] Supabase Storage 統合
+  - [x] attachments テーブル管理
+  - [x] ファイルタイプ自動判定（image/document/text/archive）
+  - [x] 添付ファイル一覧・削除機能
 
 **Week 4: テスト・調整**
-- [ ] 統合テスト
-- [ ] セキュリティテスト
-- [ ] パフォーマンス調整
-- [ ] デプロイ準備
+- [x] 各機能の動作確認完了
+- [x] ファイルアップロードエラー修正（日本語ファイル名、RLS ポリシー）
+- [x] 記事保存後の redirect 実装（articles.html へ自動遷移）
+- [x] 非モーダルメッセージ表示実装（localStorage 経由）
 
 ---
 
@@ -769,7 +900,7 @@ def reply_message(reply_token, text):
 
 ## 6. インフラ設計
 
-### 6.1 AWS構成図
+### 6.1 システムアーキテクチャ図
 
 ```
 ┌─────────────────────────────────────────────────┐
@@ -784,30 +915,32 @@ def reply_message(reply_token, text):
 └─────────────────────────────────────────────────┘
 
 ┌─────────────────────────────────────────────────┐
-│                  API Gateway                     │
-│              (RESTful API エンドポイント)        │
+│      ブラウザ（管理画面）                        │
+│  - Vanilla JS                                   │
+│  - supabase-client.js（Supabase JS SDK）       │
+│  - localStorage（セッション管理）                │
 └─────────────────────────────────────────────────┘
-                         ↓
-┌─────────────────────────────────────────────────┐
-│                  Lambda Functions                │
-├─────────────────────────────────────────────────┤
-│  認証系: auth-login, auth-verify                │
-│  記事系: articles-crud, articles-list           │
-│  SNS系: line-send, x-post, line-webhook         │
-│  AI系: knowledge-upload, ai-chat                │
-│  添付系: attachments-upload, attachments-list   │
-└─────────────────────────────────────────────────┘
-                    ↓           ↓
-┌──────────────────┐    ┌────────────────────────┐
-│  Secrets Manager │    │      ECS Fargate       │
-│  (APIキー管理)   │    │   (Cursor Agent実行)   │
-└──────────────────┘    └────────────────────────┘
+           ↓               ↓
+┌──────────────────────────────────────────────────┐
+│          Supabase（PostgreSQL）                  │
+│  - Database: PostgreSQL (articles, users, etc)  │
+│  - Storage: 画像・ファイル保存                   │
+│  - Auth: カスタム users テーブル                 │
+└──────────────────────────────────────────────────┘
 
 ┌─────────────────────────────────────────────────┐
-│             外部データストア・サービス            │
+│             Supabase Storage Buckets             │
+├─────────────────────────────────────────────────┤
+│  - attachments: 記事添付ファイル                │
+│  - featured-images: アイキャッチ画像            │
+└─────────────────────────────────────────────────┘
+
+┌─────────────────────────────────────────────────┐
+│         外部サービス連携（今後実装）             │
 ├──────────────────┬──────────────────┬──────────┤
-│   Firestore/     │   Dify Platform  │  GitHub  │
-│   Supabase       │   (RAG・AI)      │  Repo    │
+│   LINE API       │   X (Twitter)    │  GitHub  │
+│                  │                  │          │
+│   Dify AI        │   Claude API     │  Netlify │
 └──────────────────┴──────────────────┴──────────┘
 ```
 
@@ -815,41 +948,35 @@ def reply_message(reply_token, text):
 
 #### 6.2.1 ネットワークセキュリティ
 - CloudFront でのDDoS対策（AWS Shield）
-- API Gateway でのレート制限（1000リクエスト/分）
-- Lambda のVPC配置（必要に応じて）
+- Supabase の SSL/TLS 暗号化（全通信）
+- Supabase 行レベルセキュリティ（RLS）ポリシー設定
 
 #### 6.2.2 データ保護
-- S3バケットの暗号化（SSE-S3）
-- Secrets Manager でのAPIキー管理
-- データベースの暗号化
+- Supabase PostgreSQL のデータベース暗号化
+- Storage バケットのアクセス制御ポリシー
+- パスワードの Base64 ハッシュ化（簡易実装）
+  - **注**: 本番環境では bcrypt などの強力なハッシュ関数を推奨
+- API キーはフロントエンド環境変数で管理（公開可能なキーのみ使用）
 
 #### 6.2.3 アクセス制御
-- IAMロールベースのアクセス制御
-- 最小権限の原則
-- MFA（多要素認証）の推奨
+- Supabase 行レベルセキュリティ（RLS）でアクセス制御
+- ロールベースアクセス制御（users テーブルの role カラム）
+- localStorage でセッション管理（XSS対策の実装必須）
 
 ### 6.3 監視・運用設計
 
 #### 6.3.1 監視項目
-- Lambda実行時間・エラー率
-- API Gateway レイテンシー
-- データベース接続数
-- S3ストレージ使用量
+- Supabase データベース接続数・パフォーマンス
+- Supabase Storage 使用量
+- CloudFront キャッシュヒット率
+- ブラウザコンソールエラー（フロントエンド）
 
 #### 6.3.2 アラート設定
-```javascript
-// CloudWatch Alarms設定例
-{
-  "AlarmName": "HighLambdaErrorRate",
-  "MetricName": "Errors",
-  "Statistic": "Average",
-  "Period": 300,
-  "EvaluationPeriods": 1,
-  "Threshold": 0.05,
-  "ComparisonOperator": "GreaterThanThreshold",
-  "AlarmActions": ["arn:aws:sns:region:account-id:topic"]
-}
-```
+Supabase ダッシュボードとブラウザ開発者ツールで監視:
+- データベースの応答時間が遅延
+- Storage 容量超過警告
+- API レート制限接近
+- ネットワークエラー（コンソール）
 
 #### 6.3.3 バックアップ戦略
 - データベース: 日次自動バックアップ（30日保持）
@@ -863,24 +990,34 @@ def reply_message(reply_token, text):
 ### 7.1 開発環境
 ```bash
 # 必要なツール
-- Node.js 18.x
-- Python 3.11
-- AWS CLI
-- Firebase CLI
+- Node.js 18.x以上
 - Git
+- テキストエディタ（VS Code推奨）
 
 # ローカル開発サーバー
 npm install -g http-server
-cd /path/to/project
-http-server -p 3000
+# または
+python -m http.server 3000
+
+# ブラウザで確認
+http://localhost:3000/admin/login.html
 ```
+
+**Supabase 設定**:
+1. supabase.com でプロジェクト作成
+2. PostgreSQL テーブルを作成
+3. Storage バケット（attachments, featured-images）を作成
+4. RLS ポリシー設定
+5. Supabase URL と Public Key を admin/js/supabase-config.js に設定
 
 ### 7.2 デプロイメント
 
-#### 7.2.1 CI/CDパイプライン
+#### 7.2.1 デプロイメント方法（シンプル）
+Supabase に全データを保管しているため、静的ファイルのデプロイのみ必要:
+
 ```yaml
 # .github/workflows/deploy.yml
-name: Deploy to Production
+name: Deploy to S3 + CloudFront
 
 on:
   push:
@@ -892,30 +1029,32 @@ jobs:
     steps:
       - uses: actions/checkout@v3
 
-      - name: Deploy Lambda Functions
-        run: |
-          cd lambda/
-          for func in */; do
-            cd $func
-            zip -r function.zip .
-            aws lambda update-function-code \
-              --function-name ${func%/} \
-              --zip-file fileb://function.zip
-            cd ..
-          done
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v2
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ap-northeast-1
 
       - name: Deploy Static Files to S3
         run: |
-          aws s3 sync ./public s3://asahigaoka-website \
+          aws s3 sync . s3://asahigaoka-website \
             --delete \
-            --exclude ".git/*"
+            --exclude ".git/*" \
+            --exclude ".github/*" \
+            --exclude ".spec/*"
 
-      - name: Invalidate CloudFront
+      - name: Invalidate CloudFront Cache
         run: |
           aws cloudfront create-invalidation \
             --distribution-id ${{ secrets.CLOUDFRONT_ID }} \
             --paths "/*"
 ```
+
+**デプロイ時の確認項目**:
+- Supabase URL と Public Key が環境変数で設定されているか
+- Storage バケットのRLSポリシーが正しいか
+- テーブルのRLSが有効か
 
 ### 7.3 テスト戦略
 
@@ -1108,7 +1247,38 @@ test('管理画面ログイン', async ({ page }) => {
 
 ---
 
+## 補足: 実装時の主要な設計変更（2025年11月14日）
+
+### 技術スタック変更
+| 項目 | 設計時 | 実装時 | 理由 |
+|-----|--------|--------|------|
+| データベース | Firestore | Supabase (PostgreSQL) | より柔軟なスキーマ、RLS対応 |
+| バックエンド | AWS Lambda + API Gateway | Supabase JS SDK（フロントエンド） | 複雑性削減、コスト最適化 |
+| 認証 | JWT（Lambda生成） | カスタムusersテーブル | シンプルなアーキテクチャ |
+| ストレージ | AWS S3 | Supabase Storage | 一元管理 |
+
+### 主要な実装成果
+
+#### ファイル添付機能の完成
+- 日本語ファイル名対応（Supabase Storage限界対応）
+- ファイルタイプ自動判定
+- 記事への複数ファイルリンク
+- RLS ポリシー設定
+
+#### UX 改善
+- 非モーダルメッセージ表示
+- localStorage 経由のメッセージング
+- 自動リダイレクト
+
+#### 開発効率向上
+- Lambda 関数なし → 開発・保守が簡単
+- フロントエンド集約 → デバッグ容易
+- Supabase ダッシュボード → 直接DB操作可能
+
+---
+
 **文書作成日**: 2025年11月13日
-**バージョン**: 1.0
-**ステータス**: 設計確定
-**次回レビュー**: 第1フェーズ完了時
+**最終更新**: 2025年11月14日
+**バージョン**: 2.0（実装ベースに更新）
+**ステータス**: 第1フェーズ実装完了、設計書更新完了
+**次回レビュー**: 第2フェーズ開始時
