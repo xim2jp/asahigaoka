@@ -46,8 +46,8 @@ class ArticleEditor {
    */
   setupEventListeners() {
     // ログアウトボタン
-    const logoutBtn = document.querySelector('.btn-outline');
-    if (logoutBtn && logoutBtn.textContent.includes('ログアウト')) {
+    const logoutBtn = document.querySelector('a.btn-outline[href="login.html"]');
+    if (logoutBtn) {
       logoutBtn.addEventListener('click', async (e) => {
         e.preventDefault();
         await this.logout();
@@ -60,23 +60,23 @@ class ArticleEditor {
       attachmentsInput.addEventListener('change', (e) => this.handleFileSelection(e));
     }
 
-    // 保存ボタン
-    const submitBtn = document.querySelector('button[type="submit"]');
-    if (submitBtn) {
-      submitBtn.addEventListener('click', (e) => {
-        e.preventDefault();
-        this.saveArticle('published');
-      });
-    }
-
-    // 下書き保存ボタン
-    const saveDraftBtn = document.querySelector('button[type="button"]');
-    if (saveDraftBtn && saveDraftBtn.textContent.includes('下書き')) {
-      saveDraftBtn.addEventListener('click', (e) => {
-        e.preventDefault();
-        this.saveArticle('draft');
-      });
-    }
+    // 保存ボタン（保存して公開）
+    const saveButtons = document.querySelectorAll('.btn-group button, .btn-group a');
+    saveButtons.forEach(btn => {
+      if (btn.textContent.includes('保存して公開')) {
+        btn.addEventListener('click', (e) => {
+          e.preventDefault();
+          console.log('保存して公開 ボタンをクリック');
+          this.saveArticle('published');
+        });
+      } else if (btn.textContent.includes('下書き')) {
+        btn.addEventListener('click', (e) => {
+          e.preventDefault();
+          console.log('下書き保存 ボタンをクリック');
+          this.saveArticle('draft');
+        });
+      }
+    });
   }
 
   /**
@@ -378,10 +378,6 @@ class ArticleEditor {
         content,
         featured_image_url: featuredImageUrl,
         status,
-        author: {
-          id: this.currentUser.id,
-          name: this.currentUser.user_metadata?.name
-        },
         published_at: status === 'published' ? new Date().toISOString() : null
       };
 
