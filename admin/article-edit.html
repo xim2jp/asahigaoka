@@ -281,6 +281,82 @@
                             </div>
                         </div>
                     </div>
+
+                    <!-- 添付ファイルセクション -->
+                    <div class="card">
+                        <div class="card-header">
+                            <h2 class="card-title">📎 添付ファイル</h2>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="attachments" class="form-label">ファイルをアップロード</label>
+                            <input type="file" id="attachments" class="form-control" multiple accept=".pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.txt,.md,.zip,.png,.jpg,.jpeg,.gif,.webp">
+                            <small style="color: var(--text-secondary);">対応形式: 画像（PNG, JPG, GIF, WebP）、PDF、Office文書、テキスト、ZIP</small>
+                        </div>
+
+                        <!-- アップロード中の表示 -->
+                        <div id="upload-progress" style="display: none; margin-bottom: 20px;">
+                            <div style="display: flex; align-items: center; gap: 10px;">
+                                <div style="flex: 1;">
+                                    <div style="background: #e0e0e0; border-radius: 4px; height: 8px; overflow: hidden;">
+                                        <div id="progress-bar" style="background: var(--primary-color); height: 100%; width: 0%; transition: width 0.3s;"></div>
+                                    </div>
+                                </div>
+                                <span id="progress-text" style="font-size: 12px; color: var(--text-secondary);">0%</span>
+                            </div>
+                        </div>
+
+                        <!-- 添付ファイル一覧 -->
+                        <div id="attachments-list">
+                            <div style="padding: 20px; text-align: center; color: var(--text-secondary);">
+                                アップロードされたファイルがありません
+                            </div>
+                        </div>
+
+                        <!-- ファイルアイテムテンプレート（非表示） -->
+                        <style>
+                            .attachment-item {
+                                display: flex;
+                                align-items: center;
+                                justify-content: space-between;
+                                padding: 12px;
+                                border: 1px solid var(--border-color);
+                                border-radius: 4px;
+                                margin-bottom: 8px;
+                                background: #f9f9f9;
+                            }
+                            .attachment-item:hover {
+                                background: #f0f0f0;
+                            }
+                            .attachment-info {
+                                flex: 1;
+                                display: flex;
+                                align-items: center;
+                                gap: 12px;
+                            }
+                            .attachment-icon {
+                                font-size: 20px;
+                                width: 30px;
+                                text-align: center;
+                            }
+                            .attachment-details {
+                                flex: 1;
+                            }
+                            .attachment-name {
+                                font-weight: 500;
+                                color: var(--text-primary);
+                                margin-bottom: 4px;
+                            }
+                            .attachment-meta {
+                                font-size: 12px;
+                                color: var(--text-secondary);
+                            }
+                            .attachment-actions {
+                                display: flex;
+                                gap: 8px;
+                            }
+                        </style>
+                    </div>
                 </div>
 
                 <!-- SNS配信設定タブ -->

@@ -634,6 +634,197 @@ class SupabaseClient {
       return { success: false, error: error.message };
     }
   }
+
+  /**
+   * 添付ファイルをアップロード
+   * @param {File} file - ファイルオブジェクト
+   * @param {string} bucketName - バケット名（デフォルト: 'attachments'）
+   */
+  async uploadAttachment(file, bucketName = 'attachments') {
+    try {
+      const userId = this.currentUser?.id;
+      if (!userId) throw new Error('ユーザーが認証されていません');
+
+      // ファイル情報から file_type を判定
+      const fileType = this.getFileType(file);
+
+      // ファイル名の生成（タイムスタンプ + ランダム）
+      const timestamp = Date.now();
+      const random = Math.random().toString(36).substr(2, 9);
+      const fileName = `${timestamp}-${random}-${file.name}`;
+
+      // ファイルをストレージにアップロード
+      const { data: uploadData, error: uploadError } = await this.client.storage
+        .from(bucketName)
+        .upload(fileName, file);
+
+      if (uploadError) throw uploadError;
+
+      // ストレージパス
+      const storagePath = `${bucketName}/${fileName}`;
+
+      // attachments テーブルに記録
+      const { data: attachmentData, error: dbError } = await this.client
+        .from('attachments')
+        .insert({
+          file_name: file.name,
+          file_type: fileType,
+          mime_type: file.type,
+          storage_path: storagePath,
+          file_size: file.size,
+          uploaded_by: userId
+        })
+        .select()
+        .single();
+
+      if (dbError) throw dbError;
+
+      console.log('✅ ファイルアップロード成功:', attachmentData.id);
+      return { data: attachmentData, success: true };
+    } catch (error) {
+      console.error('❌ ファイルアップロードエラー:', error.message);
+      return { data: null, success: false, error: error.message };
+    }
+  }
+
+  /**
+   * ファイルタイプを判定（拡張子とMIME タイプから）
+   * @param {File} file - ファイルオブジェクト
+   * @returns {string} - 'image', 'document', 'text', 'archive'
+   */
+  getFileType(file) {
+    const mimeType = file.type.toLowerCase();
+    const fileName = file.name.toLowerCase();
+
+    // MIME タイプから判定
+    if (mimeType.startsWith('image/')) return 'image';
+    if (mimeType === 'application/pdf') return 'document';
+    if (mimeType.includes('officedocument') || mimeType.includes('msword') || mimeType.includes('spreadsheet')) {
+      return 'document';
+    }
+    if (mimeType.startsWith('text/') || fileName.endsWith('.md')) return 'text';
+    if (mimeType === 'application/zip' || fileName.endsWith('.zip')) return 'archive';
+
+    // 拡張子から判定
+    if (/\.(png|jpg|jpeg|gif|webp|svg)$/i.test(fileName)) return 'image';
+    if (/\.(pdf)$/i.test(fileName)) return 'document';
+    if (/\.(docx?|xlsx?|pptx?)$/i.test(fileName)) return 'document';
+    if (/\.(txt|md|csv)$/i.test(fileName)) return 'text';
+    if (/\.(zip|rar|7z|tar|gz)$/i.test(fileName)) return 'archive';
+
+    // デフォルト
+    return 'document';
+  }
+
+  /**
+   * 記事の添付ファイル一覧を取得
+   * @param {string} articleId - 記事ID
+   */
+  async getArticleAttachments(articleId) {
+    try {
+      const { data, error } = await this.client
+        .from('attachments')
+        .select('*,uploaded_by:users(name)')
+        .eq('article_id', articleId)
+        .order('created_at', { ascending: false });
+
+      if (error) throw error;
+      return { data: data || [], success: true };
+    } catch (error) {
+      console.error('添付ファイル取得エラー:', error.message);
+      return { data: [], success: false, error: error.message };
+    }
+  }
+
+  /**
+   * 添付ファイル一覧を取得（ユーザーがアップロードしたもの）
+   * @param {number} limit - 取得件数
+   * @param {number} offset - オフセット
+   */
+  async getAttachments(limit = 50, offset = 0) {
+    try {
+      const userId = this.currentUser?.id;
+      if (!userId) throw new Error('ユーザーが認証されていません');
+
+      const { data, error, count } = await this.client
+        .from('attachments')
+        .select('*,uploaded_by:users(name)', { count: 'exact' })
+        .eq('uploaded_by', userId)
+        .order('created_at', { ascending: false })
+        .range(offset, offset + limit - 1);
+
+      if (error) throw error;
+      return { data: data || [], count: count || 0, success: true };
+    } catch (error) {
+      console.error('❌ 添付ファイル一覧取得エラー:', error.message);
+      return { data: [], count: 0, success: false, error: error.message };
+    }
+  }
+
+  /**
+   * 添付ファイルを記事に関連付け
+   * @param {string} attachmentId - 添付ファイルID
+   * @param {string} articleId - 記事ID
+   */
+  async linkAttachmentToArticle(attachmentId, articleId) {
+    try {
+      const { data, error } = await this.client
+        .from('attachments')
+        .update({ article_id: articleId })
+        .eq('id', attachmentId)
+        .select()
+        .single();
+
+      if (error) throw error;
+      console.log('✅ ファイルを記事に関連付けました:', attachmentId);
+      return { data, success: true };
+    } catch (error) {
+      console.error('❌ ファイル関連付けエラー:', error.message);
+      return { data: null, success: false, error: error.message };
+    }
+  }
+
+  /**
+   * 添付ファイルを削除
+   * @param {string} id - 添付ファイルID
+   * @param {string} storagePath - ストレージパス
+   */
+  async deleteAttachment(id, storagePath) {
+    try {
+      // ストレージから削除
+      const [bucketName, ...pathParts] = storagePath.split('/');
+      const filePath = pathParts.join('/');
+
+      const { error: storageError } = await this.client.storage
+        .from(bucketName)
+        .remove([filePath]);
+
+      if (storageError) throw storageError;
+
+      // データベースから削除
+      const { error: dbError } = await this.client
+        .from('attachments')
+        .delete()
+        .eq('id', id);
+
+      if (dbError) throw dbError;
+
+      console.log('✅ ファイル削除成功:', id);
+      return { success: true };
+    } catch (error) {
+      console.error('❌ ファイル削除エラー:', error.message);
+      return { success: false, error: error.message };
+    }
+  }
+
+  /**
+   * 添付ファイルのダウンロードURLを取得
+   * @param {string} storagePath - ストレージパス
+   * @returns {string} - ダウンロードURL
+   */
+  getAttachmentDownloadUrl(storagePath) {
+    return `${SUPABASE_URL}/storage/v1/object/public/${storagePath}`;
+  }
 }
 
 // グローバル インスタンスとして初期化
