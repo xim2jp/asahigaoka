@@ -1,0 +1,859 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>お知らせ - 東京都練馬区旭丘一丁目町会</title>
+    <script src="https://cdn.tailwindcss.com/3.4.16"></script>
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            colors: { primary: "#57b5e7", secondary: "#8dd3c7" },
+            borderRadius: {
+              none: "0px",
+              sm: "4px",
+              DEFAULT: "8px",
+              md: "12px",
+              lg: "16px",
+              xl: "20px",
+              "2xl": "24px",
+              "3xl": "32px",
+              full: "9999px",
+              button: "8px",
+            },
+          },
+        },
+      };
+    </script>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Pacifico&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      href="https://cdnjs.cloudflare.com/ajax/libs/remixicon/4.6.0/remixicon.min.css"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="css/template.css" />
+    <style>
+      :where([class^="ri-"])::before { content: "\f3c2"; }
+      
+      /* カレンダースタイル */
+      .calendar {
+        background: white;
+        border-radius: 12px;
+        padding: 20px;
+        box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
+      }
+      
+      .calendar-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 16px;
+        padding-bottom: 12px;
+        border-bottom: 2px solid #e5e7eb;
+      }
+      
+      .calendar-title {
+        font-size: 1.25rem;
+        font-weight: bold;
+        color: #111827;
+      }
+      
+      .calendar-grid {
+        display: grid;
+        grid-template-columns: repeat(7, 1fr);
+        gap: 1px;
+        border: 1px solid #e5e7eb;
+        border-radius: 8px;
+        overflow: hidden;
+      }
+      
+      .calendar-day-header {
+        text-align: center;
+        font-size: 0.75rem;
+        font-weight: 600;
+        color: #6b7280;
+        padding: 8px 4px;
+        background: #f9fafb;
+        border-right: 1px solid #e5e7eb;
+        border-bottom: 1px solid #e5e7eb;
+      }
+      
+      .calendar-day-header:last-child {
+        border-right: none;
+      }
+      
+      .calendar-day {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+        justify-content: flex-start;
+        font-size: 0.875rem;
+        color: #374151;
+        cursor: pointer;
+        transition: background 0.2s;
+        padding: 4px;
+        height: 80px;
+        border-right: 1px solid #e5e7eb;
+        border-bottom: 1px solid #e5e7eb;
+        overflow: hidden;
+        box-sizing: border-box;
+      }
+      
+      .calendar-day:nth-child(7n) {
+        border-right: none;
+      }
+      
+      .calendar-day:hover {
+        background: #f3f4f6;
+      }
+      
+      .calendar-day.other-month {
+        color: #d1d5db;
+        background: #fafafa;
+      }
+      
+      .calendar-day.today {
+        background: #57b5e7;
+        color: white;
+        font-weight: bold;
+      }
+      
+      .calendar-day-number {
+        font-weight: 600;
+        margin-bottom: 2px;
+        flex-shrink: 0;
+        width: 100%;
+        text-align: left;
+      }
+      
+      .calendar-day-event {
+        font-size: 0.65rem;
+        line-height: 1.3;
+        text-align: left;
+        width: 100%;
+        padding: 2px 4px;
+        margin-top: auto;
+        background: #fef3c7;
+        color: #92400e;
+        border-radius: 3px;
+        overflow: hidden;
+        white-space: normal;
+        word-break: break-word;
+        cursor: pointer;
+        transition: all 0.2s;
+        flex: 1;
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+        min-height: 0;
+      }
+      
+      .calendar-day.today .calendar-day-event {
+        background: rgba(255, 255, 255, 0.3);
+        color: white;
+      }
+      
+      .calendar-day-event:hover {
+        background: #fde68a;
+      }
+      
+      .calendar-day.today .calendar-day-event:hover {
+        background: rgba(255, 255, 255, 0.5);
+      }
+      
+      .calendar-day.has-event {
+        position: relative;
+      }
+      
+      /* お知らせ一覧スタイル */
+      .news-item {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+        padding: 20px 0;
+        border-bottom: 1px dashed #d1d5db;
+        transition: background 0.2s;
+        text-decoration: none;
+        color: inherit;
+      }
+      
+      .news-item:hover {
+        background: #f9fafb;
+        padding-left: 8px;
+        padding-right: 8px;
+        margin-left: -8px;
+        margin-right: -8px;
+        border-radius: 8px;
+      }
+      
+      .news-item-image {
+        width: 120px;
+        height: 80px;
+        object-fit: cover;
+        border-radius: 8px;
+        flex-shrink: 0;
+      }
+      
+      .news-item-content {
+        flex: 1;
+        min-width: 0;
+      }
+      
+      .news-item-date {
+        font-size: 0.875rem;
+        color: #6b7280;
+        margin-bottom: 4px;
+      }
+      
+      .news-item-title {
+        font-size: 1rem;
+        font-weight: 600;
+        color: #111827;
+        margin-bottom: 8px;
+        line-height: 1.5;
+      }
+      
+      .news-item-icons {
+        display: flex;
+        gap: 8px;
+        align-items: center;
+      }
+      
+      .news-item-icon {
+        width: 20px;
+        height: 20px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 4px;
+      }
+      
+      .news-item-icon.line {
+        background: #00C300;
+        color: white;
+      }
+      
+      .news-item-icon.x {
+        background: #000000;
+        color: white;
+      }
+      
+      /* ページネーション */
+      .pagination {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        gap: 8px;
+        margin-top: 32px;
+      }
+      
+      .pagination-button {
+        min-width: 40px;
+        height: 40px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border: 1px solid #d1d5db;
+        border-radius: 8px;
+        background: white;
+        color: #374151;
+        font-size: 0.875rem;
+        cursor: pointer;
+        transition: all 0.2s;
+      }
+      
+      .pagination-button:hover:not(.disabled):not(.active) {
+        background: #f3f4f6;
+        border-color: #9ca3af;
+      }
+      
+      .pagination-button.active {
+        background: #57b5e7;
+        color: white;
+        border-color: #57b5e7;
+      }
+      
+      .pagination-button.disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+      }
+      
+      @media (max-width: 768px) {
+        .news-item {
+          flex-direction: column;
+          align-items: flex-start;
+        }
+        
+        .news-item-image {
+          width: 100%;
+          height: 200px;
+        }
+        
+        .calendar-grid {
+          gap: 1px;
+        }
+        
+        .calendar-day {
+          font-size: 0.75rem;
+          height: 60px;
+          padding: 2px;
+        }
+        
+        .calendar-day-event {
+          font-size: 0.6rem;
+          padding: 1px 2px;
+        }
+      }
+    </style>
+  </head>
+  <body class="bg-white">
+    <!-- ヘッダー -->
+    <header class="bg-white shadow-sm sticky top-0 z-50">
+      <nav class="w-full px-6 py-4">
+        <div class="flex items-center justify-between">
+          <div class="flex items-center space-x-3">
+            <div
+              class="w-12 h-12 flex items-center justify-center bg-primary rounded-lg"
+            >
+              <i class="ri-community-line text-white text-xl"></i>
+            </div>
+            <div>
+              <h1 class="text-xl font-bold text-gray-900">
+                東京都練馬区旭丘一丁目町会
+              </h1>
+              <p class="text-sm text-gray-600">
+                みんなでつくる安心・安全なまち
+              </p>
+            </div>
+          </div>
+          <div class="hidden md:flex items-center space-x-8">
+            <a
+              href="index.html"
+              class="text-gray-700 hover:text-primary transition-colors"
+              >ホーム</a
+            >
+            <a
+              href="news.html"
+              class="text-primary font-semibold hover:text-primary transition-colors"
+              >お知らせ</a
+            >
+            <a
+              href="reports.html"
+              class="text-gray-700 hover:text-primary transition-colors"
+              >事業資料</a
+            >
+            <a
+              href="town.html"
+              class="text-gray-700 hover:text-primary transition-colors"
+              >町会について</a
+            >
+            <a
+              href="antidisaster_index.html"
+              class="text-gray-700 hover:text-primary transition-colors"
+              >災害特集</a
+            >
+            <a
+              href="contact.html"
+              class="text-gray-700 hover:text-primary transition-colors"
+              >お問い合わせ</a
+            >
+          </div>
+          <button
+            class="md:hidden w-10 h-10 flex items-center justify-center"
+            id="mobile-menu-btn"
+          >
+            <i class="ri-menu-line text-xl"></i>
+          </button>
+        </div>
+        <div class="md:hidden mt-4 hidden" id="mobile-menu">
+          <div class="flex flex-col space-y-3 py-4 border-t">
+            <a
+              href="index.html"
+              class="text-gray-700 hover:text-primary transition-colors"
+              >ホーム</a
+            >
+            <a
+              href="news.html"
+              class="text-primary font-semibold hover:text-primary transition-colors"
+              >お知らせ</a
+            >
+            <a
+              href="reports.html"
+              class="text-gray-700 hover:text-primary transition-colors"
+              >事業資料</a
+            >
+            <a
+              href="town.html"
+              class="text-gray-700 hover:text-primary transition-colors"
+              >町会について</a
+            >
+            <a
+              href="antidisaster_index.html"
+              class="text-gray-700 hover:text-primary transition-colors"
+              >災害特集</a
+            >
+            <a
+              href="contact.html"
+              class="text-gray-700 hover:text-primary transition-colors"
+              >お問い合わせ</a
+            >
+          </div>
+        </div>
+      </nav>
+    </header>
+
+    <!-- ヒーローセクション -->
+    <section class="page-hero">
+      <div class="page-hero-content">
+        <div>
+          <h2 class="page-title">お知らせ</h2>
+          <p class="page-subtitle">町会からの最新情報をお届けします</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- メインコンテンツ -->
+    <main>
+      <section class="py-16">
+        <div class="max-w-6xl mx-auto px-6">
+          <!-- カレンダーセクション -->
+          <div class="grid md:grid-cols-2 gap-6 mb-12">
+            <!-- 今月のカレンダー -->
+            <div class="calendar">
+              <div class="calendar-header">
+                <h3 class="calendar-title" id="current-month-title">2025年1月</h3>
+              </div>
+              <div class="calendar-grid" id="current-month-calendar">
+                <!-- JavaScriptで生成 -->
+              </div>
+            </div>
+
+            <!-- 来月のカレンダー -->
+            <div class="calendar">
+              <div class="calendar-header">
+                <h3 class="calendar-title" id="next-month-title">2025年2月</h3>
+              </div>
+              <div class="calendar-grid" id="next-month-calendar">
+                <!-- JavaScriptで生成 -->
+              </div>
+            </div>
+          </div>
+
+          <!-- お知らせ一覧 -->
+          <div class="bg-white rounded-xl shadow-sm p-6 md:p-8">
+            <h3 class="text-2xl font-bold text-gray-900 mb-8">お知らせ一覧</h3>
+            
+            <div id="news-list">
+              <!-- JavaScriptで生成 -->
+            </div>
+
+            <!-- ページネーション -->
+            <div class="pagination" id="pagination">
+              <!-- JavaScriptで生成 -->
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <!-- フッター -->
+    <footer class="bg-gray-900 text-white py-12">
+      <div class="max-w-6xl mx-auto px-6">
+        <div class="grid md:grid-cols-4 gap-8">
+          <div>
+            <div class="flex items-center space-x-3 mb-4">
+              <div
+                class="w-10 h-10 flex items-center justify-center bg-primary rounded-lg"
+              >
+                <i class="ri-community-line text-white"></i>
+              </div>
+              <div>
+                <h5 class="font-semibold">東京都練馬区</h5>
+                <p class="text-sm text-gray-400">旭丘一丁目町会</p>
+              </div>
+            </div>
+            <p class="text-gray-400 text-sm">
+              AI
+              と共に築く新しい地域コミュニティ。すべての世代が参加しやすい町会活動を目指しています。
+            </p>
+          </div>
+          <div>
+            <h6 class="font-semibold mb-4">基本情報</h6>
+            <div class="space-y-2 text-sm text-gray-400">
+              <p>〒179-0071</p>
+              <p>東京都練馬区旭丘1丁目</p>
+              <p>TEL: 03-3950-4842（旭丘地域集会所）</p>
+              <p>Email: block1@asahigaoka-nerima.tokyo</p>
+            </div>
+          </div>
+          <div>
+            <h6 class="font-semibold mb-4">リンク</h6>
+            <div class="space-y-2 text-sm">
+              <a
+                href="privacy-policy.html"
+                class="text-gray-400 hover:text-white transition-colors block"
+                >プライバシーポリシー</a
+              >
+              <a
+                href="terms-of-service.html"
+                class="text-gray-400 hover:text-white transition-colors block"
+                >利用規約</a
+              >
+              <a
+                href="contact.html"
+                class="text-gray-400 hover:text-white transition-colors block"
+                >お問い合わせ</a
+              >
+            </div>
+          </div>
+          <div>
+            <h6 class="font-semibold mb-4">SNS</h6>
+            <div class="flex space-x-3">
+              <a
+                href="https://www.facebook.com/b1.asahigaoka"
+                target="_blank"
+                class="w-8 h-8 flex items-center justify-center bg-gray-800 rounded hover:bg-gray-700 transition-colors"
+              >
+                <i class="ri-facebook-fill"></i>
+              </a>
+              <a
+                href="https://x.com/b1_asahigaoka"
+                target="_blank"
+                class="w-8 h-8 flex items-center justify-center bg-gray-800 rounded hover:bg-gray-700 transition-colors"
+              >
+                <i class="ri-twitter-x-line"></i>
+              </a>
+              <a
+                href="https://line.me/R/ti/p/@619ynqur"
+                target="_blank"
+                class="w-8 h-8 flex items-center justify-center bg-gray-800 rounded hover:bg-gray-700 transition-colors"
+              >
+                <i class="ri-line-fill"></i>
+              </a>
+            </div>
+          </div>
+        </div>
+        <div
+          class="border-t border-gray-800 mt-8 pt-8 text-center text-sm text-gray-400"
+        >
+          <p>&copy; 2024 東京都練馬区旭丘一丁目町会. All rights reserved.</p>
+        </div>
+      </div>
+    </footer>
+
+    <!-- JavaScript -->
+    <script>
+      // モバイルメニュー
+      document.addEventListener("DOMContentLoaded", function () {
+        const mobileMenuBtn = document.getElementById("mobile-menu-btn");
+        const mobileMenu = document.getElementById("mobile-menu");
+        if (mobileMenuBtn && mobileMenu) {
+          mobileMenuBtn.addEventListener("click", function () {
+            mobileMenu.classList.toggle("hidden");
+          });
+        }
+      });
+
+      // 日付を比較する関数（年月日のみ）
+      function isSameDate(date1, date2) {
+        return date1.getFullYear() === date2.getFullYear() &&
+               date1.getMonth() === date2.getMonth() &&
+               date1.getDate() === date2.getDate();
+      }
+
+      // カレンダー生成関数
+      function generateCalendar(year, month, containerId, titleId, newsData) {
+        const container = document.getElementById(containerId);
+        const titleElement = document.getElementById(titleId);
+        
+        const date = new Date(year, month, 1);
+        const monthNames = ['1月', '2月', '3月', '4月', '5月', '6月', '7月', '8月', '9月', '10月', '11月', '12月'];
+        
+        titleElement.textContent = `${year}年${monthNames[month]}`;
+        
+        // 曜日ヘッダー
+        const dayHeaders = ['日', '月', '火', '水', '木', '金', '土'];
+        let html = '';
+        
+        dayHeaders.forEach(day => {
+          html += `<div class="calendar-day-header">${day}</div>`;
+        });
+        
+        // 最初の日の曜日を取得
+        const firstDay = date.getDay();
+        
+        // 前月の日数を取得
+        const prevMonth = month === 0 ? 11 : month - 1;
+        const prevYear = month === 0 ? year - 1 : year;
+        const prevMonthLastDay = new Date(prevYear, prevMonth + 1, 0).getDate();
+        
+        // 前月の日付を表示
+        for (let i = firstDay - 1; i >= 0; i--) {
+          const day = prevMonthLastDay - i;
+          const checkDate = new Date(prevYear, prevMonth, day);
+          const dayNews = newsData.filter(n => isSameDate(n.date, checkDate));
+          const hasEvent = dayNews.length > 0;
+          const eventHtml = hasEvent ? `<div class="calendar-day-event" onclick="event.stopPropagation(); window.location.href='${dayNews[0].detailUrl}'" title="${dayNews[0].title}">${dayNews[0].title}</div>` : '';
+          html += `<div class="calendar-day other-month ${hasEvent ? 'has-event' : ''}"><span class="calendar-day-number">${day}</span>${eventHtml}</div>`;
+        }
+        
+        // 今月の日数を取得
+        const lastDay = new Date(year, month + 1, 0).getDate();
+        const today = new Date();
+        
+        // 今月の日付を表示
+        for (let day = 1; day <= lastDay; day++) {
+          const checkDate = new Date(year, month, day);
+          const isToday = isSameDate(today, checkDate);
+          const dayNews = newsData.filter(n => isSameDate(n.date, checkDate));
+          const hasEvent = dayNews.length > 0;
+          const todayClass = isToday ? 'today' : '';
+          const eventHtml = hasEvent ? `<div class="calendar-day-event" onclick="event.stopPropagation(); window.location.href='${dayNews[0].detailUrl}'" title="${dayNews[0].title}">${dayNews[0].title}</div>` : '';
+          html += `<div class="calendar-day ${todayClass} ${hasEvent ? 'has-event' : ''}"><span class="calendar-day-number">${day}</span>${eventHtml}</div>`;
+        }
+        
+        // 次月の日付を表示（42マス埋める）
+        const totalCells = dayHeaders.length * 6;
+        const remainingCells = totalCells - (firstDay + lastDay);
+        const nextMonth = month === 11 ? 0 : month + 1;
+        const nextYear = month === 11 ? year + 1 : year;
+        for (let day = 1; day <= remainingCells; day++) {
+          const checkDate = new Date(nextYear, nextMonth, day);
+          const dayNews = newsData.filter(n => isSameDate(n.date, checkDate));
+          const hasEvent = dayNews.length > 0;
+          const eventHtml = hasEvent ? `<div class="calendar-day-event" onclick="event.stopPropagation(); window.location.href='${dayNews[0].detailUrl}'" title="${dayNews[0].title}">${dayNews[0].title}</div>` : '';
+          html += `<div class="calendar-day other-month ${hasEvent ? 'has-event' : ''}"><span class="calendar-day-number">${day}</span>${eventHtml}</div>`;
+        }
+        
+        container.innerHTML = html;
+      }
+
+      // モックデータ生成
+      function generateMockNews() {
+        const news = [];
+        const categories = ['お知らせ', 'イベント', '防災・防犯', '子育て支援', '商店街情報', '活動レポート'];
+        const titles = [
+          '防犯座談会のお知らせ',
+          '防災講習会開催',
+          '年末夜警パトロールの実施',
+          '町会総会のご案内',
+          '春の清掃活動のお知らせ',
+          '夏祭りの開催について',
+          '敬老会のご案内',
+          '防災訓練の実施',
+          '地域見守り活動の報告',
+          '新年度役員のご紹介',
+          '地域安全パトロールの実施',
+          '文化祭の開催について',
+          '年末年始のご挨拶',
+          '新入会員のご紹介',
+          '地域イベントのご案内',
+          '防災倉庫の点検について',
+          'AED講習会の開催',
+          '地域清掃活動の報告',
+          '町会報の発行について',
+          '役員会議の報告',
+          '地域交流イベントのご案内',
+          '防災備蓄品の点検',
+          '交通安全キャンペーンの実施',
+          '地域美化活動のご案内',
+          '役員選挙のご案内',
+          '地域防災訓練の実施',
+          '新年度のご挨拶',
+          '地域見守り活動の報告',
+          '文化活動のご案内',
+          '地域安全マップの作成'
+        ];
+        
+        const today = new Date();
+        
+        for (let i = 0; i < 30; i++) {
+          const date = new Date(today);
+          date.setDate(date.getDate() - i);
+          
+          const hasImage = Math.random() > 0.3; // 70%の確率で画像あり
+          const hasLine = Math.random() > 0.2; // 80%の確率でLINE配信
+          const hasX = Math.random() > 0.3; // 70%の確率でX投稿
+          
+          news.push({
+            id: i + 1,
+            date: date,
+            title: titles[i % titles.length],
+            category: categories[i % categories.length],
+            image: hasImage ? `https://picsum.photos/seed/${i}/400/300` : null,
+            linePosted: hasLine,
+            xPosted: hasX,
+            detailUrl: `news-${i + 1}.html` // 詳細ページのURL
+          });
+        }
+        
+        return news;
+      }
+
+      // 日付フォーマット
+      function formatDate(date) {
+        const year = date.getFullYear();
+        const month = String(date.getMonth() + 1).padStart(2, '0');
+        const day = String(date.getDate()).padStart(2, '0');
+        const weekdays = ['日', '月', '火', '水', '木', '金', '土'];
+        const weekday = weekdays[date.getDay()];
+        return `${year}年${month}月${day}日（${weekday}）`;
+      }
+
+      // お知らせ一覧を表示
+      function displayNews(news, page = 1, perPage = 10) {
+        const container = document.getElementById('news-list');
+        const start = (page - 1) * perPage;
+        const end = start + perPage;
+        const pageNews = news.slice(start, end);
+        
+        let html = '';
+        
+        pageNews.forEach(item => {
+          html += `
+            <a href="${item.detailUrl}" class="news-item">
+              ${item.image ? `<img src="${item.image}" alt="${item.title}" class="news-item-image">` : '<div class="news-item-image bg-gray-200 flex items-center justify-center text-gray-400 text-sm">画像なし</div>'}
+              <div class="news-item-content">
+                <div class="news-item-date">${formatDate(item.date)}</div>
+                <div class="news-item-title">${item.title}</div>
+                <div class="news-item-icons">
+                  ${item.linePosted ? '<div class="news-item-icon line" title="LINEで配信済み"><i class="ri-line-fill text-xs"></i></div>' : ''}
+                  ${item.xPosted ? '<div class="news-item-icon x" title="Xで投稿済み"><i class="ri-twitter-x-line text-xs"></i></div>' : ''}
+                </div>
+              </div>
+            </a>
+          `;
+        });
+        
+        container.innerHTML = html;
+        
+        // ページネーション生成
+        generatePagination(news.length, page, perPage);
+      }
+
+      // ページネーション生成
+      function generatePagination(total, currentPage, perPage) {
+        const container = document.getElementById('pagination');
+        const totalPages = Math.ceil(total / perPage);
+        
+        if (totalPages <= 1) {
+          container.innerHTML = '';
+          return;
+        }
+        
+        let html = '';
+        
+        // 前へボタン
+        html += `<button class="pagination-button ${currentPage === 1 ? 'disabled' : ''}" onclick="changePage(${currentPage - 1})" ${currentPage === 1 ? 'disabled' : ''}>
+          <i class="ri-arrow-left-s-line"></i>
+        </button>`;
+        
+        // ページ番号
+        const maxVisible = 5;
+        let startPage = Math.max(1, currentPage - Math.floor(maxVisible / 2));
+        let endPage = Math.min(totalPages, startPage + maxVisible - 1);
+        
+        if (endPage - startPage < maxVisible - 1) {
+          startPage = Math.max(1, endPage - maxVisible + 1);
+        }
+        
+        if (startPage > 1) {
+          html += `<button class="pagination-button" onclick="changePage(1)">1</button>`;
+          if (startPage > 2) {
+            html += `<span class="pagination-button disabled">...</span>`;
+          }
+        }
+        
+        for (let i = startPage; i <= endPage; i++) {
+          html += `<button class="pagination-button ${i === currentPage ? 'active' : ''}" onclick="changePage(${i})">${i}</button>`;
+        }
+        
+        if (endPage < totalPages) {
+          if (endPage < totalPages - 1) {
+            html += `<span class="pagination-button disabled">...</span>`;
+          }
+          html += `<button class="pagination-button" onclick="changePage(${totalPages})">${totalPages}</button>`;
+        }
+        
+        // 次へボタン
+        html += `<button class="pagination-button ${currentPage === totalPages ? 'disabled' : ''}" onclick="changePage(${currentPage + 1})" ${currentPage === totalPages ? 'disabled' : ''}>
+          <i class="ri-arrow-right-s-line"></i>
+        </button>`;
+        
+        container.innerHTML = html;
+      }
+
+      // ページ変更
+      let currentPage = 1;
+      let allNews = [];
+      
+      function changePage(page) {
+        currentPage = page;
+        displayNews(allNews, currentPage, 10);
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      }
+
+      // 初期化
+      document.addEventListener("DOMContentLoaded", function () {
+        const today = new Date();
+        const currentYear = today.getFullYear();
+        const currentMonth = today.getMonth();
+        
+        // お知らせデータ生成
+        allNews = generateMockNews();
+        
+        // カレンダー生成（お知らせデータを渡す）
+        generateCalendar(currentYear, currentMonth, 'current-month-calendar', 'current-month-title', allNews);
+        
+        const nextMonth = currentMonth === 11 ? 0 : currentMonth + 1;
+        const nextYear = currentMonth === 11 ? currentYear + 1 : currentYear;
+        generateCalendar(nextYear, nextMonth, 'next-month-calendar', 'next-month-title', allNews);
+        
+        // お知らせ一覧表示
+        displayNews(allNews, 1, 10);
+      });
+    </script>
+  
+    <script>
+      window.difyChatbotConfig = {
+        token: 't7gW8m8CMAZ2rcNw',
+        baseUrl: 'https://top-overly-pup.ngrok-free.app',
+        inputs: {
+          // You can define the inputs from the Start node here
+          // key is the variable name
+          // e.g.
+          // name: "NAME"
+        },
+        systemVariables: {
+          // user_id: 'YOU CAN DEFINE USER ID HERE',
+          // conversation_id: 'YOU CAN DEFINE CONVERSATION ID HERE, IT MUST BE A VALID UUID',
+        },
+        userVariables: {
+          // avatar_url: 'YOU CAN DEFINE USER AVATAR URL HERE',
+          // name: 'YOU CAN DEFINE USER NAME HERE',
+        },
+      }
+    </script>
+    <script
+      src="https://top-overly-pup.ngrok-free.app/embed.min.js"
+      id="t7gW8m8CMAZ2rcNw"
+      defer
+    ></script>
+    <style>
+      #dify-chatbot-bubble-button {
+        background-color: #1C64F2 !important;
+      }
+      #dify-chatbot-bubble-window {
+        width: 24rem !important;
+        height: 40rem !important;
+      }
+    </style>
+
+  </body>
+</html>
+
