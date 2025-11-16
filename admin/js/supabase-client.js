@@ -473,21 +473,56 @@ class SupabaseClient {
    */
   async updateMediaArticleIds(mediaIds, articleId) {
     try {
-      if (mediaIds.length === 0) return { success: true, updated: 0 };
+      console.log('🔗 updateMediaArticleIds 開始:', {
+        mediaIdsCount: mediaIds.length,
+        mediaIds: mediaIds,
+        articleId: articleId,
+        isArticleIdValid: !!articleId
+      });
 
-      console.log('🔗 複数の media レコードに article_id を設定:', { count: mediaIds.length, articleId });
+      if (mediaIds.length === 0) {
+        console.log('⚠️ mediaIds が空です。スキップします。');
+        return { success: true, updated: 0 };
+      }
 
-      const { error } = await this.client
+      console.log('🔗 複数の media レコードに article_id を設定中...');
+      console.log('📝 クエリ詳細:', {
+        table: 'media',
+        action: 'update',
+        updateData: { article_id: articleId },
+        whereCondition: { id: { $in: mediaIds } }
+      });
+
+      // バージョン 1: .in() を使う
+      const { data: updateData, error } = await this.client
         .from('media')
         .update({ article_id: articleId })
-        .in('id', mediaIds);
+        .in('id', mediaIds)
+        .select();
 
-      if (error) throw error;
+      console.log('📤 update レスポンス:', { data: updateData, error });
+
+      if (error) {
+        console.error('❌ SQL エラー詳細:', {
+          code: error.code,
+          message: error.message,
+          details: error.details,
+          hint: error.hint
+        });
+        throw error;
+      }
 
       console.log('✅ 複数の media に article_id を設定しました:', mediaIds.length, '個');
-      return { success: true, updated: mediaIds.length };
+      console.log('📊 更新結果:', updateData);
+      return { success: true, updated: mediaIds.length, data: updateData };
     } catch (error) {
-      console.error('❌ 複数 article_id 設定エラー:', error.message);
+      console.error('❌ 複数 article_id 設定エラー:', error);
+      console.error('❌ エラー詳細:', {
+        name: error.name,
+        message: error.message,
+        code: error.code,
+        fullError: JSON.stringify(error, null, 2)
+      });
       return { success: false, error: error.message };
     }
   }

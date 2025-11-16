@@ -633,19 +633,33 @@ class ArticleEditor {
           this.currentArticle = result.data;
 
           // アップロード済みの添付ファイルに article_id を設定
-          if (this.uploadedAttachmentIds.length > 0) {
-            console.log('🔗 アップロード済みファイルに article_id を設定中...', {
-              count: this.uploadedAttachmentIds.length,
+          if (this.uploadedAttachmentIds && this.uploadedAttachmentIds.length > 0) {
+            console.log('🔗 ファイル-記事リンク処理開始', {
+              uploadedAttachmentIds: this.uploadedAttachmentIds,
+              uploadedAttachmentIdsCount: this.uploadedAttachmentIds.length,
               articleId: this.articleId,
-              fileIds: this.uploadedAttachmentIds
+              timestamp: new Date().toISOString()
             });
+
             const linkResult = await supabaseClient.updateMediaArticleIds(this.uploadedAttachmentIds, this.articleId);
+
+            console.log('🔗 ファイル-記事リンク処理の結果:', {
+              success: linkResult.success,
+              updated: linkResult.updated,
+              error: linkResult.error
+            });
+
             if (linkResult.success) {
               console.log('✅ すべてのファイルに article_id を設定しました:', linkResult.updated, '個');
             } else {
               console.error('❌ ファイルリンク失敗:', linkResult.error);
-              this.showAlert('ファイルと記事のリンク設定に失敗しました（自動修復：編集画面で再保存してください）', 'warning');
+              this.showAlert('⚠️ ファイルと記事のリンク設定に失敗しました（コンソール確認後、編集画面で再保存してください）', 'warning');
             }
+          } else {
+            console.log('ℹ️ アップロード済みファイルなし:', {
+              uploadedAttachmentIds: this.uploadedAttachmentIds,
+              length: this.uploadedAttachmentIds?.length
+            });
           }
 
           // ローカルキャッシュをクリア（DB に article_id がセットされたので）
