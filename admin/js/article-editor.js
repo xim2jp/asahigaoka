@@ -587,6 +587,11 @@ class ArticleEditor {
           }
 
           this.showAlert('記事を保存しました', 'success');
+
+          // 1500ms後に一覧ページに遷移
+          setTimeout(() => {
+            window.location.href = 'articles.html';
+          }, 1500);
         } else {
           this.showAlert('保存に失敗しました: ' + result.error, 'error');
         }
@@ -616,6 +621,11 @@ class ArticleEditor {
             '',
             `article-edit.html?id=${this.articleId}`
           );
+
+          // 1500ms後に一覧ページに遷移
+          setTimeout(() => {
+            window.location.href = 'articles.html';
+          }, 1500);
         } else {
           this.showAlert('作成に失敗しました: ' + result.error, 'error');
         }
