@@ -421,7 +421,7 @@ class SupabaseClient {
    */
   async getArticleAttachments(articleId) {
     try {
-      console.log('📎 記事の添付ファイルを取得:', articleId);
+      console.log('📎 getArticleAttachments 開始:', { articleId });
 
       const { data, error } = await this.client
         .from('media')
@@ -430,12 +430,34 @@ class SupabaseClient {
         .is('deleted_at', null)
         .order('created_at', { ascending: false });
 
-      if (error) throw error;
+      console.log('📎 クエリ実行結果:', {
+        articleId,
+        dataLength: data ? data.length : 0,
+        data,
+        error,
+        hasError: !!error
+      });
+
+      if (error) {
+        console.error('❌ クエリエラー詳細:', {
+          code: error.code,
+          message: error.message,
+          details: error.details,
+          hint: error.hint
+        });
+        throw error;
+      }
 
       console.log('✅ 添付ファイル取得成功:', data.length, '個');
       return { data, success: true };
     } catch (error) {
-      console.error('❌ 添付ファイル取得エラー:', error.message);
+      console.error('❌ 添付ファイル取得エラー:', error);
+      console.error('❌ エラー詳細:', {
+        name: error.name,
+        message: error.message,
+        code: error.code,
+        fullError: JSON.stringify(error, null, 2)
+      });
       return { data: [], success: false, error: error.message };
     }
   }
