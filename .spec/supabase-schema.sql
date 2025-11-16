@@ -56,6 +56,16 @@ CREATE TABLE IF NOT EXISTS public.articles (
   published_at TIMESTAMP WITH TIME ZONE,
   line_published BOOLEAN DEFAULT FALSE,
   x_published BOOLEAN DEFAULT FALSE,
+  -- SEO関連カラム
+  meta_title VARCHAR(60),
+  meta_description VARCHAR(160),
+  meta_keywords VARCHAR(255),
+  slug VARCHAR(255),
+  -- イベント関連カラム
+  event_start_datetime TIMESTAMP WITH TIME ZONE,
+  event_end_datetime TIMESTAMP WITH TIME ZONE,
+  has_start_time BOOLEAN DEFAULT FALSE,
+  has_end_time BOOLEAN DEFAULT FALSE,
   created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
   updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
   deleted_at TIMESTAMP WITH TIME ZONE

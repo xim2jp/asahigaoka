@@ -9,6 +9,7 @@ class ArticleEditor {
     this.userRole = null;
     this.articleId = null;
     this.currentArticle = null;
+    this.featuredImageUrl = null; // アイキャッチ画像URL
     this.init();
   }
 
@@ -93,10 +94,16 @@ class ArticleEditor {
       });
     }
 
-    // 画像アップロード
-    const fileInput = document.querySelector('input[type="file"]');
-    if (fileInput) {
-      fileInput.addEventListener('change', (e) => this.handleImageUpload(e));
+    // アイキャッチ画像アップロード
+    const featuredImageInput = document.getElementById('featured-image');
+    if (featuredImageInput) {
+      featuredImageInput.addEventListener('change', (e) => this.handleFeaturedImageUpload(e));
+    }
+
+    // 添付ファイルアップロード
+    const attachmentsInput = document.getElementById('attachments');
+    if (attachmentsInput) {
+      attachmentsInput.addEventListener('change', (e) => this.handleAttachmentsUpload(e));
     }
 
     // ログアウトボタン
@@ -149,6 +156,7 @@ class ArticleEditor {
 
       // アイキャッチ画像を設定
       if (this.currentArticle.featured_image_url) {
+        this.featuredImageUrl = this.currentArticle.featured_image_url;
         const preview = document.getElementById('image-preview');
         if (preview) {
           preview.src = this.currentArticle.featured_image_url;
@@ -531,7 +539,8 @@ class ArticleEditor {
         meta_title: metaTitle || null,
         meta_description: metaDescription || null,
         meta_keywords: metaKeywords || null,
-        slug: slug || null
+        slug: slug || null,
+        featured_image_url: this.featuredImageUrl || null
       };
 
       let result;
@@ -604,9 +613,9 @@ class ArticleEditor {
   }
 
   /**
-   * 画像をアップロード
+   * アイキャッチ画像をアップロード
    */
-  async handleImageUpload(event) {
+  async handleFeaturedImageUpload(event) {
     const file = event.target.files[0];
     if (!file) return;
 
@@ -625,42 +634,75 @@ class ArticleEditor {
     }
 
     try {
-      const uploadBtn = event.target.closest('.file-upload-group').querySelector('button');
-      uploadBtn.disabled = true;
-      uploadBtn.textContent = 'アップロード中...';
+      console.log('🖼️ アイキャッチ画像アップロード開始:', file.name);
 
       const result = await supabaseClient.uploadMedia(file);
 
       if (result.success) {
-        // 記事を保存している場合は、featured_image_url を更新
+        // featured_image_url を this.featuredImageUrl に保存
+        this.featuredImageUrl = result.data.file_url;
+        console.log('✅ アイキャッチ画像URL保存:', this.featuredImageUrl);
+
+        // 記事を保存している場合は、featured_image_url を即座に更新
         if (this.articleId) {
+          console.log('🔄 既存記事にアイキャッチ画像を更新中...');
           await supabaseClient.updateArticle(this.articleId, {
             featured_image_url: result.data.file_url
           });
+          console.log('✅ 既存記事のアイキャッチ画像を更新完了');
         }
 
-        // 画像プレビューを表示
-        const preview = event.target.closest('.file-upload-group').querySelector('.file-preview');
-        if (preview) {
-          const img = document.createElement('img');
-          img.src = result.data.file_url;
-          img.style.maxWidth = '200px';
-          img.style.borderRadius = '4px';
-          preview.innerHTML = '';
-          preview.appendChild(img);
-        }
-
-        this.showAlert('画像をアップロードしました', 'success');
+        this.showAlert('アイキャッチ画像をアップロードしました', 'success');
       } else {
         this.showAlert('アップロードに失敗しました: ' + result.error, 'error');
       }
     } catch (error) {
       console.error('アップロードエラー:', error.message);
       this.showAlert('アップロード処理でエラーが発生しました', 'error');
-    } finally {
-      const uploadBtn = event.target.closest('.file-upload-group').querySelector('button');
-      uploadBtn.disabled = false;
-      uploadBtn.textContent = 'ファイルを選択';
+    }
+  }
+
+  /**
+   * 添付ファイルをアップロード
+   */
+  async handleAttachmentsUpload(event) {
+    const files = Array.from(event.target.files);
+    if (files.length === 0) return;
+
+    try {
+      console.log('📎 添付ファイルアップロード開始:', files.length, '個のファイル');
+
+      for (const file of files) {
+        // ファイル検証
+        const maxSize = 50 * 1024 * 1024; // 50MB
+        const allowedExtensions = ['pdf', 'doc', 'docx', 'xls', 'xlsx', 'ppt', 'pptx', 'txt', 'md', 'zip', 'png', 'jpg', 'jpeg', 'gif', 'webp'];
+
+        const fileExt = file.name.split('.').pop().toLowerCase();
+
+        if (file.size > maxSize) {
+          this.showAlert(`${file.name} のサイズが大きすぎます（50MB以下）`, 'error');
+          continue;
+        }
+
+        if (!allowedExtensions.includes(fileExt)) {
+          this.showAlert(`${file.name} の形式は対応していません`, 'error');
+          continue;
+        }
+
+        const result = await supabaseClient.uploadMedia(file);
+
+        if (result.success) {
+          console.log('✅ ファイルアップロード成功:', file.name);
+          // TODO: 添付ファイル一覧に表示する処理を実装
+        } else {
+          this.showAlert(`${file.name} のアップロードに失敗しました`, 'error');
+        }
+      }
+
+      this.showAlert('ファイルアップロード完了', 'success');
+    } catch (error) {
+      console.error('添付ファイルアップロードエラー:', error.message);
+      this.showAlert('添付ファイルアップロード処理でエラーが発生しました', 'error');
     }
   }
 
