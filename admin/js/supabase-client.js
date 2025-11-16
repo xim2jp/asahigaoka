@@ -310,9 +310,9 @@ class SupabaseClient {
   /**
    * メディア（画像）をアップロード
    * @param {File} file - ファイルオブジェクト
-   * @param {string} bucketName - バケット名（デフォルト: 'articles-images'）
+   * @param {string} bucketName - バケット名（デフォルト: 'featured-images'）
    */
-  async uploadMedia(file, bucketName = 'articles-images') {
+  async uploadMedia(file, bucketName = 'featured-images') {
     try {
       const userId = this.currentUser?.id;
       if (!userId) throw new Error('ユーザーが認証されていません');
