@@ -10,6 +10,7 @@ class ArticleEditor {
     this.articleId = null;
     this.currentArticle = null;
     this.featuredImageUrl = null; // アイキャッチ画像URL
+    this.uploadedAttachmentIds = []; // アップロード済みの添付ファイル ID
     this.init();
   }
 
@@ -617,6 +618,12 @@ class ArticleEditor {
           this.articleId = result.data.id;
           this.currentArticle = result.data;
 
+          // アップロード済みの添付ファイルに article_id を設定
+          if (this.uploadedAttachmentIds.length > 0) {
+            console.log('🔗 アップロード済みファイルに article_id を設定中...');
+            await supabaseClient.updateMediaArticleIds(this.uploadedAttachmentIds, this.articleId);
+          }
+
           // 新規作成後に featured_image_url が保存されていれば、プレビューを更新
           if (result.data.featured_image_url) {
             const preview = document.getElementById('image-preview');
@@ -787,6 +794,9 @@ class ArticleEditor {
 
         if (result.success) {
           console.log('✅ ファイルアップロード成功:', file.name, '(attachments バケット)');
+          // アップロード済みファイル ID を記録
+          this.uploadedAttachmentIds.push(result.data.id);
+          console.log('📎 アップロード済みファイル ID:', result.data.id);
           // TODO: 添付ファイル一覧に表示する処理を実装
         } else {
           this.showAlert(`${file.name} のアップロードに失敗しました`, 'error');

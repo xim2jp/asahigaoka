@@ -396,7 +396,7 @@ class SupabaseClient {
   }
 
   /**
-   * メディア一覧を取得
+   * メディア一覧を取得（全体）
    */
   async getMedia(limit = 50, offset = 0) {
     try {
@@ -412,6 +412,83 @@ class SupabaseClient {
     } catch (error) {
       console.error('メディア取得エラー:', error.message);
       return { data: [], count: 0, success: false, error: error.message };
+    }
+  }
+
+  /**
+   * 記事に関連するメディア（添付ファイル）を取得
+   * @param {string} articleId - 記事ID
+   */
+  async getArticleAttachments(articleId) {
+    try {
+      console.log('📎 記事の添付ファイルを取得:', articleId);
+
+      const { data, error } = await this.client
+        .from('media')
+        .select('*,uploaded_by:users(name)')
+        .eq('article_id', articleId)
+        .is('deleted_at', null)
+        .order('created_at', { ascending: false });
+
+      if (error) throw error;
+
+      console.log('✅ 添付ファイル取得成功:', data.length, '個');
+      return { data, success: true };
+    } catch (error) {
+      console.error('❌ 添付ファイル取得エラー:', error.message);
+      return { data: [], success: false, error: error.message };
+    }
+  }
+
+  /**
+   * メディアレコードに article_id を設定
+   * @param {string} mediaId - メディアID
+   * @param {string} articleId - 記事ID
+   */
+  async updateMediaArticleId(mediaId, articleId) {
+    try {
+      console.log('🔗 media レコードに article_id を設定:', { mediaId, articleId });
+
+      const { data, error } = await this.client
+        .from('media')
+        .update({ article_id: articleId })
+        .eq('id', mediaId)
+        .select()
+        .single();
+
+      if (error) throw error;
+
+      console.log('✅ article_id を設定しました:', mediaId);
+      return { data, success: true };
+    } catch (error) {
+      console.error('❌ article_id 設定エラー:', error.message);
+      return { data: null, success: false, error: error.message };
+    }
+  }
+
+  /**
+   * 複数のメディアレコードに article_id を設定
+   * @param {array} mediaIds - メディア ID 配列
+   * @param {string} articleId - 記事ID
+   */
+  async updateMediaArticleIds(mediaIds, articleId) {
+    try {
+      if (mediaIds.length === 0) return { success: true, updated: 0 };
+
+      console.log('🔗 複数の media レコードに article_id を設定:', { count: mediaIds.length, articleId });
+
+      const { error } = await this.client
+        .from('media')
+        .update({ article_id: articleId })
+        .in('id', mediaIds);
+
+      if (error) throw error;
+
+      console.log('✅ 複数の media に article_id を設定しました:', mediaIds.length, '個');
+      return { success: true, updated: mediaIds.length };
+    } catch (error) {
+      console.error('❌ 複数 article_id 設定エラー:', error.message);
+      return { success: false, error: error.message };
     }
   }
 
