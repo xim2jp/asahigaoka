@@ -74,6 +74,84 @@
             flex: 1;
             min-width: 100px;
         }
+        .modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .modal-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+        }
+        .modal-content {
+            position: relative;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+            width: 90%;
+            max-width: 600px;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px;
+            border-bottom: 1px solid var(--border-color);
+        }
+        .modal-header h2 {
+            margin: 0;
+            font-size: 18px;
+            color: var(--text-primary);
+        }
+        .modal-close {
+            background: none;
+            border: none;
+            font-size: 28px;
+            color: var(--text-secondary);
+            cursor: pointer;
+            padding: 0;
+            width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: color 0.2s;
+        }
+        .modal-close:hover {
+            color: var(--text-primary);
+        }
+        .modal-body {
+            padding: 20px;
+        }
+        .modal-footer {
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+            padding: 20px;
+            border-top: 1px solid var(--border-color);
+        }
+        .processing-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.3);
+            z-index: 999;
+            cursor: not-allowed;
+        }
         @media (max-width: 768px) {
             .form-row {
                 display: block;
@@ -83,6 +161,10 @@
             }
             .editor-toolbar {
                 overflow-x: auto;
+            }
+            .modal-content {
+                width: 95%;
+                max-height: 80vh;
             }
         }
     </style>
@@ -188,6 +270,29 @@
                             <input type="text" id="title" class="form-control" placeholder="記事のタイトルを入力" required>
                         </div>
 
+                        <div class="form-row" style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+                            <div class="form-group">
+                                <label for="category" class="form-label">カテゴリ *</label>
+                                <select id="category" class="form-control" required>
+                                    <option value="">カテゴリを選択</option>
+                                    <option value="notice">お知らせ</option>
+                                    <option value="event">イベント情報</option>
+                                    <option value="disaster_safety">防災・防犯</option>
+                                    <option value="child_support">子育て支援</option>
+                                    <option value="shopping_info">商店街情報</option>
+                                    <option value="activity_report">活動レポート</option>
+                                </select>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="status" class="form-label">ステータス *</label>
+                                <select id="status" class="form-control" required>
+                                    <option value="draft">下書き</option>
+                                    <option value="published">公開</option>
+                                </select>
+                            </div>
+                        </div>
+
                         <!-- イベント日時 -->
                         <div class="form-group">
                             <label class="form-label">イベント日時</label>
@@ -215,6 +320,7 @@
                         </div>
 
                         <!-- 下書き本文とAI清書機能 -->
+                        <!-- コメントアウト開始
                         <div class="form-group">
                             <label for="draft-content" class="form-label">下書き本文 *</label>
                             <div style="display: flex; gap: 10px; margin-bottom: 10px;">
@@ -227,6 +333,7 @@
                             </div>
                             <textarea id="draft-content" class="form-control" rows="6" placeholder="記事の下書きを入力してください。日付を含めることをお勧めします（例：2025年11月23日に開催）"></textarea>
                         </div>
+                        コメントアウト終了 -->
 
                         <!-- AI生成結果：記事本文 -->
                         <div class="form-group">
@@ -255,6 +362,13 @@
                                     <p>AIで生成された本文がここに表示されます。手動で編集することもできます。</p>
                                 </div>
                             </div>
+                        </div>
+
+                        <!-- AIに依頼するボタン -->
+                        <div class="form-group" style="margin-top: 15px;">
+                            <button type="button" id="ai-generate-modal-btn" class="btn btn-primary" style="white-space: nowrap;">
+                                🤖 AIに書いてもらう
+                            </button>
                         </div>
 
                         <!-- アイキャッチ画像 -->
@@ -338,29 +452,6 @@
                                     gap: 8px;
                                 }
                             </style>
-                        </div>
-
-                        <div class="form-row" style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
-                            <div class="form-group">
-                                <label for="category" class="form-label">カテゴリ *</label>
-                                <select id="category" class="form-control" required>
-                                    <option value="">カテゴリを選択</option>
-                                    <option value="notice">お知らせ</option>
-                                    <option value="event">イベント情報</option>
-                                    <option value="disaster_safety">防災・防犯</option>
-                                    <option value="child_support">子育て支援</option>
-                                    <option value="shopping_info">商店街情報</option>
-                                    <option value="activity_report">活動レポート</option>
-                                </select>
-                            </div>
-
-                            <div class="form-group">
-                                <label for="status" class="form-label">ステータス *</label>
-                                <select id="status" class="form-control" required>
-                                    <option value="draft">下書き</option>
-                                    <option value="published">公開</option>
-                                </select>
-                            </div>
                         </div>
 
                         <div class="form-group">
@@ -508,6 +599,37 @@
                     </button>
                 </div>
             </form>
+
+            <!-- AI処理中のオーバーレイ（マウス操作禁止） -->
+            <div id="processing-overlay" class="processing-overlay" style="display: none;"></div>
+
+            <!-- AI生成モーダル -->
+            <div id="ai-modal" class="modal" style="display: none;">
+                <div class="modal-overlay" id="modal-overlay"></div>
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h2>AIに記事を書いてもらう</h2>
+                        <button type="button" id="modal-close-btn" class="modal-close">&times;</button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="form-group">
+                            <label for="modal-prompt" class="form-label">プロンプト（記事の下書き）*</label>
+                            <textarea id="modal-prompt" class="form-control" rows="8" placeholder="以下例文です。箇条書きに入力すればAIが記事を代筆してくれます。
+
+12月28日開催。
+地域忘年会。
+場所：地域集会所、時間：17:00から2時間
+参加費：4000円。
+カラオケあり"></textarea>
+                            <small style="color: var(--text-secondary);">タイトルとイベント日時の情報と合わせて、AIが本文とSNS用抜粋を生成します。</small>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" id="modal-cancel-btn" class="btn btn-outline">キャンセル</button>
+                        <button type="button" id="modal-submit-btn" class="btn btn-primary">🤖 AIで記事を生成</button>
+                    </div>
+                </div>
+            </div>
         </main>
     </div>
 

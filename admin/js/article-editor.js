@@ -65,11 +65,39 @@ class ArticleEditor {
   setupEventListeners() {
     console.log('📝 イベントリスナー設定中...');
 
-    // AIに書いてもらうボタン
-    const aiGenerateBtn = document.getElementById('ai-generate-btn');
-    if (aiGenerateBtn) {
-      aiGenerateBtn.addEventListener('click', () => this.generateWithAI());
-      console.log('✅ AI生成ボタンにリスナー設定');
+    // AIに書いてもらうボタン（モーダル版）
+    const aiGenerateModalBtn = document.getElementById('ai-generate-modal-btn');
+    if (aiGenerateModalBtn) {
+      aiGenerateModalBtn.addEventListener('click', () => this.openAIModal());
+      console.log('✅ AI生成モーダルボタンにリスナー設定');
+    }
+
+    // モーダルのキャンセルボタン
+    const modalCancelBtn = document.getElementById('modal-cancel-btn');
+    if (modalCancelBtn) {
+      modalCancelBtn.addEventListener('click', () => this.closeAIModal());
+      console.log('✅ モーダルキャンセルボタンにリスナー設定');
+    }
+
+    // モーダルの閉じるボタン
+    const modalCloseBtn = document.getElementById('modal-close-btn');
+    if (modalCloseBtn) {
+      modalCloseBtn.addEventListener('click', () => this.closeAIModal());
+      console.log('✅ モーダル閉じるボタンにリスナー設定');
+    }
+
+    // モーダルのオーバーレイ
+    const modalOverlay = document.getElementById('modal-overlay');
+    if (modalOverlay) {
+      modalOverlay.addEventListener('click', () => this.closeAIModal());
+      console.log('✅ モーダルオーバーレイにリスナー設定');
+    }
+
+    // モーダルの送信ボタン
+    const modalSubmitBtn = document.getElementById('modal-submit-btn');
+    if (modalSubmitBtn) {
+      modalSubmitBtn.addEventListener('click', () => this.submitAIGeneration());
+      console.log('✅ モーダル送信ボタンにリスナー設定');
     }
 
     // 保存ボタン
@@ -282,7 +310,174 @@ class ArticleEditor {
   }
 
   /**
-   * AIに記事を生成してもらう
+   * AIモーダルを開く
+   */
+  openAIModal() {
+    console.log('🔓 AIモーダルを開く');
+    const modal = document.getElementById('ai-modal');
+    const promptField = document.getElementById('modal-prompt');
+
+    if (modal) {
+      modal.style.display = 'flex';
+      // フォーカスをテキストエリアに設定
+      if (promptField) {
+        promptField.focus();
+      }
+    }
+  }
+
+  /**
+   * AIモーダルを閉じる
+   */
+  closeAIModal() {
+    console.log('🔐 AIモーダルを閉じる');
+    const modal = document.getElementById('ai-modal');
+    if (modal) {
+      modal.style.display = 'none';
+    }
+  }
+
+  /**
+   * AIモーダルから送信（API呼び出し）
+   */
+  async submitAIGeneration() {
+    console.log('🤖 AI生成処理開始（モーダルから）');
+
+    const title = document.querySelector('#title').value.trim();
+    const draftContent = document.getElementById('modal-prompt').value.trim();
+    const eventDateFrom = document.querySelector('#event-date-from').value;
+
+    // バリデーション
+    if (!title) {
+      this.showAlert('タイトルを入力してください', 'error');
+      return;
+    }
+
+    if (!draftContent) {
+      this.showAlert('プロンプト（下書き本文）を入力してください', 'error');
+      return;
+    }
+
+    if (!eventDateFrom) {
+      this.showAlert('イベント開始日を入力してください', 'error');
+      return;
+    }
+
+    // モーダルの送信ボタンを無効化
+    const submitBtn = document.getElementById('modal-submit-btn');
+    const originalBtnText = submitBtn.textContent;
+    submitBtn.disabled = true;
+    submitBtn.textContent = '🤖 生成中...';
+
+    // 処理中オーバーレイを表示
+    this.showProcessingOverlay();
+
+    // 30秒のタイムアウト設定
+    const timeoutId = setTimeout(() => {
+      console.warn('⏱️ AI生成がタイムアウトしました（30秒）');
+      this.showAlert('処理がタイムアウトしました。もう一度試してください。', 'error');
+      this.hideProcessingOverlay();
+      submitBtn.disabled = false;
+      submitBtn.textContent = originalBtnText;
+    }, 30000); // 30秒
+
+    try {
+      // イベント開始日時を組み立て
+      const eventTimeFrom = document.querySelector('#event-time-from').value;
+      const eventDateTo = document.querySelector('#event-date-to').value;
+      const eventTimeTo = document.querySelector('#event-time-to').value;
+
+      let eventDateTimeText = eventDateFrom;
+      if (eventTimeFrom) {
+        eventDateTimeText += ' ' + eventTimeFrom;
+      }
+      if (eventDateTo) {
+        eventDateTimeText += ' 〜 ' + eventDateTo;
+        if (eventTimeTo) {
+          eventDateTimeText += ' ' + eventTimeTo;
+        }
+      }
+
+      console.log('イベント日時:', eventDateTimeText);
+
+      // Dify API呼び出し（終了日がある場合は date_to も渡す）
+      const result = await this.callDifyAPI(title, draftContent, eventDateFrom, eventDateTo);
+
+      if (result.success) {
+        // 記事本文を設定
+        const contentEditor = document.getElementById('content-editor');
+        if (contentEditor && result.data.text350) {
+          contentEditor.innerHTML = this.formatContent(result.data.text350);
+        }
+
+        // SNS用抜粋を設定
+        const excerptField = document.getElementById('excerpt');
+        if (excerptField && result.data.text80) {
+          excerptField.value = result.data.text80;
+        }
+
+        // SEOメタタイトルを自動設定（記事タイトル + 町会名）
+        const metaTitleField = document.getElementById('meta-title');
+        if (metaTitleField && !metaTitleField.value.trim()) {
+          const autoMetaTitle = `${title} | 旭丘一丁目町会`;
+          metaTitleField.value = autoMetaTitle;
+          console.log('✅ メタタイトルを自動設定しました:', autoMetaTitle);
+        }
+
+        // SEOメタディスクリプションを設定（空欄の場合のみ）
+        const metaDescField = document.getElementById('meta-description');
+        console.log('🔍 メタディスクリプション:', {
+          field: metaDescField,
+          currentValue: metaDescField ? metaDescField.value : 'フィールドが見つかりません',
+          isEmpty: metaDescField ? !metaDescField.value.trim() : false,
+          newValue: result.data.meta_desc
+        });
+        if (metaDescField && !metaDescField.value.trim() && result.data.meta_desc) {
+          metaDescField.value = result.data.meta_desc;
+          console.log('✅ メタディスクリプションを設定しました:', result.data.meta_desc);
+        }
+
+        // SEOメタキーワードを設定（空欄の場合のみ）
+        const metaKeywordsField = document.getElementById('meta-keywords');
+        console.log('🔍 メタキーワード:', {
+          field: metaKeywordsField,
+          currentValue: metaKeywordsField ? metaKeywordsField.value : 'フィールドが見つかりません',
+          isEmpty: metaKeywordsField ? !metaKeywordsField.value.trim() : false,
+          newValue: result.data.meta_kwd
+        });
+        if (metaKeywordsField && !metaKeywordsField.value.trim() && result.data.meta_kwd) {
+          metaKeywordsField.value = result.data.meta_kwd;
+          console.log('✅ メタキーワードを設定しました:', result.data.meta_kwd);
+        }
+
+        this.showAlert('AIによる記事生成が完了しました', 'success');
+
+        // モーダルを閉じる
+        this.closeAIModal();
+
+        // プロンプトをクリア
+        document.getElementById('modal-prompt').value = '';
+      } else {
+        this.showAlert('AI生成に失敗しました: ' + result.error, 'error');
+      }
+    } catch (error) {
+      console.error('AI生成エラー:', error);
+      this.showAlert('AI生成処理でエラーが発生しました: ' + error.message, 'error');
+    } finally {
+      // タイムアウトをクリア
+      clearTimeout(timeoutId);
+
+      // 処理中オーバーレイを非表示
+      this.hideProcessingOverlay();
+
+      // ボタンを元に戻す
+      submitBtn.disabled = false;
+      submitBtn.textContent = originalBtnText;
+    }
+  }
+
+  /**
+   * AIに記事を生成してもらう（旧メソッド：互換性のため保持）
    */
   async generateWithAI() {
     console.log('🤖 AI生成処理開始');
@@ -1099,6 +1294,28 @@ class ArticleEditor {
     }
 
     return result;
+  }
+
+  /**
+   * 処理中オーバーレイを表示（マウス操作禁止）
+   */
+  showProcessingOverlay() {
+    const overlay = document.getElementById('processing-overlay');
+    if (overlay) {
+      overlay.style.display = 'block';
+      console.log('🔒 処理中オーバーレイを表示');
+    }
+  }
+
+  /**
+   * 処理中オーバーレイを非表示（マウス操作開放）
+   */
+  hideProcessingOverlay() {
+    const overlay = document.getElementById('processing-overlay');
+    if (overlay) {
+      overlay.style.display = 'none';
+      console.log('🔓 処理中オーバーレイを非表示');
+    }
   }
 
   /**
