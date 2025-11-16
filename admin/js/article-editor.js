@@ -782,10 +782,11 @@ class ArticleEditor {
           continue;
         }
 
-        const result = await supabaseClient.uploadMedia(file);
+        // 添付ファイルは 'attachments' バケットにアップロード
+        const result = await supabaseClient.uploadMedia(file, 'attachments');
 
         if (result.success) {
-          console.log('✅ ファイルアップロード成功:', file.name);
+          console.log('✅ ファイルアップロード成功:', file.name, '(attachments バケット)');
           // TODO: 添付ファイル一覧に表示する処理を実装
         } else {
           this.showAlert(`${file.name} のアップロードに失敗しました`, 'error');
