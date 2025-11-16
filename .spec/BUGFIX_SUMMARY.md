@@ -23,18 +23,20 @@
 **ファイル**: `.spec/supabase-schema.sql`
 
 **問題**:
-- articles テーブルのスキーマに SEO関連カラムが定義されていなかった
-- 以下のカラムが欠落していた：
+- articles テーブルのスキーマに **SEO関連カラムのみが欠落** していた
+- 以下のカラムが不足：
   - `meta_title`
   - `meta_description`
   - `meta_keywords`
   - `slug`
-  - `event_start_datetime`
-  - `event_end_datetime`
-  - `has_start_time`
-  - `has_end_time`
 
-フロント側では正しくデータを取得・送信していましたが、データベース側でカラムが存在しないため保存されませんでした。
+**注**: イベント関連カラムは既に実装されていました
+- ✅ `event_start_datetime`
+- ✅ `event_end_datetime`
+- ✅ `has_start_time`
+- ✅ `has_end_time`
+
+フロント側では正しくデータを取得・送信していましたが、データベース側で SEO カラムが存在しないため保存されませんでした。
 
 ## 実施した修正
 
@@ -96,21 +98,17 @@ this.featuredImageUrl = result.data.file_url;
 
 **ファイル**: `.spec/supabase-schema.sql`
 
-articles テーブルに以下のカラムを追加：
+articles テーブルに以下の **SEO関連カラムのみを追加**：
 
 ```sql
--- SEO関連カラム
+-- SEO関連カラム（新規追加）
 meta_title VARCHAR(60),
 meta_description VARCHAR(160),
 meta_keywords VARCHAR(255),
-slug VARCHAR(255),
-
--- イベント関連カラム
-event_start_datetime TIMESTAMP WITH TIME ZONE,
-event_end_datetime TIMESTAMP WITH TIME ZONE,
-has_start_time BOOLEAN DEFAULT FALSE,
-has_end_time BOOLEAN DEFAULT FALSE
+slug VARCHAR(255)
 ```
+
+**注**: イベント関連カラムは既に実装済みのため、追加不要
 
 ### 3. Migration ファイルの作成
 
@@ -122,7 +120,7 @@ Supabase にスキーマ変更を反映するための migration ファイルを
 
 ### ⚠️ 重要: Database Migration の実行
 
-以下の手順で、Supabase データベースにカラムを追加してください。
+以下の手順で、Supabase データベースに **SEO関連のカラムのみを追加** してください。
 
 #### 方法1: Supabase Web UI（推奨）
 
@@ -133,26 +131,19 @@ Supabase にスキーマ変更を反映するための migration ファイルを
 5. 以下の SQL を貼り付け：
 
 ```sql
+-- SEO関連カラムの追加（イベント関連カラムは既に実装済み）
 ALTER TABLE IF EXISTS public.articles
 ADD COLUMN IF NOT EXISTS meta_title VARCHAR(60),
 ADD COLUMN IF NOT EXISTS meta_description VARCHAR(160),
 ADD COLUMN IF NOT EXISTS meta_keywords VARCHAR(255),
-ADD COLUMN IF NOT EXISTS slug VARCHAR(255),
-ADD COLUMN IF NOT EXISTS event_start_datetime TIMESTAMP WITH TIME ZONE,
-ADD COLUMN IF NOT EXISTS event_end_datetime TIMESTAMP WITH TIME ZONE,
-ADD COLUMN IF NOT EXISTS has_start_time BOOLEAN DEFAULT FALSE,
-ADD COLUMN IF NOT EXISTS has_end_time BOOLEAN DEFAULT FALSE;
+ADD COLUMN IF NOT EXISTS slug VARCHAR(255);
 
 CREATE UNIQUE INDEX IF NOT EXISTS idx_articles_slug ON public.articles(slug) WHERE deleted_at IS NULL;
 
 COMMENT ON COLUMN public.articles.meta_title IS 'SEO用メタタイトル（60文字以内）';
 COMMENT ON COLUMN public.articles.meta_description IS 'SEO用メタディスクリプション（160文字以内）';
-COMMENT ON COLUMN public.articles.meta_keywords IS 'SEO用メタキーワード';
+COMMENT ON COLUMN public.articles.meta_keywords IS 'SEO用メタキーワード（カンマ区切り）';
 COMMENT ON COLUMN public.articles.slug IS '記事URL用スラッグ';
-COMMENT ON COLUMN public.articles.event_start_datetime IS 'イベント開始日時';
-COMMENT ON COLUMN public.articles.event_end_datetime IS 'イベント終了日時';
-COMMENT ON COLUMN public.articles.has_start_time IS 'イベント開始時刻を指定したか';
-COMMENT ON COLUMN public.articles.has_end_time IS 'イベント終了時刻を指定したか';
 ```
 
 6. 「Run」をクリック
@@ -174,14 +165,16 @@ Migration 実行後、以下の手順で動作確認してください：
 2. **新規記事作成テスト**
    - タイトルを入力
    - 下書き本文を入力
-   - イベント開始日を設定
+   - イベント開始日を設定（イベント関連カラムは既存）
+   - イベント開始時刻を入力（オプション）
    - アイキャッチ画像をアップロード
    - SEO設定タブで、メタタイトル、メタディスクリプション、メタキーワード、スラッグを入力
    - 「下書き保存」をクリック
 
 3. **データベース確認**
    - Supabase Dashboard の「Table Editor」で articles テーブルを確認
-   - アップロードした画像、SEO メタデータ、イベント日時が正しく保存されているか確認
+   - アップロードした画像、SEO メタデータが正しく保存されているか確認
+   - イベント日時は既に実装済み
 
 4. **記事編集テスト**
    - 作成した記事を開く

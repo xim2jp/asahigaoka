@@ -1,23 +1,23 @@
 # Database Migration ガイド
 
-## Migration: SEO関連カラムとイベント関連カラムの追加
+## Migration: SEO関連カラムの追加
 
 ### 概要
-articles テーブルに以下のカラムを追加して、SEO最適化機能とイベント日時管理機能を実装します。
+articles テーブルに SEO最適化機能用のカラムを追加します。
 
 ### 対象のカラム
 
-#### SEO関連カラム
+#### SEO関連カラム（新規追加）
 - `meta_title` (VARCHAR(60)): 検索結果に表示されるメタタイトル
 - `meta_description` (VARCHAR(160)): 検索結果に表示される説明文
 - `meta_keywords` (VARCHAR(255)): SEO用キーワード
 - `slug` (VARCHAR(255)): 記事URL用スラッグ
 
-#### イベント関連カラム
-- `event_start_datetime` (TIMESTAMP): イベント開始日時
-- `event_end_datetime` (TIMESTAMP): イベント終了日時
-- `has_start_time` (BOOLEAN): イベント開始時刻を指定したかどうか
-- `has_end_time` (BOOLEAN): イベント終了時刻を指定したかどうか
+#### イベント関連カラム（既に実装済み）
+- ✅ `event_start_datetime` - 既存
+- ✅ `event_end_datetime` - 既存
+- ✅ `has_start_time` - 既存
+- ✅ `has_end_time` - 既存
 
 ### 実行手順
 
@@ -27,8 +27,18 @@ articles テーブルに以下のカラムを追加して、SEO最適化機能�
 2. プロジェクト「asahigaoka」を選択
 3. 左側メニューから「SQL Editor」を選択
 4. 「New query」をクリック
-5. 以下の `.spec/migrations/001_add_seo_and_event_columns.sql` の内容をコピー&ペースト
+5. 以下の SQL をコピー&ペースト
 6. 「Run」ボタンをクリック
+
+```sql
+ALTER TABLE IF EXISTS public.articles
+ADD COLUMN IF NOT EXISTS meta_title VARCHAR(60),
+ADD COLUMN IF NOT EXISTS meta_description VARCHAR(160),
+ADD COLUMN IF NOT EXISTS meta_keywords VARCHAR(255),
+ADD COLUMN IF NOT EXISTS slug VARCHAR(255);
+
+CREATE UNIQUE INDEX IF NOT EXISTS idx_articles_slug ON public.articles(slug) WHERE deleted_at IS NULL;
+```
 
 #### 方法2: Supabase CLI から実行
 
