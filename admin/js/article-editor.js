@@ -155,13 +155,29 @@ class ArticleEditor {
       document.querySelector('#slug').value = this.currentArticle.slug || '';
 
       // アイキャッチ画像を設定
+      console.log('🖼️ アイキャッチ画像チェック:', {
+        featured_image_url: this.currentArticle.featured_image_url,
+        hasValue: !!this.currentArticle.featured_image_url
+      });
+
       if (this.currentArticle.featured_image_url) {
         this.featuredImageUrl = this.currentArticle.featured_image_url;
         const preview = document.getElementById('image-preview');
+        console.log('✅ アイキャッチ画像設定処理:', {
+          url: this.currentArticle.featured_image_url,
+          previewElement: !!preview,
+          previewId: preview?.id
+        });
+
         if (preview) {
           preview.src = this.currentArticle.featured_image_url;
           preview.classList.add('show');
+          console.log('✅ プレビューを表示しました');
+        } else {
+          console.warn('⚠️ image-preview 要素が見つかりません');
         }
+      } else {
+        console.log('ℹ️ featured_image_url が設定されていません');
       }
 
       // イベント日時を設定
@@ -278,6 +294,14 @@ class ArticleEditor {
         const excerptField = document.getElementById('excerpt');
         if (excerptField && result.data.text80) {
           excerptField.value = result.data.text80;
+        }
+
+        // SEOメタタイトルを自動設定（記事タイトル + 町会名）
+        const metaTitleField = document.getElementById('meta-title');
+        if (metaTitleField && !metaTitleField.value.trim()) {
+          const autoMetaTitle = `${title} | 旭丘一丁目町会`;
+          metaTitleField.value = autoMetaTitle;
+          console.log('✅ メタタイトルを自動設定しました:', autoMetaTitle);
         }
 
         // SEOメタディスクリプションを設定（空欄の場合のみ）
@@ -550,8 +574,19 @@ class ArticleEditor {
         result = await supabaseClient.updateArticle(this.articleId, articleData);
 
         if (result.success) {
-          this.showAlert('記事を保存しました', 'success');
           this.currentArticle = result.data;
+
+          // 更新後に featured_image_url が設定されていれば、プレビューを更新
+          if (result.data.featured_image_url) {
+            const preview = document.getElementById('image-preview');
+            if (preview) {
+              preview.src = result.data.featured_image_url;
+              preview.classList.add('show');
+              console.log('✅ 更新後にアイキャッチ画像プレビューを更新:', result.data.featured_image_url);
+            }
+          }
+
+          this.showAlert('記事を保存しました', 'success');
         } else {
           this.showAlert('保存に失敗しました: ' + result.error, 'error');
         }
@@ -562,6 +597,17 @@ class ArticleEditor {
         if (result.success) {
           this.articleId = result.data.id;
           this.currentArticle = result.data;
+
+          // 新規作成後に featured_image_url が保存されていれば、プレビューを更新
+          if (result.data.featured_image_url) {
+            const preview = document.getElementById('image-preview');
+            if (preview) {
+              preview.src = result.data.featured_image_url;
+              preview.classList.add('show');
+              console.log('✅ 新規作成後にアイキャッチ画像プレビューを更新:', result.data.featured_image_url);
+            }
+          }
+
           this.showAlert('記事を作成しました', 'success');
 
           // URL を更新（履歴に追加しない）
