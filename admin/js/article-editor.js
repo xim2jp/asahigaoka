@@ -11,6 +11,7 @@ class ArticleEditor {
     this.currentArticle = null;
     this.featuredImageUrl = null; // アイキャッチ画像URL
     this.uploadedAttachmentIds = []; // アップロード済みの添付ファイル ID
+    this.uploadedAttachments = []; // アップロード済みファイル情報（新規作成時用）
     this.init();
   }
 
@@ -633,9 +634,24 @@ class ArticleEditor {
 
           // アップロード済みの添付ファイルに article_id を設定
           if (this.uploadedAttachmentIds.length > 0) {
-            console.log('🔗 アップロード済みファイルに article_id を設定中...');
-            await supabaseClient.updateMediaArticleIds(this.uploadedAttachmentIds, this.articleId);
+            console.log('🔗 アップロード済みファイルに article_id を設定中...', {
+              count: this.uploadedAttachmentIds.length,
+              articleId: this.articleId,
+              fileIds: this.uploadedAttachmentIds
+            });
+            const linkResult = await supabaseClient.updateMediaArticleIds(this.uploadedAttachmentIds, this.articleId);
+            if (linkResult.success) {
+              console.log('✅ すべてのファイルに article_id を設定しました:', linkResult.updated, '個');
+            } else {
+              console.error('❌ ファイルリンク失敗:', linkResult.error);
+              this.showAlert('ファイルと記事のリンク設定に失敗しました（自動修復：編集画面で再保存してください）', 'warning');
+            }
           }
+
+          // ローカルキャッシュをクリア（DB に article_id がセットされたので）
+          this.uploadedAttachments = [];
+          this.uploadedAttachmentIds = [];
+          console.log('🧹 ローカルキャッシュをクリア');
 
           // 新規作成後に featured_image_url が保存されていれば、プレビューを更新
           if (result.data.featured_image_url) {
@@ -810,7 +826,19 @@ class ArticleEditor {
           // アップロード済みファイル ID を記録
           this.uploadedAttachmentIds.push(result.data.id);
           console.log('📎 アップロード済みファイル ID:', result.data.id);
-          // TODO: 添付ファイル一覧に表示する処理を実装
+
+          // ファイル情報をローカルに保存（新規作成時のために）
+          const attachmentInfo = {
+            id: result.data.id,
+            file_name: result.data.file_name,
+            file_size: result.data.file_size,
+            file_url: result.data.file_url,
+            storage_path: result.data.storage_path,
+            created_at: new Date().toISOString(),
+            uploaded_by: { name: this.currentUser?.user_metadata?.name || 'あなた' }
+          };
+          this.uploadedAttachments.push(attachmentInfo);
+          console.log('📦 ローカルに保存:', attachmentInfo);
         } else {
           this.showAlert(`${file.name} のアップロードに失敗しました`, 'error');
         }
@@ -820,10 +848,15 @@ class ArticleEditor {
 
       // アップロード後に添付ファイル一覧を更新
       if (this.articleId) {
+        // 既存記事の場合：DB から取得して表示
         const attachmentsResult = await supabaseClient.getArticleAttachments(this.articleId);
         if (attachmentsResult.success && attachmentsResult.data) {
           this.displayAttachments(attachmentsResult.data);
         }
+      } else {
+        // 新規記事の場合：ローカルの uploadedAttachments を表示
+        console.log('📋 新規作成時：ローカルのアップロード済みファイルを表示');
+        this.displayAttachments(this.uploadedAttachments);
       }
     } catch (error) {
       console.error('添付ファイルアップロードエラー:', error.message);
