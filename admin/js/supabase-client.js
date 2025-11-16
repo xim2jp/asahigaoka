@@ -314,7 +314,15 @@ class SupabaseClient {
    */
   async uploadMedia(file, bucketName = 'featured-images') {
     try {
+      console.log('📤 uploadMedia 開始:', {
+        fileName: file.name,
+        fileSize: file.size,
+        fileType: file.type,
+        bucketName: bucketName
+      });
+
       const userId = this.currentUser?.id;
+      console.log('👤 userId:', userId);
       if (!userId) throw new Error('ユーザーが認証されていません');
 
       // ファイル名の生成（タイムスタンプ + ランダム + 拡張子）
@@ -324,15 +332,34 @@ class SupabaseClient {
       const ext = file.name.substring(file.name.lastIndexOf('.')).toLowerCase();
       const fileName = `${timestamp}-${random}${ext}`;
 
+      console.log('📝 生成されたファイル名:', fileName);
+
       // ファイルをストレージにアップロード
+      console.log('📤 Storage にアップロード中...');
       const { data: uploadData, error: uploadError } = await this.client.storage
         .from(bucketName)
         .upload(fileName, file);
 
-      if (uploadError) throw uploadError;
+      console.log('📥 Storage アップロード結果:', {
+        success: !uploadError,
+        data: uploadData,
+        error: uploadError
+      });
+
+      if (uploadError) {
+        console.error('❌ Storage アップロードエラー:', uploadError);
+        throw uploadError;
+      }
+
+      console.log('✅ Storage アップロード成功');
 
       // アップロード成功後、メディア情報をDB に記録
       const fileUrl = `${SUPABASE_URL}/storage/v1/object/public/${bucketName}/${fileName}`;
+
+      console.log('💾 media テーブルに記録中...', {
+        fileUrl: fileUrl,
+        storage_path: `${bucketName}/${fileName}`
+      });
 
       const { data: mediaData, error: dbError } = await this.client
         .from('media')
@@ -348,12 +375,22 @@ class SupabaseClient {
         .select()
         .single();
 
-      if (dbError) throw dbError;
+      console.log('📊 media テーブル INSERT 結果:', {
+        success: !dbError,
+        data: mediaData,
+        error: dbError
+      });
+
+      if (dbError) {
+        console.error('❌ media テーブル INSERT エラー:', dbError);
+        throw dbError;
+      }
 
       console.log('✅ メディアアップロード成功:', mediaData.id);
       return { data: mediaData, success: true };
     } catch (error) {
       console.error('❌ メディアアップロードエラー:', error.message);
+      console.error('エラー詳細:', error);
       return { data: null, success: false, error: error.message };
     }
   }
