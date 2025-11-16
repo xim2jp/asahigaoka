@@ -423,9 +423,10 @@ class SupabaseClient {
     try {
       console.log('📎 getArticleAttachments 開始:', { articleId });
 
+      // まずは JOIN なしで試す
       const { data, error } = await this.client
         .from('media')
-        .select('*,uploaded_by:users(name)')
+        .select('*')
         .eq('article_id', articleId)
         .is('deleted_at', null)
         .order('created_at', { ascending: false });
