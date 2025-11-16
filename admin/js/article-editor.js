@@ -96,14 +96,28 @@ class ArticleEditor {
 
     // アイキャッチ画像アップロード
     const featuredImageInput = document.getElementById('featured-image');
+    console.log('🖼️ featured-image 要素:', featuredImageInput);
     if (featuredImageInput) {
-      featuredImageInput.addEventListener('change', (e) => this.handleFeaturedImageUpload(e));
+      featuredImageInput.addEventListener('change', (e) => {
+        console.log('👂 featured-image change イベント発火');
+        this.handleFeaturedImageUpload(e);
+      });
+      console.log('✅ featured-image のリスナーを設定しました');
+    } else {
+      console.warn('⚠️ featured-image 要素が見つかりません');
     }
 
     // 添付ファイルアップロード
     const attachmentsInput = document.getElementById('attachments');
+    console.log('📎 attachments 要素:', attachmentsInput);
     if (attachmentsInput) {
-      attachmentsInput.addEventListener('change', (e) => this.handleAttachmentsUpload(e));
+      attachmentsInput.addEventListener('change', (e) => {
+        console.log('👂 attachments change イベント発火');
+        this.handleAttachmentsUpload(e);
+      });
+      console.log('✅ attachments のリスナーを設定しました');
+    } else {
+      console.warn('⚠️ attachments 要素が見つかりません');
     }
 
     // ログアウトボタン
@@ -672,12 +686,27 @@ class ArticleEditor {
    * アイキャッチ画像をアップロード
    */
   async handleFeaturedImageUpload(event) {
+    console.log('🖼️ handleFeaturedImageUpload が呼ばれました');
+
     const file = event.target.files[0];
-    if (!file) return;
+    console.log('📂 ファイル:', file);
+
+    if (!file) {
+      console.warn('⚠️ ファイルが選択されていません');
+      return;
+    }
 
     // ファイル検証
     const maxSize = 5 * 1024 * 1024; // 5MB
     const allowedTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
+
+    console.log('🔍 ファイル検証:', {
+      name: file.name,
+      size: file.size,
+      type: file.type,
+      maxSize: maxSize,
+      isAllowedType: allowedTypes.includes(file.type)
+    });
 
     if (file.size > maxSize) {
       this.showAlert('ファイルサイズが大きすぎます（5MB以下）', 'error');
@@ -691,30 +720,38 @@ class ArticleEditor {
 
     try {
       console.log('🖼️ アイキャッチ画像アップロード開始:', file.name);
+      console.log('📤 supabaseClient.uploadMedia を呼び出し中...');
 
       const result = await supabaseClient.uploadMedia(file);
+
+      console.log('📥 アップロード結果:', result);
 
       if (result.success) {
         // featured_image_url を this.featuredImageUrl に保存
         this.featuredImageUrl = result.data.file_url;
         console.log('✅ アイキャッチ画像URL保存:', this.featuredImageUrl);
+        console.log('📋 this.featuredImageUrl:', this.featuredImageUrl);
 
         // 記事を保存している場合は、featured_image_url を即座に更新
         if (this.articleId) {
-          console.log('🔄 既存記事にアイキャッチ画像を更新中...');
+          console.log('🔄 既存記事にアイキャッチ画像を更新中... (articleId:', this.articleId, ')');
           await supabaseClient.updateArticle(this.articleId, {
             featured_image_url: result.data.file_url
           });
           console.log('✅ 既存記事のアイキャッチ画像を更新完了');
+        } else {
+          console.log('ℹ️ 新規記事モード（保存時に featured_image_url を含める）');
         }
 
         this.showAlert('アイキャッチ画像をアップロードしました', 'success');
       } else {
+        console.error('❌ アップロード失敗:', result.error);
         this.showAlert('アップロードに失敗しました: ' + result.error, 'error');
       }
     } catch (error) {
-      console.error('アップロードエラー:', error.message);
-      this.showAlert('アップロード処理でエラーが発生しました', 'error');
+      console.error('❌ アップロードエラー:', error.message);
+      console.error('エラー詳細:', error);
+      this.showAlert('アップロード処理でエラーが発生しました: ' + error.message, 'error');
     }
   }
 
