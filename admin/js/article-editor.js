@@ -220,6 +220,19 @@ class ArticleEditor {
         }
       }
 
+      // 記事に紐付く添付ファイルを取得して表示
+      if (this.articleId) {
+        console.log('📎 記事の添付ファイルを取得中...');
+        const attachmentsResult = await supabaseClient.getArticleAttachments(this.articleId);
+        if (attachmentsResult.success && attachmentsResult.data && attachmentsResult.data.length > 0) {
+          console.log('✅ 添付ファイル取得成功:', attachmentsResult.data.length, '個');
+          this.displayAttachments(attachmentsResult.data);
+        } else {
+          console.log('ℹ️ 添付ファイルなし');
+          this.displayAttachments([]);
+        }
+      }
+
       // タイトル更新
       const pageTitle = document.querySelector('.page-title');
       if (pageTitle) {
@@ -804,10 +817,160 @@ class ArticleEditor {
       }
 
       this.showAlert('ファイルアップロード完了', 'success');
+
+      // アップロード後に添付ファイル一覧を更新
+      if (this.articleId) {
+        const attachmentsResult = await supabaseClient.getArticleAttachments(this.articleId);
+        if (attachmentsResult.success && attachmentsResult.data) {
+          this.displayAttachments(attachmentsResult.data);
+        }
+      }
     } catch (error) {
       console.error('添付ファイルアップロードエラー:', error.message);
       this.showAlert('添付ファイルアップロード処理でエラーが発生しました', 'error');
     }
+  }
+
+  /**
+   * 添付ファイル一覧を表示
+   * @param {array} attachments - 添付ファイルの配列
+   */
+  displayAttachments(attachments) {
+    const attachmentsList = document.getElementById('attachments-list');
+    if (!attachmentsList) {
+      console.warn('⚠️ attachments-list 要素が見つかりません');
+      return;
+    }
+
+    // 既存の内容をクリア
+    attachmentsList.innerHTML = '';
+
+    // ファイルがない場合
+    if (!attachments || attachments.length === 0) {
+      attachmentsList.innerHTML = `
+        <div style="padding: 20px; text-align: center; color: var(--text-secondary);">
+          アップロードされたファイルがありません
+        </div>
+      `;
+      console.log('📋 添付ファイルなし - プレースホルダーを表示');
+      return;
+    }
+
+    // 各ファイルのアイテムを作成
+    attachments.forEach((attachment) => {
+      const fileIcon = this.getFileIcon(attachment.file_name);
+      const fileSize = this.formatFileSize(attachment.file_size);
+      const uploadedBy = attachment.uploaded_by ? attachment.uploaded_by.name : '不明';
+
+      const itemHTML = `
+        <div class="attachment-item" data-attachment-id="${attachment.id}">
+          <div class="attachment-info">
+            <div class="attachment-icon">${fileIcon}</div>
+            <div class="attachment-details">
+              <div class="attachment-name">${attachment.file_name}</div>
+              <div class="attachment-meta">${fileSize} • ${uploadedBy} • ${new Date(attachment.created_at).toLocaleDateString('ja-JP')}</div>
+            </div>
+          </div>
+          <div class="attachment-actions">
+            <a href="${attachment.file_url}" target="_blank" class="btn btn-sm btn-outline" title="ダウンロード">
+              📥
+            </a>
+            <button type="button" class="btn btn-sm btn-outline" data-delete-id="${attachment.id}" title="削除">
+              🗑️
+            </button>
+          </div>
+        </div>
+      `;
+
+      const itemDiv = document.createElement('div');
+      itemDiv.innerHTML = itemHTML;
+      attachmentsList.appendChild(itemDiv.firstElementChild);
+
+      // 削除ボタンのイベントリスナーを設定
+      const deleteBtn = itemDiv.querySelector('[data-delete-id]');
+      if (deleteBtn) {
+        deleteBtn.addEventListener('click', (e) => {
+          e.preventDefault();
+          this.deleteAttachment(attachment.id, attachment.storage_path);
+        });
+      }
+    });
+
+    console.log('✅ 添付ファイル一覧を表示しました:', attachments.length, '個');
+  }
+
+  /**
+   * 添付ファイルを削除
+   * @param {string} mediaId - メディアID
+   * @param {string} storagePath - ストレージパス
+   */
+  async deleteAttachment(mediaId, storagePath) {
+    if (!confirm('このファイルを削除してもよろしいですか？')) {
+      return;
+    }
+
+    try {
+      console.log('🗑️ 添付ファイルを削除中:', mediaId);
+      const result = await supabaseClient.deleteMedia(mediaId, storagePath);
+
+      if (result.success) {
+        console.log('✅ ファイル削除成功');
+        this.showAlert('ファイルを削除しました', 'success');
+
+        // 削除後に一覧を更新
+        if (this.articleId) {
+          const attachmentsResult = await supabaseClient.getArticleAttachments(this.articleId);
+          if (attachmentsResult.success) {
+            this.displayAttachments(attachmentsResult.data);
+          }
+        }
+      } else {
+        this.showAlert('ファイル削除に失敗しました: ' + result.error, 'error');
+      }
+    } catch (error) {
+      console.error('❌ ファイル削除エラー:', error.message);
+      this.showAlert('ファイル削除処理でエラーが発生しました', 'error');
+    }
+  }
+
+  /**
+   * ファイルの種類に応じてアイコンを返す
+   * @param {string} fileName - ファイル名
+   * @returns {string} - ファイルアイコン
+   */
+  getFileIcon(fileName) {
+    const ext = fileName.split('.').pop().toLowerCase();
+    const icons = {
+      'pdf': '📄',
+      'doc': '📝',
+      'docx': '📝',
+      'xls': '📊',
+      'xlsx': '📊',
+      'ppt': '🎨',
+      'pptx': '🎨',
+      'txt': '📄',
+      'md': '📄',
+      'zip': '📦',
+      'png': '🖼️',
+      'jpg': '🖼️',
+      'jpeg': '🖼️',
+      'gif': '🖼️',
+      'webp': '🖼️'
+    };
+    return icons[ext] || '📎';
+  }
+
+  /**
+   * ファイルサイズをフォーマット
+   * @param {number} bytes - バイト数
+   * @returns {string} - フォーマットされたサイズ
+   */
+  formatFileSize(bytes) {
+    if (!bytes) return 'サイズ不明';
+    if (bytes < 1024) return bytes + ' B';
+    if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + ' KB';
+    if (bytes < 1024 * 1024 * 1024) return (bytes / (1024 * 1024)).toFixed(1) + ' MB';
+    return (bytes / (1024 * 1024 * 1024)).toFixed(1) + ' GB';
   }
 
   /**
