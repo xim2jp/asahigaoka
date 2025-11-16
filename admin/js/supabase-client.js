@@ -879,26 +879,6 @@ class SupabaseClient {
   }
 
   /**
-   * 記事の添付ファイル一覧を取得
-   * @param {string} articleId - 記事ID
-   */
-  async getArticleAttachments(articleId) {
-    try {
-      const { data, error } = await this.client
-        .from('attachments')
-        .select('*,uploaded_by:users(name)')
-        .eq('article_id', articleId)
-        .order('created_at', { ascending: false });
-
-      if (error) throw error;
-      return { data: data || [], success: true };
-    } catch (error) {
-      console.error('添付ファイル取得エラー:', error.message);
-      return { data: [], success: false, error: error.message };
-    }
-  }
-
-  /**
    * 添付ファイル一覧を取得（ユーザーがアップロードしたもの）
    * @param {number} limit - 取得件数
    * @param {number} offset - オフセット
