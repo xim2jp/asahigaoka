@@ -421,9 +421,11 @@ class SupabaseClient {
    */
   async getArticleAttachments(articleId) {
     try {
-      console.log('📎 getArticleAttachments 開始:', { articleId });
+      console.log('📎 START getArticleAttachments with articleId=' + articleId);
 
-      // まずは JOIN なしで試す
+      // クエリ実行前
+      console.log('📎 BEFORE query');
+
       const { data, error } = await this.client
         .from('media')
         .select('*')
@@ -431,34 +433,18 @@ class SupabaseClient {
         .is('deleted_at', null)
         .order('created_at', { ascending: false });
 
-      console.log('📎 クエリ実行結果:', {
-        articleId,
-        dataLength: data ? data.length : 0,
-        data,
-        error,
-        hasError: !!error
-      });
+      // クエリ実行後
+      console.log('📎 AFTER query - data length=' + (data ? data.length : 'null') + ', hasError=' + !!error);
 
       if (error) {
-        console.error('❌ クエリエラー詳細:', {
-          code: error.code,
-          message: error.message,
-          details: error.details,
-          hint: error.hint
-        });
+        console.error('❌ ERROR: ' + error.message);
         throw error;
       }
 
-      console.log('✅ 添付ファイル取得成功:', data.length, '個');
+      console.log('✅ SUCCESS: ' + data.length + ' files');
       return { data, success: true };
     } catch (error) {
-      console.error('❌ 添付ファイル取得エラー:', error);
-      console.error('❌ エラー詳細:', {
-        name: error.name,
-        message: error.message,
-        code: error.code,
-        fullError: JSON.stringify(error, null, 2)
-      });
+      console.error('❌ CATCH: ' + error.message);
       return { data: [], success: false, error: error.message };
     }
   }
