@@ -223,13 +223,36 @@ class ArticleEditor {
 
       // 記事に紐付く添付ファイルを取得して表示
       if (this.articleId) {
-        console.log('📎 記事の添付ファイルを取得中...');
-        const attachmentsResult = await supabaseClient.getArticleAttachments(this.articleId);
-        if (attachmentsResult.success && attachmentsResult.data && attachmentsResult.data.length > 0) {
-          console.log('✅ 添付ファイル取得成功:', attachmentsResult.data.length, '個');
-          this.displayAttachments(attachmentsResult.data);
-        } else {
-          console.log('ℹ️ 添付ファイルなし');
+        console.log('📎 記事の添付ファイルを取得中...', {
+          articleId: this.articleId,
+          supabaseClientExists: !!supabaseClient,
+          supabaseClientType: typeof supabaseClient,
+          hasGetArticleAttachments: !!supabaseClient?.getArticleAttachments
+        });
+
+        try {
+          console.log('🔄 getArticleAttachments を呼び出し中...');
+          const attachmentsResult = await supabaseClient.getArticleAttachments(this.articleId);
+          console.log('🔄 getArticleAttachments の戻り値:', {
+            success: attachmentsResult.success,
+            dataLength: attachmentsResult.data ? attachmentsResult.data.length : 0,
+            error: attachmentsResult.error
+          });
+
+          if (attachmentsResult.success && attachmentsResult.data && attachmentsResult.data.length > 0) {
+            console.log('✅ 添付ファイル取得成功:', attachmentsResult.data.length, '個');
+            this.displayAttachments(attachmentsResult.data);
+          } else {
+            console.log('ℹ️ 添付ファイルなし', {
+              success: attachmentsResult.success,
+              hasData: !!attachmentsResult.data,
+              dataLength: attachmentsResult.data ? attachmentsResult.data.length : 0,
+              error: attachmentsResult.error
+            });
+            this.displayAttachments([]);
+          }
+        } catch (error) {
+          console.error('❌ getArticleAttachments 呼び出しエラー:', error);
           this.displayAttachments([]);
         }
       }
