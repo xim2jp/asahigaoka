@@ -12,6 +12,8 @@ class ArticleEditor {
     this.featuredImageUrl = null; // アイキャッチ画像URL
     this.uploadedAttachmentIds = []; // アップロード済みの添付ファイル ID
     this.uploadedAttachments = []; // アップロード済みファイル情報（新規作成時用）
+    this.activeModalTab = 'text'; // モーダルの現在のタブ（'text' or 'file'）
+    this.selectedFile = null; // 選択されたファイル
     this.init();
   }
 
@@ -98,6 +100,61 @@ class ArticleEditor {
     if (modalSubmitBtn) {
       modalSubmitBtn.addEventListener('click', () => this.submitAIGeneration());
       console.log('✅ モーダル送信ボタンにリスナー設定');
+    }
+
+    // モーダルタブ切り替え
+    const modalTabButtons = document.querySelectorAll('.modal-tab-button');
+    modalTabButtons.forEach(btn => {
+      btn.addEventListener('click', (e) => this.switchModalTab(e.target.dataset.modalTab));
+    });
+    console.log('✅ モーダルタブボタンにリスナー設定');
+
+    // ファイルドロップゾーン
+    const fileDropZone = document.getElementById('file-drop-zone');
+    const modalFileInput = document.getElementById('modal-file-input');
+
+    if (fileDropZone && modalFileInput) {
+      // クリックでファイル選択
+      fileDropZone.addEventListener('click', () => modalFileInput.click());
+
+      // ドラッグ＆ドロップ
+      fileDropZone.addEventListener('dragover', (e) => {
+        e.preventDefault();
+        fileDropZone.style.borderColor = 'var(--primary-color)';
+        fileDropZone.style.background = '#e3f2fd';
+      });
+
+      fileDropZone.addEventListener('dragleave', (e) => {
+        e.preventDefault();
+        fileDropZone.style.borderColor = 'var(--border-color)';
+        fileDropZone.style.background = '#f9f9f9';
+      });
+
+      fileDropZone.addEventListener('drop', (e) => {
+        e.preventDefault();
+        fileDropZone.style.borderColor = 'var(--border-color)';
+        fileDropZone.style.background = '#f9f9f9';
+        const files = e.dataTransfer.files;
+        if (files.length > 0) {
+          this.handleModalFileSelect(files[0]);
+        }
+      });
+
+      // ファイル選択
+      modalFileInput.addEventListener('change', (e) => {
+        if (e.target.files.length > 0) {
+          this.handleModalFileSelect(e.target.files[0]);
+        }
+      });
+
+      console.log('✅ ファイルドロップゾーンにリスナー設定');
+    }
+
+    // ファイルクリアボタン
+    const clearFileBtn = document.getElementById('clear-file-btn');
+    if (clearFileBtn) {
+      clearFileBtn.addEventListener('click', () => this.clearSelectedFile());
+      console.log('✅ ファイルクリアボタンにリスナー設定');
     }
 
     // 保存ボタン
@@ -335,6 +392,108 @@ class ArticleEditor {
     if (modal) {
       modal.style.display = 'none';
     }
+    // ファイル選択をクリア
+    this.clearSelectedFile();
+  }
+
+  /**
+   * モーダルタブを切り替える
+   */
+  switchModalTab(tabName) {
+    console.log('🔄 モーダルタブ切り替え:', tabName);
+    this.activeModalTab = tabName;
+
+    // タブボタンのスタイル更新
+    const tabButtons = document.querySelectorAll('.modal-tab-button');
+    tabButtons.forEach(btn => {
+      if (btn.dataset.modalTab === tabName) {
+        btn.style.color = 'var(--primary-color)';
+        btn.style.borderBottomColor = 'var(--primary-color)';
+        btn.classList.add('active');
+      } else {
+        btn.style.color = 'var(--text-secondary)';
+        btn.style.borderBottomColor = 'transparent';
+        btn.classList.remove('active');
+      }
+    });
+
+    // タブコンテンツの表示切り替え
+    const textTab = document.getElementById('modal-tab-text');
+    const fileTab = document.getElementById('modal-tab-file');
+
+    if (tabName === 'text') {
+      textTab.style.display = 'block';
+      fileTab.style.display = 'none';
+    } else {
+      textTab.style.display = 'none';
+      fileTab.style.display = 'block';
+    }
+  }
+
+  /**
+   * モーダル内でファイルが選択された時の処理
+   */
+  handleModalFileSelect(file) {
+    console.log('📁 ファイル選択:', file.name);
+
+    // ファイルサイズ制限（20MB）
+    const maxSize = 20 * 1024 * 1024;
+    if (file.size > maxSize) {
+      this.showAlert('ファイルサイズが大きすぎます（20MB以下）', 'error');
+      return;
+    }
+
+    // 対応ファイル形式チェック
+    const allowedTypes = [
+      'image/jpeg', 'image/png', 'image/gif', 'image/webp',
+      'application/pdf',
+      'application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+      'application/vnd.ms-excel', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+      'application/vnd.ms-powerpoint', 'application/vnd.openxmlformats-officedocument.presentationml.presentation',
+      'text/html'
+    ];
+
+    if (!allowedTypes.includes(file.type)) {
+      this.showAlert('対応していないファイル形式です', 'error');
+      return;
+    }
+
+    this.selectedFile = file;
+
+    // ファイル情報を表示
+    const fileInfo = document.getElementById('selected-file-info');
+    const fileName = document.getElementById('selected-file-name');
+    const fileSize = document.getElementById('selected-file-size');
+    const fileIcon = document.getElementById('selected-file-icon');
+
+    if (fileInfo && fileName && fileSize && fileIcon) {
+      fileName.textContent = file.name;
+      fileSize.textContent = this.formatFileSize(file.size);
+      fileIcon.textContent = this.getFileIcon(file.name);
+      fileInfo.style.display = 'block';
+    }
+
+    console.log('✅ ファイル選択完了:', file.name);
+  }
+
+  /**
+   * 選択されたファイルをクリア
+   */
+  clearSelectedFile() {
+    this.selectedFile = null;
+
+    const fileInfo = document.getElementById('selected-file-info');
+    const modalFileInput = document.getElementById('modal-file-input');
+
+    if (fileInfo) {
+      fileInfo.style.display = 'none';
+    }
+
+    if (modalFileInput) {
+      modalFileInput.value = '';
+    }
+
+    console.log('🧹 ファイル選択をクリア');
   }
 
   /**
@@ -342,7 +501,14 @@ class ArticleEditor {
    */
   async submitAIGeneration() {
     console.log('🤖 AI生成処理開始（モーダルから）');
+    console.log('📋 アクティブタブ:', this.activeModalTab);
 
+    // タブに応じて処理を分岐
+    if (this.activeModalTab === 'file') {
+      return this.submitFileAIGeneration();
+    }
+
+    // テキスト入力タブの処理
     const title = document.querySelector('#title').value.trim();
     const draftContent = document.getElementById('modal-prompt').value.trim();
     const eventDateFrom = document.querySelector('#event-date-from').value;
@@ -707,6 +873,176 @@ class ArticleEditor {
         message: error.message,
         stack: error.stack
       });
+      return {
+        success: false,
+        error: `${error.name}: ${error.message}`
+      };
+    }
+  }
+
+  /**
+   * ファイルからAI生成を実行
+   */
+  async submitFileAIGeneration() {
+    console.log('🤖 ファイルからAI生成処理開始');
+
+    // バリデーション
+    if (!this.selectedFile) {
+      this.showAlert('ファイルを選択してください', 'error');
+      return;
+    }
+
+    // モーダルの送信ボタンを無効化
+    const submitBtn = document.getElementById('modal-submit-btn');
+    const originalBtnText = submitBtn.textContent;
+    submitBtn.disabled = true;
+    submitBtn.textContent = '🤖 分析中...';
+
+    // 処理中オーバーレイを表示
+    this.showProcessingOverlay();
+
+    // 60秒のタイムアウト設定
+    const timeoutId = setTimeout(() => {
+      console.warn('⏱️ AI生成がタイムアウトしました（60秒）');
+      this.showAlert('処理がタイムアウトしました。もう一度試してください。', 'error');
+      this.hideProcessingOverlay();
+      submitBtn.disabled = false;
+      submitBtn.textContent = originalBtnText;
+    }, 60000);
+
+    try {
+      // ファイルをBase64にエンコード
+      const base64Data = await this.fileToBase64(this.selectedFile);
+      console.log('📄 ファイルをBase64エンコード完了');
+
+      // 画像分析APIを呼び出し
+      const result = await this.callImageAnalysisAPI(base64Data);
+
+      if (result.success) {
+        // タイトルを設定
+        const titleField = document.querySelector('#title');
+        if (titleField && result.data.title) {
+          titleField.value = result.data.title;
+          console.log('✅ タイトルを設定しました:', result.data.title);
+        }
+
+        // 記事本文を設定
+        const contentEditor = document.getElementById('content-editor');
+        if (contentEditor && result.data.text350) {
+          contentEditor.innerHTML = this.formatContent(result.data.text350);
+        }
+
+        // SNS用抜粋を設定
+        const excerptField = document.getElementById('excerpt');
+        if (excerptField && result.data.text80) {
+          excerptField.value = result.data.text80;
+        }
+
+        // SEOメタタイトルを自動設定（タイトル + 町会名）
+        const metaTitleField = document.getElementById('meta-title');
+        if (metaTitleField && result.data.title) {
+          const autoMetaTitle = `${result.data.title} | 旭丘一丁目町会`;
+          metaTitleField.value = autoMetaTitle;
+          console.log('✅ メタタイトルを設定しました:', autoMetaTitle);
+        }
+
+        // SEOメタディスクリプションを設定（空欄の場合のみ）
+        const metaDescField = document.getElementById('meta-description');
+        if (metaDescField && !metaDescField.value.trim() && result.data.meta_desc) {
+          metaDescField.value = result.data.meta_desc;
+          console.log('✅ メタディスクリプションを設定しました:', result.data.meta_desc);
+        }
+
+        // SEOメタキーワードを設定（空欄の場合のみ）
+        const metaKeywordsField = document.getElementById('meta-keywords');
+        if (metaKeywordsField && !metaKeywordsField.value.trim() && result.data.meta_kwd) {
+          metaKeywordsField.value = result.data.meta_kwd;
+          console.log('✅ メタキーワードを設定しました:', result.data.meta_kwd);
+        }
+
+        this.showAlert('ファイルからAIによる記事生成が完了しました', 'success');
+
+        // モーダルを閉じる
+        this.closeAIModal();
+      } else {
+        this.showAlert('ファイルの送信に失敗しました。ほかのファイルで試すか、直接記事を書いてください。', 'error');
+      }
+    } catch (error) {
+      console.error('ファイルAI生成エラー:', error);
+      this.showAlert('ファイルの送信に失敗しました。ほかのファイルで試すか、直接記事を書いてください。', 'error');
+    } finally {
+      clearTimeout(timeoutId);
+      this.hideProcessingOverlay();
+      submitBtn.disabled = false;
+      submitBtn.textContent = originalBtnText;
+    }
+  }
+
+  /**
+   * ファイルをBase64にエンコード
+   */
+  fileToBase64(file) {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.readAsDataURL(file);
+      reader.onload = () => {
+        // data:image/png;base64,XXXX の形式から base64 部分を抽出
+        const base64 = reader.result.split(',')[1];
+        resolve(base64);
+      };
+      reader.onerror = error => reject(error);
+    });
+  }
+
+  /**
+   * 画像分析APIを呼び出す（Lambda経由）
+   */
+  async callImageAnalysisAPI(base64Data) {
+    const apiEndpoint = window.DIFY_IMAGE_PROXY_ENDPOINT || 'https://YOUR_API_GATEWAY_ENDPOINT/prod/analyze-image';
+
+    const requestBody = {
+      request: base64Data
+    };
+
+    console.log('🖼️ 画像分析APIリクエスト送信');
+    console.log('API エンドポイント:', apiEndpoint);
+
+    try {
+      const response = await fetch(apiEndpoint, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(requestBody)
+      });
+
+      console.log('レスポンス受信:', response.status, response.statusText);
+
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        console.error('APIエラー:', errorData);
+        throw new Error(errorData.error || `HTTP error! status: ${response.status}`);
+      }
+
+      const data = await response.json();
+      console.log('画像分析APIレスポンス:', data);
+
+      if (data.success && data.data) {
+        return {
+          success: true,
+          data: {
+            title: data.data.title || '',
+            text350: data.data.text350 || '',
+            text80: data.data.text80 || '',
+            meta_desc: data.data.meta_desc || '',
+            meta_kwd: data.data.meta_kwd || ''
+          }
+        };
+      } else {
+        throw new Error(data.error || 'レスポンスの形式が不正です');
+      }
+    } catch (error) {
+      console.error('画像分析API呼び出しエラー:', error);
       return {
         success: false,
         error: `${error.name}: ${error.message}`

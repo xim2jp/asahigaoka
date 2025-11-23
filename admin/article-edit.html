@@ -612,16 +612,55 @@
                         <button type="button" id="modal-close-btn" class="modal-close">&times;</button>
                     </div>
                     <div class="modal-body">
-                        <div class="form-group">
-                            <label for="modal-prompt" class="form-label">プロンプト（記事の下書き）*</label>
-                            <textarea id="modal-prompt" class="form-control" rows="8" placeholder="以下例文です。箇条書きに入力すればAIが記事を代筆してくれます。
+                        <!-- モーダル内タブナビゲーション -->
+                        <div class="modal-tab-nav" style="display: flex; gap: 10px; margin-bottom: 20px; border-bottom: 2px solid var(--border-color);">
+                            <button type="button" class="modal-tab-button active" data-modal-tab="text" style="padding: 10px 20px; background: none; border: none; cursor: pointer; font-size: 14px; color: var(--primary-color); border-bottom: 2px solid var(--primary-color); margin-bottom: -2px;">
+                                📝 テキスト入力
+                            </button>
+                            <button type="button" class="modal-tab-button" data-modal-tab="file" style="padding: 10px 20px; background: none; border: none; cursor: pointer; font-size: 14px; color: var(--text-secondary); border-bottom: 2px solid transparent; margin-bottom: -2px;">
+                                📁 ファイルから生成
+                            </button>
+                        </div>
+
+                        <!-- テキスト入力タブ -->
+                        <div id="modal-tab-text" class="modal-tab-content">
+                            <div class="form-group">
+                                <label for="modal-prompt" class="form-label">プロンプト（記事の下書き）*</label>
+                                <textarea id="modal-prompt" class="form-control" rows="8" placeholder="以下例文です。箇条書きに入力すればAIが記事を代筆してくれます。
 
 12月28日開催。
 地域忘年会。
 場所：地域集会所、時間：17:00から2時間
 参加費：4000円。
 カラオケあり"></textarea>
-                            <small style="color: var(--text-secondary);">タイトルとイベント日時の情報と合わせて、AIが本文とSNS用抜粋を生成します。</small>
+                                <small style="color: var(--text-secondary);">タイトルとイベント日時の情報と合わせて、AIが本文とSNS用抜粋を生成します。</small>
+                            </div>
+                        </div>
+
+                        <!-- ファイルアップロードタブ -->
+                        <div id="modal-tab-file" class="modal-tab-content" style="display: none;">
+                            <div class="form-group">
+                                <label class="form-label">ファイルをアップロード *</label>
+                                <div id="file-drop-zone" style="border: 2px dashed var(--border-color); border-radius: 8px; padding: 40px 20px; text-align: center; cursor: pointer; transition: all 0.3s; background: #f9f9f9;">
+                                    <div style="font-size: 48px; margin-bottom: 10px;">📄</div>
+                                    <p style="margin: 0 0 10px 0; font-weight: 500;">ファイルをドラッグ＆ドロップ</p>
+                                    <p style="margin: 0; color: var(--text-secondary); font-size: 14px;">または クリックしてファイルを選択</p>
+                                    <input type="file" id="modal-file-input" style="display: none;" accept="image/*,.pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.html">
+                                </div>
+                                <div id="selected-file-info" style="display: none; margin-top: 15px; padding: 12px; background: #e8f5e9; border-radius: 8px;">
+                                    <div style="display: flex; align-items: center; gap: 10px;">
+                                        <span id="selected-file-icon" style="font-size: 24px;">📄</span>
+                                        <div style="flex: 1;">
+                                            <div id="selected-file-name" style="font-weight: 500;"></div>
+                                            <div id="selected-file-size" style="font-size: 12px; color: var(--text-secondary);"></div>
+                                        </div>
+                                        <button type="button" id="clear-file-btn" style="background: none; border: none; cursor: pointer; font-size: 18px;">❌</button>
+                                    </div>
+                                </div>
+                                <small style="color: var(--text-secondary); display: block; margin-top: 10px;">
+                                    対応形式: 画像（JPG, PNG, GIF, WebP）、PDF、Office文書（Word, Excel, PowerPoint）、HTML
+                                </small>
+                            </div>
                         </div>
                     </div>
                     <div class="modal-footer">
