@@ -164,8 +164,14 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 
     // フォーム送信（モック）
+    // 注意：article-edit.html では ArticleEditor が form を処理するため、除外
     const forms = document.querySelectorAll('form');
     forms.forEach(form => {
+        // article-edit.html（記事編集ページ）の場合は処理しない
+        if (form.hasAttribute('data-article-form')) {
+            return; // スキップ
+        }
+
         form.addEventListener('submit', function(e) {
             e.preventDefault();
             console.log('Form submitted (mock)');

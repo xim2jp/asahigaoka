@@ -107,7 +107,7 @@
                     <table class="table">
                         <thead>
                             <tr>
-                                <th>ID</th>
+                                <th>No</th>
                                 <th>名前</th>
                                 <th>メールアドレス</th>
                                 <th>権限</th>
@@ -118,106 +118,6 @@
                             </tr>
                         </thead>
                         <tbody>
-                            <tr>
-                                <td data-label="ID">001</td>
-                                <td data-label="名前">
-                                    <div style="display: flex; align-items: center; gap: 10px;">
-                                        <div class="user-avatar">田</div>
-                                        田中太郎
-                                    </div>
-                                </td>
-                                <td data-label="メール">admin@example.com</td>
-                                <td data-label="権限"><span class="badge badge-danger">管理者</span></td>
-                                <td data-label="最終ログイン">2025/11/13 10:30</td>
-                                <td data-label="登録日">2025/01/01</td>
-                                <td data-label="ステータス"><span class="badge badge-success">有効</span></td>
-                                <td data-label="操作">
-                                    <div class="table-actions">
-                                        <button class="btn btn-sm btn-outline" data-modal="edit-user-modal">編集</button>
-                                        <button class="btn btn-sm btn-danger">削除</button>
-                                    </div>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td data-label="ID">002</td>
-                                <td data-label="名前">
-                                    <div style="display: flex; align-items: center; gap: 10px;">
-                                        <div class="user-avatar" style="background-color: var(--info-color);">佐</div>
-                                        佐藤花子
-                                    </div>
-                                </td>
-                                <td data-label="メール">sato@example.com</td>
-                                <td data-label="権限"><span class="badge badge-info">編集者</span></td>
-                                <td data-label="最終ログイン">2025/11/12 15:20</td>
-                                <td data-label="登録日">2025/02/15</td>
-                                <td data-label="ステータス"><span class="badge badge-success">有効</span></td>
-                                <td data-label="操作">
-                                    <div class="table-actions">
-                                        <button class="btn btn-sm btn-outline" data-modal="edit-user-modal">編集</button>
-                                        <button class="btn btn-sm btn-danger">削除</button>
-                                    </div>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td data-label="ID">003</td>
-                                <td data-label="名前">
-                                    <div style="display: flex; align-items: center; gap: 10px;">
-                                        <div class="user-avatar" style="background-color: var(--warning-color);">鈴</div>
-                                        鈴木一郎
-                                    </div>
-                                </td>
-                                <td data-label="メール">suzuki@example.com</td>
-                                <td data-label="権限"><span class="badge badge-info">編集者</span></td>
-                                <td data-label="最終ログイン">2025/11/10 09:00</td>
-                                <td data-label="登録日">2025/03/20</td>
-                                <td data-label="ステータス"><span class="badge badge-success">有効</span></td>
-                                <td data-label="操作">
-                                    <div class="table-actions">
-                                        <button class="btn btn-sm btn-outline" data-modal="edit-user-modal">編集</button>
-                                        <button class="btn btn-sm btn-danger">削除</button>
-                                    </div>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td data-label="ID">004</td>
-                                <td data-label="名前">
-                                    <div style="display: flex; align-items: center; gap: 10px;">
-                                        <div class="user-avatar" style="background-color: var(--secondary-color);">山</div>
-                                        山田次郎
-                                    </div>
-                                </td>
-                                <td data-label="メール">yamada@example.com</td>
-                                <td data-label="権限"><span class="badge badge-info">編集者</span></td>
-                                <td data-label="最終ログイン">2025/11/08 14:00</td>
-                                <td data-label="登録日">2025/04/10</td>
-                                <td data-label="ステータス"><span class="badge badge-warning">無効</span></td>
-                                <td data-label="操作">
-                                    <div class="table-actions">
-                                        <button class="btn btn-sm btn-outline" data-modal="edit-user-modal">編集</button>
-                                        <button class="btn btn-sm btn-danger">削除</button>
-                                    </div>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td data-label="ID">005</td>
-                                <td data-label="名前">
-                                    <div style="display: flex; align-items: center; gap: 10px;">
-                                        <div class="user-avatar" style="background-color: var(--accent-color);">高</div>
-                                        高橋美咲
-                                    </div>
-                                </td>
-                                <td data-label="メール">takahashi@example.com</td>
-                                <td data-label="権限"><span class="badge badge-danger">管理者</span></td>
-                                <td data-label="最終ログイン">2025/11/13 08:30</td>
-                                <td data-label="登録日">2025/05/01</td>
-                                <td data-label="ステータス"><span class="badge badge-success">有効</span></td>
-                                <td data-label="操作">
-                                    <div class="table-actions">
-                                        <button class="btn btn-sm btn-outline" data-modal="edit-user-modal">編集</button>
-                                        <button class="btn btn-sm btn-danger">削除</button>
-                                    </div>
-                                </td>
-                            </tr>
                         </tbody>
                     </table>
                 </div>
@@ -355,6 +255,12 @@
         </div>
     </div>
 
+    <!-- Supabase SDK -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+    <!-- アプリケーションスクリプト -->
+    <script src="js/supabase-client.js"></script>
     <script src="js/app.js"></script>
+    <script src="js/users.js"></script>
 </body>
 </html>

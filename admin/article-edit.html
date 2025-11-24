@@ -74,6 +74,84 @@
             flex: 1;
             min-width: 100px;
         }
+        .modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .modal-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+        }
+        .modal-content {
+            position: relative;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+            width: 90%;
+            max-width: 600px;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px;
+            border-bottom: 1px solid var(--border-color);
+        }
+        .modal-header h2 {
+            margin: 0;
+            font-size: 18px;
+            color: var(--text-primary);
+        }
+        .modal-close {
+            background: none;
+            border: none;
+            font-size: 28px;
+            color: var(--text-secondary);
+            cursor: pointer;
+            padding: 0;
+            width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: color 0.2s;
+        }
+        .modal-close:hover {
+            color: var(--text-primary);
+        }
+        .modal-body {
+            padding: 20px;
+        }
+        .modal-footer {
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+            padding: 20px;
+            border-top: 1px solid var(--border-color);
+        }
+        .processing-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.3);
+            z-index: 999;
+            cursor: not-allowed;
+        }
         @media (max-width: 768px) {
             .form-row {
                 display: block;
@@ -83,6 +161,10 @@
             }
             .editor-toolbar {
                 overflow-x: auto;
+            }
+            .modal-content {
+                width: 95%;
+                max-height: 80vh;
             }
         }
     </style>
@@ -168,11 +250,10 @@
         <main class="main-content">
             <h1 class="page-title">新規記事作成</h1>
 
-            <form>
+            <form data-article-form>
                 <!-- タブナビゲーション -->
                 <div class="tab-nav">
                     <button type="button" class="tab-button active" data-tab="basic">基本情報</button>
-                    <button type="button" class="tab-button" data-tab="content">コンテンツ</button>
                     <button type="button" class="tab-button" data-tab="sns">SNS配信設定</button>
                     <button type="button" class="tab-button" data-tab="seo">SEO設定</button>
                 </div>
@@ -212,6 +293,167 @@
                             </div>
                         </div>
 
+                        <!-- イベント日時 -->
+                        <div class="form-group">
+                            <label class="form-label">イベント日時</label>
+                            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+                                <div>
+                                    <label for="event-date-from" class="form-label" style="font-size: 0.9em; color: #666;">開始日 *</label>
+                                    <input type="date" id="event-date-from" class="form-control" required>
+                                </div>
+                                <div>
+                                    <label for="event-time-from" class="form-label" style="font-size: 0.9em; color: #666;">開始時刻</label>
+                                    <input type="time" id="event-time-from" class="form-control" placeholder="HH:MM">
+                                </div>
+                                <div>
+                                    <label for="event-date-to" class="form-label" style="font-size: 0.9em; color: #666;">終了日</label>
+                                    <input type="date" id="event-date-to" class="form-control">
+                                </div>
+                                <div>
+                                    <label for="event-time-to" class="form-label" style="font-size: 0.9em; color: #666;">終了時刻</label>
+                                    <input type="time" id="event-time-to" class="form-control" placeholder="HH:MM">
+                                </div>
+                            </div>
+                            <small style="color: #666; display: block; margin-top: 5px;">
+                                例: 総会 → 2025-12-31 13:30、キャンプ → 2026-01-23 〜 2026-01-25
+                            </small>
+                        </div>
+
+                        <!-- 下書き本文とAI清書機能 -->
+                        <!-- コメントアウト開始
+                        <div class="form-group">
+                            <label for="draft-content" class="form-label">下書き本文 *</label>
+                            <div style="display: flex; gap: 10px; margin-bottom: 10px;">
+                                <button type="button" id="ai-generate-btn" class="btn btn-primary" style="white-space: nowrap;">
+                                    🤖 AIに書いてもらう
+                                </button>
+                                <small style="color: var(--text-secondary); display: flex; align-items: center;">
+                                    簡単な下書きを入力してください。AIが正式な記事とSNS用抜粋を生成します。
+                                </small>
+                            </div>
+                            <textarea id="draft-content" class="form-control" rows="6" placeholder="記事の下書きを入力してください。日付を含めることをお勧めします（例：2025年11月23日に開催）"></textarea>
+                        </div>
+                        コメントアウト終了 -->
+
+                        <!-- AI生成結果：記事本文 -->
+                        <div class="form-group">
+                            <label for="content-editor" class="form-label">記事本文 *</label>
+                            <div class="editor-container">
+                                <div class="editor-toolbar">
+                                    <button type="button" class="editor-btn" data-command="bold" title="太字"><strong>B</strong></button>
+                                    <button type="button" class="editor-btn" data-command="italic" title="斜体"><em>I</em></button>
+                                    <button type="button" class="editor-btn" data-command="underline" title="下線"><u>U</u></button>
+                                    <button type="button" class="editor-btn" data-command="strikethrough" title="取り消し線"><s>S</s></button>
+                                    <span style="border-left: 1px solid #ddd; margin: 0 5px;"></span>
+                                    <button type="button" class="editor-btn" data-command="h1" title="見出し1">H1</button>
+                                    <button type="button" class="editor-btn" data-command="h2" title="見出し2">H2</button>
+                                    <button type="button" class="editor-btn" data-command="h3" title="見出し3">H3</button>
+                                    <span style="border-left: 1px solid #ddd; margin: 0 5px;"></span>
+                                    <button type="button" class="editor-btn" data-command="ul" title="箇条書き">☰</button>
+                                    <button type="button" class="editor-btn" data-command="ol" title="番号付きリスト">1.</button>
+                                    <span style="border-left: 1px solid #ddd; margin: 0 5px;"></span>
+                                    <button type="button" class="editor-btn" data-command="link" title="リンク">🔗</button>
+                                    <button type="button" class="editor-btn" data-command="image" title="画像">🖼️</button>
+                                    <span style="border-left: 1px solid #ddd; margin: 0 5px;"></span>
+                                    <button type="button" class="editor-btn" data-command="undo" title="元に戻す">↶</button>
+                                    <button type="button" class="editor-btn" data-command="redo" title="やり直し">↷</button>
+                                </div>
+                                <div class="editor-content" id="content-editor" contenteditable="true">
+                                    <p>AIで生成された本文がここに表示されます。手動で編集することもできます。</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- AIに依頼するボタン -->
+                        <div class="form-group" style="margin-top: 15px;">
+                            <button type="button" id="ai-generate-modal-btn" class="btn btn-primary" style="white-space: nowrap;">
+                                🤖 AIに書いてもらう
+                            </button>
+                        </div>
+
+                        <!-- アイキャッチ画像 -->
+                        <div class="form-group">
+                            <label for="featured-image" class="form-label">アイキャッチ画像</label>
+                            <input type="file" id="featured-image" class="form-control" accept="image/*">
+                            <img class="image-preview" id="image-preview" src="" alt="プレビュー">
+                        </div>
+
+                        <!-- 添付ファイルセクション -->
+                        <div class="card" style="margin-top: 20px;">
+                            <div class="card-header">
+                                <h3 class="card-title" style="font-size: 16px;">📎 添付ファイル</h3>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="attachments" class="form-label">ファイルをアップロード</label>
+                                <input type="file" id="attachments" class="form-control" multiple accept=".pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.txt,.md,.zip,.png,.jpg,.jpeg,.gif,.webp">
+                                <small style="color: var(--text-secondary);">対応形式: 画像（PNG, JPG, GIF, WebP）、PDF、Office文書、テキスト、ZIP</small>
+                            </div>
+
+                            <!-- アップロード中の表示 -->
+                            <div id="upload-progress" style="display: none; margin-bottom: 20px;">
+                                <div style="display: flex; align-items: center; gap: 10px;">
+                                    <div style="flex: 1;">
+                                        <div style="background: #e0e0e0; border-radius: 4px; height: 8px; overflow: hidden;">
+                                            <div id="progress-bar" style="background: var(--primary-color); height: 100%; width: 0%; transition: width 0.3s;"></div>
+                                        </div>
+                                    </div>
+                                    <span id="progress-text" style="font-size: 12px; color: var(--text-secondary);">0%</span>
+                                </div>
+                            </div>
+
+                            <!-- 添付ファイル一覧 -->
+                            <div id="attachments-list">
+                                <div style="padding: 20px; text-align: center; color: var(--text-secondary);">
+                                    アップロードされたファイルがありません
+                                </div>
+                            </div>
+
+                            <!-- ファイルアイテムテンプレート（非表示） -->
+                            <style>
+                                .attachment-item {
+                                    display: flex;
+                                    align-items: center;
+                                    justify-content: space-between;
+                                    padding: 12px;
+                                    border: 1px solid var(--border-color);
+                                    border-radius: 4px;
+                                    margin-bottom: 8px;
+                                    background: #f9f9f9;
+                                }
+                                .attachment-item:hover {
+                                    background: #f0f0f0;
+                                }
+                                .attachment-info {
+                                    flex: 1;
+                                    display: flex;
+                                    align-items: center;
+                                    gap: 12px;
+                                }
+                                .attachment-icon {
+                                    font-size: 20px;
+                                    width: 30px;
+                                    text-align: center;
+                                }
+                                .attachment-details {
+                                    flex: 1;
+                                }
+                                .attachment-name {
+                                    font-weight: 500;
+                                    color: var(--text-primary);
+                                    margin-bottom: 4px;
+                                }
+                                .attachment-meta {
+                                    font-size: 12px;
+                                    color: var(--text-secondary);
+                                }
+                                .attachment-actions {
+                                    display: flex;
+                                    gap: 8px;
+                                }
+                            </style>
+                        </div>
+
                         <div class="form-group">
                             <label for="excerpt" class="form-label">抜粋（SNS配信用）</label>
                             <textarea id="excerpt" class="form-control" rows="3" placeholder="記事の概要を簡潔に入力（100文字程度）"></textarea>
@@ -231,53 +473,6 @@
                             <div class="form-group">
                                 <label for="publish-date" class="form-label">公開日時</label>
                                 <input type="datetime-local" id="publish-date" class="form-control">
-                            </div>
-
-                            <div class="form-group">
-                                <label for="featured-image" class="form-label">アイキャッチ画像</label>
-                                <input type="file" id="featured-image" class="form-control" accept="image/*">
-                                <img class="image-preview" id="image-preview" src="" alt="プレビュー">
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- コンテンツタブ -->
-                <div id="content" class="tab-content">
-                    <div class="card">
-                        <div class="card-header">
-                            <h2 class="card-title">記事内容</h2>
-                        </div>
-
-                        <div class="editor-container">
-                            <div class="editor-toolbar">
-                                <button type="button" class="editor-btn" data-command="bold" title="太字"><strong>B</strong></button>
-                                <button type="button" class="editor-btn" data-command="italic" title="斜体"><em>I</em></button>
-                                <button type="button" class="editor-btn" data-command="underline" title="下線"><u>U</u></button>
-                                <button type="button" class="editor-btn" data-command="strikethrough" title="取り消し線"><s>S</s></button>
-                                <span style="border-left: 1px solid #ddd; margin: 0 5px;"></span>
-                                <button type="button" class="editor-btn" data-command="h1" title="見出し1">H1</button>
-                                <button type="button" class="editor-btn" data-command="h2" title="見出し2">H2</button>
-                                <button type="button" class="editor-btn" data-command="h3" title="見出し3">H3</button>
-                                <span style="border-left: 1px solid #ddd; margin: 0 5px;"></span>
-                                <button type="button" class="editor-btn" data-command="ul" title="箇条書き">☰</button>
-                                <button type="button" class="editor-btn" data-command="ol" title="番号付きリスト">1.</button>
-                                <span style="border-left: 1px solid #ddd; margin: 0 5px;"></span>
-                                <button type="button" class="editor-btn" data-command="link" title="リンク">🔗</button>
-                                <button type="button" class="editor-btn" data-command="image" title="画像">🖼️</button>
-                                <span style="border-left: 1px solid #ddd; margin: 0 5px;"></span>
-                                <button type="button" class="editor-btn" data-command="undo" title="元に戻す">↶</button>
-                                <button type="button" class="editor-btn" data-command="redo" title="やり直し">↷</button>
-                            </div>
-                            <div class="editor-content" contenteditable="true">
-                                <h2>記事のタイトル</h2>
-                                <p>ここに記事の本文を入力してください。</p>
-                                <p>リッチテキストエディタを使用して、<strong>太字</strong>、<em>斜体</em>、<u>下線</u>などの装飾を追加できます。</p>
-                                <ul>
-                                    <li>箇条書きアイテム1</li>
-                                    <li>箇条書きアイテム2</li>
-                                    <li>箇条書きアイテム3</li>
-                                </ul>
                             </div>
                         </div>
                     </div>
@@ -376,6 +571,12 @@
                         </div>
 
                         <div class="form-group">
+                            <label for="meta-keywords" class="form-label">メタキーワード</label>
+                            <input type="text" id="meta-keywords" class="form-control" placeholder="キーワード1, キーワード2, キーワード3">
+                            <small style="color: #666; display: block; margin-top: 5px;">カンマ区切りで入力してください</small>
+                        </div>
+
+                        <div class="form-group">
                             <label for="slug" class="form-label">スラッグ（URL）</label>
                             <input type="text" id="slug" class="form-control" placeholder="article-url-slug">
                         </div>
@@ -398,11 +599,84 @@
                     </button>
                 </div>
             </form>
+
+            <!-- AI処理中のオーバーレイ（マウス操作禁止） -->
+            <div id="processing-overlay" class="processing-overlay" style="display: none;"></div>
+
+            <!-- AI生成モーダル -->
+            <div id="ai-modal" class="modal" style="display: none;">
+                <div class="modal-overlay" id="modal-overlay"></div>
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h2>AIに記事を書いてもらう</h2>
+                        <button type="button" id="modal-close-btn" class="modal-close">&times;</button>
+                    </div>
+                    <div class="modal-body">
+                        <!-- モーダル内タブナビゲーション -->
+                        <div class="modal-tab-nav" style="display: flex; gap: 10px; margin-bottom: 20px; border-bottom: 2px solid var(--border-color);">
+                            <button type="button" class="modal-tab-button active" data-modal-tab="text" style="padding: 10px 20px; background: none; border: none; cursor: pointer; font-size: 14px; color: var(--primary-color); border-bottom: 2px solid var(--primary-color); margin-bottom: -2px;">
+                                📝 テキスト入力
+                            </button>
+                            <button type="button" class="modal-tab-button" data-modal-tab="file" style="padding: 10px 20px; background: none; border: none; cursor: pointer; font-size: 14px; color: var(--text-secondary); border-bottom: 2px solid transparent; margin-bottom: -2px;">
+                                📁 ファイルから生成
+                            </button>
+                        </div>
+
+                        <!-- テキスト入力タブ -->
+                        <div id="modal-tab-text" class="modal-tab-content">
+                            <div class="form-group">
+                                <label for="modal-prompt" class="form-label">プロンプト（記事の下書き）*</label>
+                                <textarea id="modal-prompt" class="form-control" rows="8" placeholder="以下例文です。箇条書きに入力すればAIが記事を代筆してくれます。
+
+12月28日開催。
+地域忘年会。
+場所：地域集会所、時間：17:00から2時間
+参加費：4000円。
+カラオケあり"></textarea>
+                                <small style="color: var(--text-secondary);">タイトルとイベント日時の情報と合わせて、AIが本文とSNS用抜粋を生成します。</small>
+                            </div>
+                        </div>
+
+                        <!-- ファイルアップロードタブ -->
+                        <div id="modal-tab-file" class="modal-tab-content" style="display: none;">
+                            <div class="form-group">
+                                <label class="form-label">ファイルをアップロード *</label>
+                                <div id="file-drop-zone" style="border: 2px dashed var(--border-color); border-radius: 8px; padding: 40px 20px; text-align: center; cursor: pointer; transition: all 0.3s; background: #f9f9f9;">
+                                    <div style="font-size: 48px; margin-bottom: 10px;">📄</div>
+                                    <p style="margin: 0 0 10px 0; font-weight: 500;">ファイルをドラッグ＆ドロップ</p>
+                                    <p style="margin: 0; color: var(--text-secondary); font-size: 14px;">または クリックしてファイルを選択</p>
+                                    <input type="file" id="modal-file-input" style="display: none;" accept="image/*,.pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.html">
+                                </div>
+                                <div id="selected-file-info" style="display: none; margin-top: 15px; padding: 12px; background: #e8f5e9; border-radius: 8px;">
+                                    <div style="display: flex; align-items: center; gap: 10px;">
+                                        <span id="selected-file-icon" style="font-size: 24px;">📄</span>
+                                        <div style="flex: 1;">
+                                            <div id="selected-file-name" style="font-weight: 500;"></div>
+                                            <div id="selected-file-size" style="font-size: 12px; color: var(--text-secondary);"></div>
+                                        </div>
+                                        <button type="button" id="clear-file-btn" style="background: none; border: none; cursor: pointer; font-size: 18px;">❌</button>
+                                    </div>
+                                </div>
+                                <small style="color: var(--text-secondary); display: block; margin-top: 10px;">
+                                    対応形式: 画像（JPG, PNG, GIF, WebP）、PDF、Office文書（Word, Excel, PowerPoint）、HTML
+                                </small>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" id="modal-cancel-btn" class="btn btn-outline">キャンセル</button>
+                        <button type="button" id="modal-submit-btn" class="btn btn-primary">🤖 AIで記事を生成</button>
+                    </div>
+                </div>
+            </div>
         </main>
     </div>
 
     <!-- Supabase JS SDK (CDN) -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+    <!-- API設定 -->
+    <script src="js/config.js"></script>
 
     <!-- Supabase クライアント初期化 -->
     <script src="js/supabase-client.js"></script>

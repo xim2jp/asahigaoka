@@ -590,3 +590,86 @@ select.form-control {
     border-radius: 0 0 4px 4px;
     background-color: white;
 }
+
+/* ローディングオーバーレイ */
+.loading-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    z-index: 9999;
+}
+
+.loading-overlay .spinner {
+    width: 50px;
+    height: 50px;
+    border: 5px solid rgba(255, 255, 255, 0.3);
+    border-top-color: white;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+/* 通知メッセージ */
+.notification {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    padding: 15px 20px;
+    border-radius: 4px;
+    box-shadow: var(--shadow-lg);
+    max-width: 400px;
+    opacity: 0;
+    transform: translateX(100%);
+    transition: all 0.3s ease;
+    z-index: 10000;
+}
+
+.notification.show {
+    opacity: 1;
+    transform: translateX(0);
+}
+
+.notification-success {
+    background-color: #4CAF50;
+    color: white;
+}
+
+.notification-error {
+    background-color: #f44336;
+    color: white;
+}
+
+.notification-info {
+    background-color: #2196F3;
+    color: white;
+}
+
+.notification-warning {
+    background-color: #ff9800;
+    color: white;
+}
+
+/* テーブル操作ボタン */
+.table-actions {
+    display: flex;
+    gap: 5px;
+    flex-wrap: wrap;
+}
+
+/* レスポンシブテーブル */
+.table-responsive {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+}
+
+/* ユーザーアバター（テーブル内） */
+.table .user-avatar {
+    width: 28px;
+    height: 28px;
+    font-size: 12px;
+}

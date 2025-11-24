@@ -56,6 +56,16 @@ CREATE TABLE IF NOT EXISTS public.articles (
   published_at TIMESTAMP WITH TIME ZONE,
   line_published BOOLEAN DEFAULT FALSE,
   x_published BOOLEAN DEFAULT FALSE,
+  -- SEO関連カラム
+  meta_title VARCHAR(60),
+  meta_description VARCHAR(160),
+  meta_keywords VARCHAR(255),
+  slug VARCHAR(255),
+  -- イベント関連カラム
+  event_start_datetime TIMESTAMP WITH TIME ZONE,
+  event_end_datetime TIMESTAMP WITH TIME ZONE,
+  has_start_time BOOLEAN DEFAULT FALSE,
+  has_end_time BOOLEAN DEFAULT FALSE,
   created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
   updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
   deleted_at TIMESTAMP WITH TIME ZONE
@@ -90,6 +100,7 @@ CREATE TABLE IF NOT EXISTS public.media (
   file_size BIGINT,
   file_url TEXT NOT NULL,
   storage_path TEXT,
+  article_id UUID REFERENCES public.articles(id) ON DELETE CASCADE,
   uploaded_by UUID NOT NULL REFERENCES public.users(id) ON DELETE SET NULL,
   mime_type VARCHAR(100),
   width INTEGER,
@@ -100,9 +111,11 @@ CREATE TABLE IF NOT EXISTS public.media (
 
 -- インデックス
 CREATE INDEX idx_media_uploaded_by ON public.media(uploaded_by);
+CREATE INDEX idx_media_article_id ON public.media(article_id);
 CREATE INDEX idx_media_created_at ON public.media(created_at DESC);
 
 COMMENT ON TABLE public.media IS 'メディア/画像管理テーブル';
+COMMENT ON COLUMN public.media.article_id IS '記事への外部キー（記事削除時に関連メディアも削除）';
 
 -- ==========================================
 -- 4. AIチャット履歴テーブル (ai_chat_history)

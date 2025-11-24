@@ -8,6 +8,25 @@ terraform {
   }
 }
 
+# 変数定義
+variable "dify_api_key" {
+  description = "Dify API Key for article generation"
+  type        = string
+  sensitive   = true
+}
+
+variable "dify_api_endpoint" {
+  description = "Dify API endpoint URL"
+  type        = string
+  default     = "https://top-overly-pup.ngrok-free.app/v1/workflows/run"
+}
+
+variable "dify_api_key_image_analysis" {
+  description = "Dify API Key for image analysis"
+  type        = string
+  sensitive   = true
+}
+
 provider "aws" {
   region = "ap-northeast-1"
 }
@@ -197,4 +216,370 @@ output "cloudfront_domain_name" {
 
 output "website_url" {
   value = "https://${local.domain_name}"
+}
+
+# ===================================
+# Dify API Proxy Lambda Function
+# ===================================
+
+# Lambda用IAMロール
+resource "aws_iam_role" "dify_proxy_lambda" {
+  name = "dify-proxy-lambda-role"
+
+  assume_role_policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Action = "sts:AssumeRole"
+        Effect = "Allow"
+        Principal = {
+          Service = "lambda.amazonaws.com"
+        }
+      }
+    ]
+  })
+}
+
+# CloudWatch Logs用のポリシーをアタッチ
+resource "aws_iam_role_policy_attachment" "dify_proxy_lambda_logs" {
+  role       = aws_iam_role.dify_proxy_lambda.name
+  policy_arn = "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+}
+
+# S3書き込み権限をLambdaに追加
+resource "aws_iam_role_policy" "dify_proxy_lambda_s3" {
+  name = "dify-proxy-lambda-s3-policy"
+  role = aws_iam_role.dify_proxy_lambda.id
+
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Effect = "Allow"
+        Action = [
+          "s3:PutObject"
+        ]
+        Resource = "${aws_s3_bucket.website.arn}/images/news_images/*"
+      }
+    ]
+  })
+}
+
+# Lambda関数用のZIPファイルを作成
+data "archive_file" "dify_proxy_lambda" {
+  type        = "zip"
+  source_dir  = "${path.module}/lambda/dify_proxy"
+  output_path = "${path.module}/lambda/dify_proxy.zip"
+}
+
+# Lambda関数
+resource "aws_lambda_function" "dify_proxy" {
+  filename         = data.archive_file.dify_proxy_lambda.output_path
+  function_name    = "dify-api-proxy"
+  role            = aws_iam_role.dify_proxy_lambda.arn
+  handler         = "lambda_function.lambda_handler"
+  source_code_hash = data.archive_file.dify_proxy_lambda.output_base64sha256
+  runtime         = "python3.11"
+  timeout         = 30
+
+  environment {
+    variables = {
+      DIFY_API_KEY      = var.dify_api_key
+      DIFY_API_ENDPOINT = var.dify_api_endpoint
+    }
+  }
+}
+
+# CloudWatch Logsグループ
+resource "aws_cloudwatch_log_group" "dify_proxy_lambda" {
+  name              = "/aws/lambda/${aws_lambda_function.dify_proxy.function_name}"
+  retention_in_days = 7
+}
+
+# API Gateway REST API
+resource "aws_api_gateway_rest_api" "dify_proxy" {
+  name        = "dify-proxy-api"
+  description = "Dify API Proxy for article generation"
+}
+
+# API Gateway リソース（/generate-article）
+resource "aws_api_gateway_resource" "generate_article" {
+  rest_api_id = aws_api_gateway_rest_api.dify_proxy.id
+  parent_id   = aws_api_gateway_rest_api.dify_proxy.root_resource_id
+  path_part   = "generate-article"
+}
+
+# API Gateway メソッド（POST）
+resource "aws_api_gateway_method" "generate_article_post" {
+  rest_api_id   = aws_api_gateway_rest_api.dify_proxy.id
+  resource_id   = aws_api_gateway_resource.generate_article.id
+  http_method   = "POST"
+  authorization = "NONE"
+}
+
+# API Gateway メソッド（OPTIONS - CORS用）
+resource "aws_api_gateway_method" "generate_article_options" {
+  rest_api_id   = aws_api_gateway_rest_api.dify_proxy.id
+  resource_id   = aws_api_gateway_resource.generate_article.id
+  http_method   = "OPTIONS"
+  authorization = "NONE"
+}
+
+# API Gateway 統合（POST）
+resource "aws_api_gateway_integration" "generate_article_post" {
+  rest_api_id             = aws_api_gateway_rest_api.dify_proxy.id
+  resource_id             = aws_api_gateway_resource.generate_article.id
+  http_method             = aws_api_gateway_method.generate_article_post.http_method
+  integration_http_method = "POST"
+  type                    = "AWS_PROXY"
+  uri                     = aws_lambda_function.dify_proxy.invoke_arn
+}
+
+# API Gateway 統合（OPTIONS - CORS用）
+resource "aws_api_gateway_integration" "generate_article_options" {
+  rest_api_id = aws_api_gateway_rest_api.dify_proxy.id
+  resource_id = aws_api_gateway_resource.generate_article.id
+  http_method = aws_api_gateway_method.generate_article_options.http_method
+  type        = "MOCK"
+
+  request_templates = {
+    "application/json" = "{\"statusCode\": 200}"
+  }
+}
+
+# API Gateway メソッドレスポンス（OPTIONS）
+resource "aws_api_gateway_method_response" "generate_article_options" {
+  rest_api_id = aws_api_gateway_rest_api.dify_proxy.id
+  resource_id = aws_api_gateway_resource.generate_article.id
+  http_method = aws_api_gateway_method.generate_article_options.http_method
+  status_code = "200"
+
+  response_parameters = {
+    "method.response.header.Access-Control-Allow-Headers" = true
+    "method.response.header.Access-Control-Allow-Methods" = true
+    "method.response.header.Access-Control-Allow-Origin"  = true
+  }
+}
+
+# API Gateway 統合レスポンス（OPTIONS）
+resource "aws_api_gateway_integration_response" "generate_article_options" {
+  rest_api_id = aws_api_gateway_rest_api.dify_proxy.id
+  resource_id = aws_api_gateway_resource.generate_article.id
+  http_method = aws_api_gateway_method.generate_article_options.http_method
+  status_code = aws_api_gateway_method_response.generate_article_options.status_code
+
+  response_parameters = {
+    "method.response.header.Access-Control-Allow-Headers" = "'Content-Type'"
+    "method.response.header.Access-Control-Allow-Methods" = "'POST,OPTIONS'"
+    "method.response.header.Access-Control-Allow-Origin"  = "'*'"
+  }
+
+  depends_on = [aws_api_gateway_integration.generate_article_options]
+}
+
+# Lambda実行許可（API Gatewayから）
+resource "aws_lambda_permission" "api_gateway" {
+  statement_id  = "AllowAPIGatewayInvoke"
+  action        = "lambda:InvokeFunction"
+  function_name = aws_lambda_function.dify_proxy.function_name
+  principal     = "apigateway.amazonaws.com"
+  source_arn    = "${aws_api_gateway_rest_api.dify_proxy.execution_arn}/*/*"
+}
+
+# API Gateway デプロイ
+resource "aws_api_gateway_deployment" "dify_proxy" {
+  rest_api_id = aws_api_gateway_rest_api.dify_proxy.id
+
+  triggers = {
+    redeployment = sha1(jsonencode([
+      aws_api_gateway_resource.generate_article.id,
+      aws_api_gateway_method.generate_article_post.id,
+      aws_api_gateway_method.generate_article_options.id,
+      aws_api_gateway_integration.generate_article_post.id,
+      aws_api_gateway_integration.generate_article_options.id,
+      aws_api_gateway_integration_response.generate_article_options.id,
+      timestamp()
+    ]))
+  }
+
+  lifecycle {
+    create_before_destroy = true
+  }
+
+  depends_on = [
+    aws_api_gateway_integration.generate_article_post,
+    aws_api_gateway_integration.generate_article_options
+  ]
+}
+
+# API Gateway ステージ
+resource "aws_api_gateway_stage" "prod" {
+  deployment_id = aws_api_gateway_deployment.dify_proxy.id
+  rest_api_id   = aws_api_gateway_rest_api.dify_proxy.id
+  stage_name    = "prod"
+}
+
+# 出力：API Gateway エンドポイント
+output "dify_proxy_api_endpoint" {
+  value       = "${aws_api_gateway_stage.prod.invoke_url}/generate-article"
+  description = "Dify Proxy API endpoint URL"
+}
+
+# ===================================
+# Dify API Proxy Lambda Function (Image Analysis)
+# ===================================
+
+# Lambda関数用のZIPファイルを作成（画像分析用）
+data "archive_file" "dify_proxy_image_lambda" {
+  type        = "zip"
+  source_dir  = "${path.module}/lambda/dify_proxy_image"
+  output_path = "${path.module}/lambda/dify_proxy_image.zip"
+}
+
+# Lambda関数（画像分析用）
+resource "aws_lambda_function" "dify_proxy_image" {
+  filename         = data.archive_file.dify_proxy_image_lambda.output_path
+  function_name    = "dify-api-proxy-image"
+  role            = aws_iam_role.dify_proxy_lambda.arn
+  handler         = "lambda_function.lambda_handler"
+  source_code_hash = data.archive_file.dify_proxy_image_lambda.output_base64sha256
+  runtime         = "python3.11"
+  timeout         = 60
+
+  environment {
+    variables = {
+      DIFY_API_KEY      = var.dify_api_key_image_analysis
+      DIFY_API_ENDPOINT = var.dify_api_endpoint
+    }
+  }
+}
+
+# CloudWatch Logsグループ（画像分析用）
+resource "aws_cloudwatch_log_group" "dify_proxy_image_lambda" {
+  name              = "/aws/lambda/${aws_lambda_function.dify_proxy_image.function_name}"
+  retention_in_days = 7
+}
+
+# API Gateway リソース（/analyze-image）
+resource "aws_api_gateway_resource" "analyze_image" {
+  rest_api_id = aws_api_gateway_rest_api.dify_proxy.id
+  parent_id   = aws_api_gateway_rest_api.dify_proxy.root_resource_id
+  path_part   = "analyze-image"
+}
+
+# API Gateway メソッド（POST）
+resource "aws_api_gateway_method" "analyze_image_post" {
+  rest_api_id   = aws_api_gateway_rest_api.dify_proxy.id
+  resource_id   = aws_api_gateway_resource.analyze_image.id
+  http_method   = "POST"
+  authorization = "NONE"
+}
+
+# API Gateway メソッド（OPTIONS - CORS用）
+resource "aws_api_gateway_method" "analyze_image_options" {
+  rest_api_id   = aws_api_gateway_rest_api.dify_proxy.id
+  resource_id   = aws_api_gateway_resource.analyze_image.id
+  http_method   = "OPTIONS"
+  authorization = "NONE"
+}
+
+# API Gateway 統合（POST）
+resource "aws_api_gateway_integration" "analyze_image_post" {
+  rest_api_id             = aws_api_gateway_rest_api.dify_proxy.id
+  resource_id             = aws_api_gateway_resource.analyze_image.id
+  http_method             = aws_api_gateway_method.analyze_image_post.http_method
+  integration_http_method = "POST"
+  type                    = "AWS_PROXY"
+  uri                     = aws_lambda_function.dify_proxy_image.invoke_arn
+}
+
+# API Gateway 統合（OPTIONS - CORS用）
+resource "aws_api_gateway_integration" "analyze_image_options" {
+  rest_api_id = aws_api_gateway_rest_api.dify_proxy.id
+  resource_id = aws_api_gateway_resource.analyze_image.id
+  http_method = aws_api_gateway_method.analyze_image_options.http_method
+  type        = "MOCK"
+
+  request_templates = {
+    "application/json" = "{\"statusCode\": 200}"
+  }
+}
+
+# API Gateway メソッドレスポンス（OPTIONS）
+resource "aws_api_gateway_method_response" "analyze_image_options" {
+  rest_api_id = aws_api_gateway_rest_api.dify_proxy.id
+  resource_id = aws_api_gateway_resource.analyze_image.id
+  http_method = aws_api_gateway_method.analyze_image_options.http_method
+  status_code = "200"
+
+  response_parameters = {
+    "method.response.header.Access-Control-Allow-Headers" = true
+    "method.response.header.Access-Control-Allow-Methods" = true
+    "method.response.header.Access-Control-Allow-Origin"  = true
+  }
+}
+
+# API Gateway 統合レスポンス（OPTIONS）
+resource "aws_api_gateway_integration_response" "analyze_image_options" {
+  rest_api_id = aws_api_gateway_rest_api.dify_proxy.id
+  resource_id = aws_api_gateway_resource.analyze_image.id
+  http_method = aws_api_gateway_method.analyze_image_options.http_method
+  status_code = aws_api_gateway_method_response.analyze_image_options.status_code
+
+  response_parameters = {
+    "method.response.header.Access-Control-Allow-Headers" = "'Content-Type'"
+    "method.response.header.Access-Control-Allow-Methods" = "'POST,OPTIONS'"
+    "method.response.header.Access-Control-Allow-Origin"  = "'*'"
+  }
+
+  depends_on = [aws_api_gateway_integration.analyze_image_options]
+}
+
+# Lambda実行許可（API Gatewayから - 画像分析用）
+resource "aws_lambda_permission" "api_gateway_image" {
+  statement_id  = "AllowAPIGatewayInvokeImage"
+  action        = "lambda:InvokeFunction"
+  function_name = aws_lambda_function.dify_proxy_image.function_name
+  principal     = "apigateway.amazonaws.com"
+  source_arn    = "${aws_api_gateway_rest_api.dify_proxy.execution_arn}/*/*"
+}
+
+# デプロイメントトリガーを更新（画像分析エンドポイント追加）
+resource "aws_api_gateway_deployment" "dify_proxy_v2" {
+  rest_api_id = aws_api_gateway_rest_api.dify_proxy.id
+
+  triggers = {
+    redeployment = sha1(jsonencode([
+      aws_api_gateway_resource.generate_article.id,
+      aws_api_gateway_method.generate_article_post.id,
+      aws_api_gateway_method.generate_article_options.id,
+      aws_api_gateway_integration.generate_article_post.id,
+      aws_api_gateway_integration.generate_article_options.id,
+      aws_api_gateway_integration_response.generate_article_options.id,
+      aws_api_gateway_resource.analyze_image.id,
+      aws_api_gateway_method.analyze_image_post.id,
+      aws_api_gateway_method.analyze_image_options.id,
+      aws_api_gateway_integration.analyze_image_post.id,
+      aws_api_gateway_integration.analyze_image_options.id,
+      aws_api_gateway_integration_response.analyze_image_options.id,
+      timestamp()
+    ]))
+  }
+
+  lifecycle {
+    create_before_destroy = true
+  }
+
+  depends_on = [
+    aws_api_gateway_integration.generate_article_post,
+    aws_api_gateway_integration.generate_article_options,
+    aws_api_gateway_integration.analyze_image_post,
+    aws_api_gateway_integration.analyze_image_options
+  ]
+}
+
+# 出力：画像分析 API Gateway エンドポイント
+output "dify_proxy_image_api_endpoint" {
+  value       = "${aws_api_gateway_stage.prod.invoke_url}/analyze-image"
+  description = "Dify Proxy API endpoint URL for image analysis"
 }
