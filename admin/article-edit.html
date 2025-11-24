@@ -254,8 +254,7 @@
                 <!-- タブナビゲーション -->
                 <div class="tab-nav">
                     <button type="button" class="tab-button active" data-tab="basic">基本情報</button>
-                    <button type="button" class="tab-button" data-tab="sns">SNS配信設定</button>
-                    <button type="button" class="tab-button" data-tab="seo">SEO設定</button>
+                    <button type="button" class="tab-button" data-tab="seo-sns">SEO/SNS設定</button>
                 </div>
 
                 <!-- 基本情報タブ -->
@@ -469,6 +468,45 @@
                             </div>
                         </div>
 
+                        <!-- TOPページ掲載設定 -->
+                        <div class="form-group">
+                            <label class="form-label">TOPページ掲載設定</label>
+                            <div style="display: grid; gap: 10px;">
+                                <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
+                                    <input type="checkbox" id="is-news-featured">
+                                    <span>最新情報に掲載する</span>
+                                    <small style="color: var(--text-secondary); font-weight: normal;">（ONの場合、最新順に6件表示されます）</small>
+                                </label>
+                                <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
+                                    <input type="checkbox" id="is-activity-highlight">
+                                    <span>町会活動ハイライトに掲載する</span>
+                                    <small style="color: var(--text-secondary); font-weight: normal;">（画像がある記事のみ。ONの場合、最新順に6件表示されます）</small>
+                                </label>
+                            </div>
+                        </div>
+
+                        <!-- 表示・連携設定 -->
+                        <div class="form-group">
+                            <label class="form-label">表示・連携設定</label>
+                            <div style="display: grid; gap: 10px;">
+                                <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
+                                    <input type="checkbox" id="show-in-news-list" checked>
+                                    <span>お知らせ一覧に表示する</span>
+                                    <small style="color: var(--text-secondary); font-weight: normal;">（通常はON。OFFにすると一覧には出ませんが、直接リンクで閲覧可能です）</small>
+                                </label>
+                                <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
+                                    <input type="checkbox" id="show-in-calendar">
+                                    <span>カレンダーに表示する</span>
+                                    <small style="color: var(--text-secondary); font-weight: normal;">（イベント日時が設定されている場合のみ有効）</small>
+                                </label>
+                                <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
+                                    <input type="checkbox" id="include-in-rag">
+                                    <span>AI学習データ（RAG）に登録する</span>
+                                    <small style="color: var(--text-secondary); font-weight: normal;">（ONにすると、AIアシスタントがこの記事の内容を回答に使用します）</small>
+                                </label>
+                            </div>
+                        </div>
+
                         <div class="form-row" style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
                             <div class="form-group">
                                 <label for="publish-date" class="form-label">公開日時</label>
@@ -478,83 +516,9 @@
                     </div>
                 </div>
 
-                <!-- SNS配信設定タブ -->
-                <div id="sns" class="tab-content">
-                    <div class="card">
-                        <div class="card-header">
-                            <h2 class="card-title">LINE配信設定</h2>
-                        </div>
-
-                        <div class="form-group">
-                            <label>
-                                <input type="checkbox" id="line-enabled">
-                                LINEに配信する
-                            </label>
-                        </div>
-
-                        <div class="form-row" style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
-                            <div class="form-group">
-                                <label for="line-schedule" class="form-label">配信タイミング</label>
-                                <select id="line-schedule" class="form-control">
-                                    <option value="immediate">即座に配信</option>
-                                    <option value="scheduled">予約配信</option>
-                                </select>
-                            </div>
-
-                            <div class="form-group">
-                                <label for="line-datetime" class="form-label">配信日時</label>
-                                <input type="datetime-local" id="line-datetime" class="form-control">
-                            </div>
-                        </div>
-
-                        <div class="form-group">
-                            <label for="line-message" class="form-label">配信メッセージ</label>
-                            <textarea id="line-message" class="form-control" rows="4" placeholder="LINE配信用のメッセージを入力"></textarea>
-                        </div>
-                    </div>
-
-                    <div class="card">
-                        <div class="card-header">
-                            <h2 class="card-title">X（Twitter）投稿設定</h2>
-                        </div>
-
-                        <div class="form-group">
-                            <label>
-                                <input type="checkbox" id="x-enabled">
-                                Xに投稿する
-                            </label>
-                        </div>
-
-                        <div class="form-row" style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
-                            <div class="form-group">
-                                <label for="x-schedule" class="form-label">投稿タイミング</label>
-                                <select id="x-schedule" class="form-control">
-                                    <option value="immediate">即座に投稿</option>
-                                    <option value="scheduled">予約投稿</option>
-                                </select>
-                            </div>
-
-                            <div class="form-group">
-                                <label for="x-datetime" class="form-label">投稿日時</label>
-                                <input type="datetime-local" id="x-datetime" class="form-control">
-                            </div>
-                        </div>
-
-                        <div class="form-group">
-                            <label for="x-message" class="form-label">投稿内容</label>
-                            <textarea id="x-message" class="form-control" rows="4" placeholder="X投稿用のメッセージを入力（280文字以内）" maxlength="280"></textarea>
-                            <small style="color: var(--text-secondary);">0 / 280 文字</small>
-                        </div>
-
-                        <div class="form-group">
-                            <label for="x-hashtags" class="form-label">ハッシュタグ</label>
-                            <input type="text" id="x-hashtags" class="form-control" placeholder="#旭丘一丁目 #町会" value="#旭丘一丁目">
-                        </div>
-                    </div>
-                </div>
-
-                <!-- SEO設定タブ -->
-                <div id="seo" class="tab-content">
+                <!-- SEO/SNS設定タブ -->
+                <div id="seo-sns" class="tab-content">
+                    <!-- SEO設定 -->
                     <div class="card">
                         <div class="card-header">
                             <h2 class="card-title">SEO設定</h2>
@@ -579,6 +543,51 @@
                         <div class="form-group">
                             <label for="slug" class="form-label">スラッグ（URL）</label>
                             <input type="text" id="slug" class="form-control" placeholder="article-url-slug">
+                            <small style="color: #666;">空欄の場合、保存時に記事IDが自動設定されます</small>
+                        </div>
+                    </div>
+
+                    <!-- LINE配信設定 -->
+                    <div class="card">
+                        <div class="card-header">
+                            <h2 class="card-title">LINE配信設定</h2>
+                        </div>
+
+                        <div class="form-group">
+                            <label>
+                                <input type="checkbox" id="line-enabled">
+                                LINEに配信する（即時配信のみ）
+                            </label>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="line-message" class="form-label">配信メッセージ</label>
+                            <textarea id="line-message" class="form-control" rows="4" placeholder="LINE配信用のメッセージを入力（空欄の場合、抜粋からハッシュタグを除いたものがセットされます）"></textarea>
+                        </div>
+                    </div>
+
+                    <!-- X投稿設定 -->
+                    <div class="card">
+                        <div class="card-header">
+                            <h2 class="card-title">X（Twitter）投稿設定</h2>
+                        </div>
+
+                        <div class="form-group">
+                            <label>
+                                <input type="checkbox" id="x-enabled">
+                                Xに投稿する（即時投稿のみ）
+                            </label>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="x-message" class="form-label">投稿内容</label>
+                            <textarea id="x-message" class="form-control" rows="4" placeholder="X投稿用のメッセージを入力（280文字以内。空欄の場合、抜粋がそのままセットされます）" maxlength="280"></textarea>
+                            <small style="color: var(--text-secondary);">0 / 280 文字</small>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="x-hashtags" class="form-label">ハッシュタグ</label>
+                            <input type="text" id="x-hashtags" class="form-control" placeholder="#旭丘一丁目 #町会" value="#旭丘一丁目">
                         </div>
                     </div>
                 </div>
@@ -683,6 +692,9 @@
 
     <!-- 管理画面共通機能 -->
     <script src="js/app.js"></script>
+
+    <!-- 静的ページ生成クライアント -->
+    <script src="js/static-generator-client.js"></script>
 
     <!-- 記事編集機能 -->
     <script src="js/article-editor.js"></script>

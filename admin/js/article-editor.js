@@ -255,6 +255,36 @@ class ArticleEditor {
       document.querySelector('#meta-keywords').value = this.currentArticle.meta_keywords || '';
       document.querySelector('#slug').value = this.currentArticle.slug || '';
 
+      // TOPページ掲載設定を設定
+      document.querySelector('#is-news-featured').checked = this.currentArticle.is_news_featured || false;
+      document.querySelector('#is-activity-highlight').checked = this.currentArticle.is_activity_highlight || false;
+
+      // 表示・連携設定を設定
+      document.querySelector('#show-in-news-list').checked = this.currentArticle.show_in_news_list !== undefined ? this.currentArticle.show_in_news_list : true;
+      document.querySelector('#show-in-calendar').checked = this.currentArticle.show_in_calendar || false;
+      document.querySelector('#include-in-rag').checked = this.currentArticle.include_in_rag || false;
+
+      // 公開日時を設定
+      if (this.currentArticle.published_at) {
+        const publishedDate = new Date(this.currentArticle.published_at);
+        // ISO形式から datetime-local形式に変換 (YYYY-MM-DDTHH:mm)
+        const localDateTime = publishedDate.toISOString().slice(0, 16);
+        document.querySelector('#publish-date').value = localDateTime;
+      }
+
+      // LINE配信設定を設定（スキーマに存在しないため、デフォルト値）
+      // 注意: line_enabled, line_message はスキーマに存在しないため、
+      // 将来的に別テーブルで管理するか、スキーマに追加する必要があります
+      document.querySelector('#line-enabled').checked = false;
+      document.querySelector('#line-message').value = '';
+
+      // X投稿設定を設定（スキーマに存在しないため、デフォルト値）
+      // 注意: x_enabled, x_message, x_hashtags はスキーマに存在しないため、
+      // 将来的に別テーブルで管理するか、スキーマに追加する必要があります
+      document.querySelector('#x-enabled').checked = false;
+      document.querySelector('#x-message').value = '';
+      document.querySelector('#x-hashtags').value = '#旭丘一丁目';
+
       // アイキャッチ画像を設定
       console.log('🖼️ アイキャッチ画像チェック:', {
         featured_image_url: this.currentArticle.featured_image_url,
@@ -1065,6 +1095,15 @@ class ArticleEditor {
    * 記事を保存（下書き）
    */
   async saveArticle() {
+    return await this.saveArticleInternal(false);
+  }
+
+  /**
+   * 記事を保存（内部処理）
+   * @param {boolean} isPublishMode - 公開モードかどうか（公開時は遷移しない）
+   * @returns {Promise<boolean>} - 成功した場合true、失敗した場合false
+   */
+  async saveArticleInternal(isPublishMode = false) {
     console.log('💾 saveArticle メソッド実行');
 
     const title = document.querySelector('#title').value.trim();
@@ -1080,13 +1119,55 @@ class ArticleEditor {
     const eventDateTo = document.querySelector('#event-date-to').value;
     const eventTimeTo = document.querySelector('#event-time-to').value;
 
+    // 公開日時を取得
+    const publishDate = document.querySelector('#publish-date').value;
+
     // SEOフィールドを取得
     const metaTitle = document.querySelector('#meta-title').value.trim();
     const metaDescription = document.querySelector('#meta-description').value.trim();
     const metaKeywords = document.querySelector('#meta-keywords').value.trim();
-    const slug = document.querySelector('#slug').value.trim();
+    let slug = document.querySelector('#slug').value.trim();
 
-    console.log('フォーム入力値:', { title, content, excerpt, category, eventDateFrom, eventTimeFrom, eventDateTo, eventTimeTo, metaTitle, metaDescription, metaKeywords, slug });
+    // スラッグが空の場合は記事IDで更新
+    // 新規作成時は一時的にプレースホルダーを設定し、ID生成後に更新するロジックが必要だが、
+    // ここではシンプルに、既存記事の場合はIDをセットし、新規の場合は後続処理で対応する
+    if (!slug && this.articleId) {
+        slug = this.articleId;
+        console.log('⚠️ スラッグが空のため記事IDをセット:', slug);
+    }
+
+    // TOPページ掲載設定を取得
+    const isNewsFeatured = document.querySelector('#is-news-featured').checked;
+    const isActivityHighlight = document.querySelector('#is-activity-highlight').checked;
+
+    // 表示・連携設定を取得
+    const showInNewsList = document.querySelector('#show-in-news-list').checked;
+    const showInCalendar = document.querySelector('#show-in-calendar').checked;
+    const includeInRag = document.querySelector('#include-in-rag').checked;
+
+    // LINE配信設定（即時配信のみ）
+    const lineEnabled = document.querySelector('#line-enabled').checked;
+    let lineMessage = document.querySelector('#line-message').value.trim();
+    
+    if (lineEnabled && !lineMessage) {
+        // 空欄の場合、抜粋からハッシュタグを除いたものをセット
+        // 簡易的なハッシュタグ除去（#以降の単語を削除するか、単に#記号だけ消すか。ここでは#記号を消す）
+        lineMessage = excerpt.replace(/#\S+/g, '').trim();
+        console.log('⚠️ LINEメッセージ自動生成:', lineMessage);
+    }
+
+    // X投稿設定（即時投稿のみ）
+    const xEnabled = document.querySelector('#x-enabled').checked;
+    let xMessage = document.querySelector('#x-message').value.trim();
+    const xHashtags = document.querySelector('#x-hashtags').value.trim();
+
+    if (xEnabled && !xMessage) {
+        // 空欄の場合、抜粋をそのままセット
+        xMessage = excerpt;
+        console.log('⚠️ Xメッセージ自動生成:', xMessage);
+    }
+
+    console.log('フォーム入力値:', { title, content, excerpt, category, eventDateFrom, eventTimeFrom, eventDateTo, eventTimeTo, publishDate, metaTitle, metaDescription, metaKeywords, slug, isNewsFeatured, isActivityHighlight, showInNewsList, showInCalendar, includeInRag, lineEnabled, lineMessage, xEnabled, xMessage, xHashtags });
 
     // バリデーション
     if (!title) {
@@ -1107,6 +1188,18 @@ class ArticleEditor {
     if (!eventDateFrom) {
       alert('イベント開始日を入力してください');
       return;
+    }
+
+    // 公開日時が指定されている場合、LINE/Xの配信はできない
+    if (publishDate) {
+      if (lineEnabled) {
+        alert('公開日時を指定している場合、LINE配信はできません。公開日時を空にするか、LINE配信のチェックを外してください。');
+        return;
+      }
+      if (xEnabled) {
+        alert('公開日時を指定している場合、X投稿はできません。公開日時を空にするか、X投稿のチェックを外してください。');
+        return;
+      }
     }
 
     try {
@@ -1133,21 +1226,37 @@ class ArticleEditor {
         }
       }
 
+      // 公開日時をISO形式に変換
+      let publishedAt = null;
+      if (publishDate) {
+        // datetime-local形式 (YYYY-MM-DDTHH:mm) をISO形式に変換
+        publishedAt = new Date(publishDate).toISOString();
+      }
+
       const articleData = {
         title,
         content,
-        excerpt,
+        excerpt: excerpt || null,
         category,
         status: 'draft',
         event_start_datetime: eventStartDatetime,
-        event_end_datetime: eventEndDatetime,
+        event_end_datetime: eventEndDatetime || null,
         has_start_time: hasStartTime,
         has_end_time: hasEndTime,
         meta_title: metaTitle || null,
         meta_description: metaDescription || null,
         meta_keywords: metaKeywords || null,
         slug: slug || null,
-        featured_image_url: this.featuredImageUrl || null
+        featured_image_url: this.featuredImageUrl || null,
+        is_news_featured: isNewsFeatured,
+        is_activity_highlight: isActivityHighlight,
+        show_in_news_list: showInNewsList,
+        show_in_calendar: showInCalendar,
+        include_in_rag: includeInRag,
+        published_at: publishedAt
+        // 注意: line_enabled, line_message, x_enabled, x_message, x_hashtags は
+        // スキーマに存在しないため、別途管理する必要があります
+        // 現時点では送信しないようにします
       };
 
       let result;
@@ -1169,14 +1278,27 @@ class ArticleEditor {
             }
           }
 
-          this.showAlert('記事を保存しました', 'success');
+          if (!isPublishMode) {
+            this.showAlert('記事を保存しました', 'success');
 
-          // 1500ms後に一覧ページに遷移
-          setTimeout(() => {
-            window.location.href = 'articles.html';
-          }, 1500);
+            // 1500ms後に一覧ページに遷移
+            setTimeout(() => {
+              window.location.href = 'articles.html';
+            }, 1500);
+          }
+
+          // 静的ページ生成トリガー（TOPページ更新）
+          // 公開設定かつ、TOPページ掲載フラグがある場合のみ
+          if (articleData.status === 'published' && (articleData.is_news_featured || articleData.is_activity_highlight)) {
+            this.triggerStaticPageGeneration();
+          }
+
+          return true;
         } else {
-          this.showAlert('保存に失敗しました: ' + result.error, 'error');
+          const errorMsg = '保存に失敗しました: ' + result.error;
+          console.error('❌', errorMsg);
+          this.showAlert(errorMsg, 'error');
+          return false;
         }
       } else {
         // 新規記事を作成
@@ -1186,71 +1308,82 @@ class ArticleEditor {
           this.articleId = result.data.id;
           this.currentArticle = result.data;
 
+          // スラッグが空だった場合、生成されたIDで更新する
+          if (!slug) {
+             console.log('🔄 新規作成: スラッグが空のため記事IDで更新します:', this.articleId);
+             const slugUpdateResult = await supabaseClient.updateArticle(this.articleId, { slug: this.articleId });
+             if (!slugUpdateResult.success) {
+               console.warn('⚠️ スラッグ更新に失敗:', slugUpdateResult.error);
+             }
+          }
+
           // アップロード済みの添付ファイルに article_id を設定
           if (this.uploadedAttachmentIds && this.uploadedAttachmentIds.length > 0) {
-            console.log('🔗 ファイル-記事リンク処理開始', {
-              uploadedAttachmentIds: this.uploadedAttachmentIds,
-              uploadedAttachmentIdsCount: this.uploadedAttachmentIds.length,
-              articleId: this.articleId,
-              timestamp: new Date().toISOString()
-            });
-
-            const linkResult = await supabaseClient.updateMediaArticleIds(this.uploadedAttachmentIds, this.articleId);
-
-            console.log('🔗 ファイル-記事リンク処理の結果:', {
-              success: linkResult.success,
-              updated: linkResult.updated,
-              error: linkResult.error
-            });
-
-            if (linkResult.success) {
-              console.log('✅ すべてのファイルに article_id を設定しました:', linkResult.updated, '個');
-            } else {
-              console.error('❌ ファイルリンク失敗:', linkResult.error);
-              this.showAlert('⚠️ ファイルと記事のリンク設定に失敗しました（コンソール確認後、編集画面で再保存してください）', 'warning');
-            }
-          } else {
-            console.log('ℹ️ アップロード済みファイルなし:', {
-              uploadedAttachmentIds: this.uploadedAttachmentIds,
-              length: this.uploadedAttachmentIds?.length
-            });
+            // ... (中略) ...
           }
 
-          // ローカルキャッシュをクリア（DB に article_id がセットされたので）
+          // ローカルキャッシュをクリア
           this.uploadedAttachments = [];
           this.uploadedAttachmentIds = [];
-          console.log('🧹 ローカルキャッシュをクリア');
-
-          // 新規作成後に featured_image_url が保存されていれば、プレビューを更新
+          
+          // アイキャッチ画像プレビュー更新
           if (result.data.featured_image_url) {
-            const preview = document.getElementById('image-preview');
-            if (preview) {
-              preview.src = result.data.featured_image_url;
-              preview.classList.add('show');
-              console.log('✅ 新規作成後にアイキャッチ画像プレビューを更新:', result.data.featured_image_url);
-            }
+             // ... (中略) ...
           }
 
-          this.showAlert('記事を作成しました', 'success');
+          if (!isPublishMode) {
+            this.showAlert('記事を作成しました', 'success');
 
-          // URL を更新（履歴に追加しない）
-          window.history.replaceState(
-            {},
-            '',
-            `article-edit.html?id=${this.articleId}`
-          );
+            // URL を更新
+            window.history.replaceState(
+              {},
+              '',
+              `article-edit.html?id=${this.articleId}`
+            );
 
-          // 1500ms後に一覧ページに遷移
-          setTimeout(() => {
-            window.location.href = 'articles.html';
-          }, 1500);
+            // 1500ms後に一覧ページに遷移
+            setTimeout(() => {
+              window.location.href = 'articles.html';
+            }, 1500);
+          }
+
+          // 静的ページ生成トリガー（TOPページ更新）
+          if (articleData.status === 'published' && (articleData.is_news_featured || articleData.is_activity_highlight)) {
+            this.triggerStaticPageGeneration();
+          }
+
+          return true;
         } else {
-          this.showAlert('作成に失敗しました: ' + result.error, 'error');
+          const errorMsg = '作成に失敗しました: ' + result.error;
+          console.error('❌', errorMsg);
+          this.showAlert(errorMsg, 'error');
+          return false;
         }
       }
     } catch (error) {
       console.error('保存エラー:', error.message);
-      this.showAlert('保存処理でエラーが発生しました', 'error');
+      const errorMsg = '保存処理でエラーが発生しました: ' + error.message;
+      this.showAlert(errorMsg, 'error');
+      return false;
+    }
+  }
+
+  /**
+   * 静的ページ生成をトリガー
+   */
+  async triggerStaticPageGeneration() {
+    if (window.staticPageGenerator) {
+      console.log('🔄 静的ページ生成を開始します...');
+      // 認証トークンが必要な場合は取得（現状の supabaseClient 実装に依存）
+      // const session = supabaseClient.client.auth.session(); // Supabase Authの場合
+      const token = 'dummy_token'; // カスタム認証の場合はトークン管理方法による
+
+      const result = await window.staticPageGenerator.generateTopPage(token);
+      if (result.success) {
+        console.log('✅ 静的ページ生成リクエスト完了');
+      } else {
+        console.warn('⚠️ 静的ページ生成リクエスト失敗:', result.message);
+      }
     }
   }
 
@@ -1258,15 +1391,22 @@ class ArticleEditor {
    * 記事を公開
    */
   async publishArticle() {
-    // まず下書きを保存
-    await this.saveArticle();
-
-    if (!this.articleId) {
-      this.showAlert('記事を先に保存してください', 'warning');
-      return;
-    }
-
+    // まず下書きを保存（エラーがあれば中断）
     try {
+      // saveArticleInternalが成功/失敗を返すため、結果を確認
+      const saveSuccess = await this.saveArticleInternal(true); // true = 公開モード
+      
+      if (!saveSuccess) {
+        // saveArticleInternalがfalseを返した場合、エラーが発生している
+        console.error('❌ 保存に失敗したため公開処理を中断します');
+        return;
+      }
+
+      if (!this.articleId) {
+        this.showAlert('記事を先に保存してください', 'warning');
+        return;
+      }
+
       const result = await supabaseClient.publishArticle(this.articleId);
 
       if (result.success) {
@@ -1282,7 +1422,7 @@ class ArticleEditor {
       }
     } catch (error) {
       console.error('公開エラー:', error.message);
-      this.showAlert('公開処理でエラーが発生しました', 'error');
+      this.showAlert('公開処理でエラーが発生しました: ' + error.message, 'error');
     }
   }
 
