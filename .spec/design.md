@@ -2371,8 +2371,171 @@ cors_headers = {
 
 ---
 
+## 15. ニュース記事詳細ページ設計
+
+### 15.1 ディレクトリ構造
+
+ニュース記事の個別ページは `news/` フォルダ内に配置する。
+
+```
+/
+├── news.html                    # お知らせ一覧ページ
+├── news/                        # 記事詳細ページ格納フォルダ
+│   ├── news_template.html       # 記事詳細ページテンプレート
+│   ├── {slug}.html              # 生成される個別記事ページ
+│   └── ...
+├── css/
+│   └── template.css
+└── ...
+```
+
+### 15.2 相対パス設計
+
+`news/` フォルダ内のページからは、親ディレクトリのリソースに `../` でアクセスする。
+
+| リソース種別 | パス |
+|-------------|------|
+| CSS | `../css/template.css` |
+| ホームページ | `../index.html` |
+| お知らせ一覧 | `../news.html` |
+| 事業資料 | `../reports.html` |
+| 町会について | `../town.html` |
+| 災害特集 | `../antidisaster_index.html` |
+| お問い合わせ | `../contact.html` |
+| プライバシーポリシー | `../privacy-policy.html` |
+| 利用規約 | `../terms-of-service.html` |
+
+### 15.3 テンプレート構造 (news_template.html)
+
+#### 15.3.1 HTML構成
+
+```html
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <!-- SEOメタタグ -->
+  <title>{{meta_title}} - 東京都練馬区旭丘一丁目町会</title>
+  <meta name="description" content="{{meta_description}}" />
+  <meta name="keywords" content="{{meta_keywords}}" />
+  <!-- OGPタグ -->
+  <meta property="og:title" content="{{meta_title}}" />
+  <meta property="og:description" content="{{meta_description}}" />
+  <meta property="og:image" content="{{featured_image_url}}" />
+  <!-- Twitter Card -->
+  <meta name="twitter:card" content="summary_large_image" />
+  <!-- CSS (相対パス) -->
+  <link rel="stylesheet" href="../css/template.css" />
+</head>
+<body>
+  <!-- ヘッダー (他ページと共通、リンクは../) -->
+  <header>...</header>
+
+  <main>
+    <!-- パンくずリスト -->
+    <nav class="breadcrumb">
+      ホーム > お知らせ > {{title}}
+    </nav>
+
+    <!-- 記事ヘッダー -->
+    <header class="article-header">
+      <span class="article-category">{{category_label}}</span>
+      <time>{{published_at_formatted}}</time>
+      <h1>{{title}}</h1>
+      <!-- イベント日時 (条件付き表示) -->
+      <div class="event-datetime">{{event_datetime_formatted}}</div>
+    </header>
+
+    <!-- アイキャッチ画像 -->
+    <img src="{{featured_image_url}}" alt="{{title}}" />
+
+    <!-- 記事本文 -->
+    <div class="article-content">{{content}}</div>
+
+    <!-- 添付ファイル -->
+    <section class="attachments-section">...</section>
+
+    <!-- シェアボタン -->
+    <section class="share-section">
+      <a href="LINE共有URL">LINEで送る</a>
+      <a href="X共有URL">Xでポスト</a>
+      <a href="Facebook共有URL">Facebookでシェア</a>
+    </section>
+
+    <!-- 前後記事ナビゲーション -->
+    <nav class="article-navigation">
+      <a href="{{prev_article.slug}}.html">前の記事</a>
+      <a href="{{next_article.slug}}.html">次の記事</a>
+      <a href="../news.html">お知らせ一覧に戻る</a>
+    </nav>
+  </main>
+
+  <!-- フッター (他ページと共通、リンクは../) -->
+  <footer>...</footer>
+
+  <!-- Dify チャットボット -->
+  <script>...</script>
+</body>
+</html>
+```
+
+#### 15.3.2 テンプレート変数一覧
+
+| 変数名 | 型 | 説明 |
+|--------|-----|------|
+| `{{title}}` | String | 記事タイトル |
+| `{{content}}` | HTML | 記事本文（HTMLとして出力） |
+| `{{excerpt}}` | String | 抜粋 |
+| `{{category}}` | String | カテゴリID (notice, event等) |
+| `{{category_label}}` | String | カテゴリ表示名 |
+| `{{published_at}}` | String | ISO8601形式の公開日時 |
+| `{{published_at_formatted}}` | String | 表示用フォーマット済み日時 |
+| `{{featured_image_url}}` | String | アイキャッチ画像URL |
+| `{{meta_title}}` | String | SEOタイトル |
+| `{{meta_description}}` | String | SEOディスクリプション |
+| `{{meta_keywords}}` | String | SEOキーワード |
+| `{{article_url}}` | String | 記事の完全URL |
+| `{{article_url_encoded}}` | String | URLエンコード済みURL |
+| `{{title_encoded}}` | String | URLエンコード済みタイトル |
+| `{{event_datetime_formatted}}` | String | イベント日時（表示用） |
+| `{{attachments}}` | Array | 添付ファイル配列 |
+| `{{prev_article}}` | Object | 前の記事情報 |
+| `{{next_article}}` | Object | 次の記事情報 |
+
+#### 15.3.3 カテゴリ別スタイル
+
+```css
+.category-notice { background: #dbeafe; color: #1e40af; }
+.category-event { background: #fef3c7; color: #92400e; }
+.category-disaster_safety { background: #fee2e2; color: #991b1b; }
+.category-child_support { background: #d1fae5; color: #065f46; }
+.category-shopping_info { background: #fce7f3; color: #9d174d; }
+.category-activity_report { background: #e0e7ff; color: #3730a3; }
+```
+
+### 15.4 静的ページ生成フロー
+
+1. 管理画面で記事を公開
+2. Lambda関数 `page-generator` を呼び出し
+3. Supabaseから記事データを取得
+4. `news_template.html` をテンプレートとして使用
+5. テンプレート変数を記事データで置換
+6. 生成したHTMLを `news/{slug}.html` としてS3にアップロード
+7. CloudFrontキャッシュを無効化
+
+### 15.5 リンク先構成
+
+| リンク元 | リンク先 |
+|---------|---------|
+| news.html 記事一覧 | `news/{slug}.html` |
+| index.html 最新情報 | `news/{slug}.html` |
+| カレンダーイベント | `news/{slug}.html` |
+| 記事詳細 前後ナビ | `{prev_slug}.html`, `{next_slug}.html` |
+| 記事詳細 一覧へ戻る | `../news.html` |
+
+---
+
 **文書作成日**: 2025年11月13日
-**最終更新**: 2025年11月16日
-**バージョン**: 2.2（AI記事生成機能実装完了）
+**最終更新**: 2025年12月07日
+**バージョン**: 2.3（ニュース記事詳細ページテンプレート追加）
 **ステータス**: 第1フェーズ完了、AI記事生成実装済み、静的ページ生成設計完了
 **次回レビュー**: 第2フェーズ開始時
