@@ -1633,8 +1633,8 @@ Response: 200 OK
 {
   "success": true,
   "generated_at": "2025-11-15T10:30:00Z",
-  "file_path": "s3://asahigaoka-website/articles/mochitsuki-2025-11-15.html",
-  "url": "https://asahigaoka-website.com/articles/mochitsuki-2025-11-15.html",
+  "file_path": "s3://asahigaoka-website/news/mochitsuki-2025-11-15.html",
+  "url": "https://asahigaoka-website.com/news/mochitsuki-2025-11-15.html",
   "cache_invalidated": true
 }
 ```
@@ -1643,9 +1643,26 @@ Response: 200 OK
 1. 記事データ取得（ID or slug）
 2. 添付ファイル取得
 3. 前後の記事取得（ナビゲーション用）
-4. テンプレートで記事詳細ページを生成
-5. S3 にアップロード（articles/{slug}.html）
+4. テンプレート（`news/news_template.html`）で記事詳細ページを生成
+5. S3 にアップロード（`news/{slug}.html`）
 6. CloudFront キャッシュ無効化
+
+**出力先ディレクトリ構造**:
+```
+/
+├── news.html                    # お知らせ一覧ページ
+├── news/                        # 記事詳細ページ格納フォルダ
+│   ├── news_template.html       # 記事詳細ページテンプレート
+│   ├── {slug}.html              # 生成される個別記事ページ
+│   └── ...
+└── ...
+```
+
+**相対パス設計**:
+`news/` フォルダ内のページからは、親ディレクトリのリソースに `../` でアクセス。
+- CSS: `../css/template.css`
+- ホームページ: `../index.html`
+- お知らせ一覧: `../news.html`
 
 #### 12.2.4 全ページ一括生成
 
@@ -2066,7 +2083,7 @@ Response: 200 OK
 ---
 
 **文書作成日**: 2025年11月13日
-**最終更新**: 2025年11月24日
-**バージョン**: 2.3（記事編集画面改善、バリデーション強化）
-**ステータス**: 第1フェーズ実装完了、記事編集機能改善完了
+**最終更新**: 2025年12月07日
+**バージョン**: 2.4（news フォルダ構造追加）
+**ステータス**: 第1フェーズ実装完了、記事編集機能改善完了、ニュース詳細ページテンプレート追加
 
