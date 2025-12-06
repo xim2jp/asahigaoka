@@ -75,3 +75,4 @@ class StaticPageGenerator {
 // グローバルインスタンス作成
 window.staticPageGenerator = new StaticPageGenerator();
 
+
