@@ -260,6 +260,7 @@ class ArticleEditor {
       document.querySelector('#is-activity-highlight').checked = this.currentArticle.is_activity_highlight || false;
 
       // 表示・連携設定を設定
+      document.querySelector('#generate-article-page').checked = this.currentArticle.generate_article_page !== undefined ? this.currentArticle.generate_article_page : true;
       document.querySelector('#show-in-news-list').checked = this.currentArticle.show_in_news_list !== undefined ? this.currentArticle.show_in_news_list : true;
       document.querySelector('#show-in-calendar').checked = this.currentArticle.show_in_calendar || false;
       document.querySelector('#include-in-rag').checked = this.currentArticle.include_in_rag || false;
@@ -1137,6 +1138,7 @@ class ArticleEditor {
     const isActivityHighlight = document.querySelector('#is-activity-highlight').checked;
 
     // 表示・連携設定を取得
+    const generateArticlePage = document.querySelector('#generate-article-page').checked;
     const showInNewsList = document.querySelector('#show-in-news-list').checked;
     const showInCalendar = document.querySelector('#show-in-calendar').checked;
     const includeInRag = document.querySelector('#include-in-rag').checked;
@@ -1246,6 +1248,7 @@ class ArticleEditor {
         featured_image_url: this.featuredImageUrl || null,
         is_news_featured: isNewsFeatured,
         is_activity_highlight: isActivityHighlight,
+        generate_article_page: generateArticlePage,
         show_in_news_list: showInNewsList,
         show_in_calendar: showInCalendar,
         include_in_rag: includeInRag,
@@ -1302,6 +1305,15 @@ class ArticleEditor {
           // 公開設定かつ、TOPページ掲載フラグがある場合のみ
           if (articleData.status === 'published' && (articleData.is_news_featured || articleData.is_activity_highlight)) {
             this.triggerStaticPageGeneration();
+          }
+
+          // 記事ページ生成・お知らせ一覧更新
+          if (window.staticPageGenerator) {
+            await window.staticPageGenerator.processArticleSave(result.data, {
+              generateArticlePage: generateArticlePage,
+              showInNewsList: showInNewsList,
+              showInCalendar: showInCalendar
+            });
           }
 
           return true;
@@ -1373,6 +1385,15 @@ class ArticleEditor {
           // 静的ページ生成トリガー（TOPページ更新）
           if (articleData.status === 'published' && (articleData.is_news_featured || articleData.is_activity_highlight)) {
             this.triggerStaticPageGeneration();
+          }
+
+          // 記事ページ生成・お知らせ一覧更新
+          if (window.staticPageGenerator) {
+            await window.staticPageGenerator.processArticleSave(result.data, {
+              generateArticlePage: generateArticlePage,
+              showInNewsList: showInNewsList,
+              showInCalendar: showInCalendar
+            });
           }
 
           return true;
