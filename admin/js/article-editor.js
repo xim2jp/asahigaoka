@@ -272,16 +272,12 @@ class ArticleEditor {
         document.querySelector('#publish-date').value = localDateTime;
       }
 
-      // LINE配信設定を設定（スキーマに存在しないため、デフォルト値）
-      // 注意: line_enabled, line_message はスキーマに存在しないため、
-      // 将来的に別テーブルで管理するか、スキーマに追加する必要があります
-      document.querySelector('#line-enabled').checked = false;
+      // LINE配信設定を設定（line_publishedはスキーマに存在）
+      document.querySelector('#line-enabled').checked = this.currentArticle.line_published || false;
       document.querySelector('#line-message').value = '';
 
-      // X投稿設定を設定（スキーマに存在しないため、デフォルト値）
-      // 注意: x_enabled, x_message, x_hashtags はスキーマに存在しないため、
-      // 将来的に別テーブルで管理するか、スキーマに追加する必要があります
-      document.querySelector('#x-enabled').checked = false;
+      // X投稿設定を設定（x_publishedはスキーマに存在）
+      document.querySelector('#x-enabled').checked = this.currentArticle.x_published || false;
       document.querySelector('#x-message').value = '';
       document.querySelector('#x-hashtags').value = '#旭丘一丁目';
 
@@ -1253,11 +1249,14 @@ class ArticleEditor {
         show_in_news_list: showInNewsList,
         show_in_calendar: showInCalendar,
         include_in_rag: includeInRag,
-        published_at: publishedAt
-        // 注意: line_enabled, line_message, x_enabled, x_message, x_hashtags は
-        // スキーマに存在しないため、別途管理する必要があります
-        // 現時点では送信しないようにします
+        published_at: publishedAt,
+        line_published: lineEnabled,
+        x_published: xEnabled
       };
+
+      // LINE/X投稿判定用: 更新前の状態を保存
+      const previousLinePublished = this.currentArticle?.line_published || false;
+      const previousXPublished = this.currentArticle?.x_published || false;
 
       let result;
 
@@ -1276,6 +1275,18 @@ class ArticleEditor {
               preview.classList.add('show');
               console.log('✅ 更新後にアイキャッチ画像プレビューを更新:', result.data.featured_image_url);
             }
+          }
+
+          // LINE通知トリガー: 更新時、line_publishedがfalse→trueに変更された場合
+          if (!previousLinePublished && lineEnabled) {
+            console.log('📢 LINE通知トリガー: line_publishedがfalse→trueに変更');
+            await this.postToLine(title, excerpt, lineMessage, result.data.slug || this.articleId);
+          }
+
+          // X投稿トリガー: 更新時、x_publishedがfalse→trueに変更された場合
+          if (!previousXPublished && xEnabled) {
+            console.log('📢 X投稿トリガー: x_publishedがfalse→trueに変更');
+            await this.postToX(title, excerpt, xMessage, xHashtags, result.data.slug || this.articleId);
           }
 
           if (!isPublishMode) {
@@ -1329,6 +1340,18 @@ class ArticleEditor {
           // アイキャッチ画像プレビュー更新
           if (result.data.featured_image_url) {
              // ... (中略) ...
+          }
+
+          // LINE通知トリガー: 新規作成時、line_published=trueの場合
+          if (lineEnabled) {
+            console.log('📢 LINE通知トリガー: 新規作成でline_published=true');
+            await this.postToLine(title, excerpt, lineMessage, result.data.slug || this.articleId);
+          }
+
+          // X投稿トリガー: 新規作成時、x_published=trueの場合
+          if (xEnabled) {
+            console.log('📢 X投稿トリガー: 新規作成でx_published=true');
+            await this.postToX(title, excerpt, xMessage, xHashtags, result.data.slug || this.articleId);
           }
 
           if (!isPublishMode) {
@@ -1791,6 +1814,121 @@ class ArticleEditor {
     if (overlay) {
       overlay.style.display = 'none';
       console.log('🔓 処理中オーバーレイを非表示');
+    }
+  }
+
+  /**
+   * LINEに通知（ブロードキャスト）
+   * @param {string} title - 記事タイトル
+   * @param {string} excerpt - 抜粋（SNS用）
+   * @param {string} lineMessage - カスタムメッセージ（空の場合はexcerptを使用）
+   * @param {string} slug - 記事スラッグ（URL用）
+   */
+  async postToLine(title, excerpt, lineMessage, slug) {
+    const endpoint = window.LINE_BROADCAST_ENDPOINT;
+    if (!endpoint) {
+      console.error('❌ LINE通知エンドポイントが設定されていません');
+      this.showAlert('LINE通知エンドポイントが設定されていません', 'error');
+      return;
+    }
+
+    try {
+      console.log('📢 LINE通知処理を開始...');
+
+      // 通知メッセージを組み立て
+      const articleUrl = `https://asahigaoka-nerima.tokyo/news/${slug}.html`;
+      let message = lineMessage || excerpt || title;
+
+      // タイトルとURLを追加
+      message = `【新着記事】${title}\n\n${message}\n\n${articleUrl}`;
+
+      console.log('📝 LINE通知内容:', message);
+
+      const response = await fetch(endpoint, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ message })
+      });
+
+      const result = await response.json();
+
+      if (response.ok && result.status === 'success') {
+        console.log('✅ LINE通知成功:', result.line_response);
+        this.showAlert('LINEへの通知が完了しました', 'success');
+      } else {
+        console.error('❌ LINE通知失敗:', result);
+        this.showAlert(`LINE通知に失敗しました: ${result.message || 'Unknown error'}`, 'error');
+      }
+    } catch (error) {
+      console.error('❌ LINE通知エラー:', error);
+      this.showAlert(`LINE通知処理でエラーが発生しました: ${error.message}`, 'error');
+    }
+  }
+
+  /**
+   * Xに投稿
+   * @param {string} title - 記事タイトル
+   * @param {string} excerpt - 抜粋（SNS用）
+   * @param {string} xMessage - カスタムメッセージ（空の場合はexcerptを使用）
+   * @param {string} xHashtags - ハッシュタグ
+   * @param {string} slug - 記事スラッグ（URL用）
+   */
+  async postToX(title, excerpt, xMessage, xHashtags, slug) {
+    const endpoint = window.X_POST_ENDPOINT;
+    if (!endpoint) {
+      console.error('❌ X投稿エンドポイントが設定されていません');
+      this.showAlert('X投稿エンドポイントが設定されていません', 'error');
+      return;
+    }
+
+    try {
+      console.log('📢 X投稿処理を開始...');
+
+      // 投稿メッセージを組み立て
+      let message = xMessage || excerpt || title;
+
+      // ハッシュタグを追加
+      if (xHashtags) {
+        message = `${message}\n${xHashtags}`;
+      }
+
+      // 記事URLを追加
+      const articleUrl = `https://asahigaoka-nerima.tokyo/news/${slug}.html`;
+      message = `${message}\n${articleUrl}`;
+
+      // 280文字制限に収める
+      if (message.length > 280) {
+        // URLとハッシュタグの長さを計算
+        const urlAndTags = `\n${xHashtags || ''}\n${articleUrl}`;
+        const maxContentLength = 280 - urlAndTags.length;
+        const truncatedContent = (xMessage || excerpt || title).substring(0, maxContentLength - 3) + '...';
+        message = `${truncatedContent}${urlAndTags}`;
+      }
+
+      console.log('📝 投稿内容:', message);
+
+      const response = await fetch(endpoint, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ message })
+      });
+
+      const result = await response.json();
+
+      if (response.ok && result.status === 'success') {
+        console.log('✅ X投稿成功:', result.tweet_response);
+        this.showAlert('Xへの投稿が完了しました', 'success');
+      } else {
+        console.error('❌ X投稿失敗:', result);
+        this.showAlert(`X投稿に失敗しました: ${result.message || 'Unknown error'}`, 'error');
+      }
+    } catch (error) {
+      console.error('❌ X投稿エラー:', error);
+      this.showAlert(`X投稿処理でエラーが発生しました: ${error.message}`, 'error');
     }
   }
 
