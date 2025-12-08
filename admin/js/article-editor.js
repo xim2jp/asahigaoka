@@ -278,10 +278,8 @@ class ArticleEditor {
       document.querySelector('#line-enabled').checked = false;
       document.querySelector('#line-message').value = '';
 
-      // X投稿設定を設定（スキーマに存在しないため、デフォルト値）
-      // 注意: x_enabled, x_message, x_hashtags はスキーマに存在しないため、
-      // 将来的に別テーブルで管理するか、スキーマに追加する必要があります
-      document.querySelector('#x-enabled').checked = false;
+      // X投稿設定を設定（x_publishedはスキーマに存在）
+      document.querySelector('#x-enabled').checked = this.currentArticle.x_published || false;
       document.querySelector('#x-message').value = '';
       document.querySelector('#x-hashtags').value = '#旭丘一丁目';
 
@@ -1253,11 +1251,12 @@ class ArticleEditor {
         show_in_news_list: showInNewsList,
         show_in_calendar: showInCalendar,
         include_in_rag: includeInRag,
-        published_at: publishedAt
-        // 注意: line_enabled, line_message, x_enabled, x_message, x_hashtags は
-        // スキーマに存在しないため、別途管理する必要があります
-        // 現時点では送信しないようにします
+        published_at: publishedAt,
+        x_published: xEnabled
       };
+
+      // X投稿判定用: 更新前のx_published状態を保存
+      const previousXPublished = this.currentArticle?.x_published || false;
 
       let result;
 
@@ -1276,6 +1275,12 @@ class ArticleEditor {
               preview.classList.add('show');
               console.log('✅ 更新後にアイキャッチ画像プレビューを更新:', result.data.featured_image_url);
             }
+          }
+
+          // X投稿トリガー: 更新時、x_publishedがfalse→trueに変更された場合
+          if (!previousXPublished && xEnabled) {
+            console.log('📢 X投稿トリガー: x_publishedがfalse→trueに変更');
+            await this.postToX(title, excerpt, xMessage, xHashtags, result.data.slug || this.articleId);
           }
 
           if (!isPublishMode) {
@@ -1329,6 +1334,12 @@ class ArticleEditor {
           // アイキャッチ画像プレビュー更新
           if (result.data.featured_image_url) {
              // ... (中略) ...
+          }
+
+          // X投稿トリガー: 新規作成時、x_published=trueの場合
+          if (xEnabled) {
+            console.log('📢 X投稿トリガー: 新規作成でx_published=true');
+            await this.postToX(title, excerpt, xMessage, xHashtags, result.data.slug || this.articleId);
           }
 
           if (!isPublishMode) {
@@ -1791,6 +1802,71 @@ class ArticleEditor {
     if (overlay) {
       overlay.style.display = 'none';
       console.log('🔓 処理中オーバーレイを非表示');
+    }
+  }
+
+  /**
+   * Xに投稿
+   * @param {string} title - 記事タイトル
+   * @param {string} excerpt - 抜粋（SNS用）
+   * @param {string} xMessage - カスタムメッセージ（空の場合はexcerptを使用）
+   * @param {string} xHashtags - ハッシュタグ
+   * @param {string} slug - 記事スラッグ（URL用）
+   */
+  async postToX(title, excerpt, xMessage, xHashtags, slug) {
+    const endpoint = window.X_POST_ENDPOINT;
+    if (!endpoint) {
+      console.error('❌ X投稿エンドポイントが設定されていません');
+      this.showAlert('X投稿エンドポイントが設定されていません', 'error');
+      return;
+    }
+
+    try {
+      console.log('📢 X投稿処理を開始...');
+
+      // 投稿メッセージを組み立て
+      let message = xMessage || excerpt || title;
+
+      // ハッシュタグを追加
+      if (xHashtags) {
+        message = `${message}\n${xHashtags}`;
+      }
+
+      // 記事URLを追加
+      const articleUrl = `https://asahigaoka-nerima.tokyo/news/${slug}.html`;
+      message = `${message}\n${articleUrl}`;
+
+      // 280文字制限に収める
+      if (message.length > 280) {
+        // URLとハッシュタグの長さを計算
+        const urlAndTags = `\n${xHashtags || ''}\n${articleUrl}`;
+        const maxContentLength = 280 - urlAndTags.length;
+        const truncatedContent = (xMessage || excerpt || title).substring(0, maxContentLength - 3) + '...';
+        message = `${truncatedContent}${urlAndTags}`;
+      }
+
+      console.log('📝 投稿内容:', message);
+
+      const response = await fetch(endpoint, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ message })
+      });
+
+      const result = await response.json();
+
+      if (response.ok && result.status === 'success') {
+        console.log('✅ X投稿成功:', result.tweet_response);
+        this.showAlert('Xへの投稿が完了しました', 'success');
+      } else {
+        console.error('❌ X投稿失敗:', result);
+        this.showAlert(`X投稿に失敗しました: ${result.message || 'Unknown error'}`, 'error');
+      }
+    } catch (error) {
+      console.error('❌ X投稿エラー:', error);
+      this.showAlert(`X投稿処理でエラーが発生しました: ${error.message}`, 'error');
     }
   }
 
