@@ -17,3 +17,6 @@ window.PAGE_GENERATOR_ENDPOINT = 'https://api.asahigaoka-nerima.tokyo/api/genera
 
 // X投稿 API エンドポイント（Lambda経由）
 window.X_POST_ENDPOINT = 'https://wgoz4zndo3.execute-api.ap-northeast-1.amazonaws.com/prod/x-post';
+
+// LINE通知 API エンドポイント（Lambda経由）
+window.LINE_BROADCAST_ENDPOINT = 'https://wgoz4zndo3.execute-api.ap-northeast-1.amazonaws.com/prod/line-broadcast';
