@@ -106,6 +106,19 @@ def lambda_handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
         slug = article.get('slug') or article.get('id')
         file_path = f'news/{slug}.html'
 
+        # 削除フラグが立っていない場合のみステータスチェック
+        # ステータスが 'published' でない場合は詳細ページを生成しない
+        if not delete_flag and article.get('status') != 'published':
+            print(f'記事が公開状態ではありません: status={article.get("status")}')
+            return {
+                'statusCode': 400,
+                'headers': cors_headers,
+                'body': json.dumps({
+                    'success': False,
+                    'error': f'Article is not published (status: {article.get("status")}). Only published articles can have detail pages.'
+                }, ensure_ascii=False)
+            }
+
         if delete_flag:
             # 削除処理
             result = delete_from_github(

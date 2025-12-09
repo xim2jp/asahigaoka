@@ -1260,6 +1260,7 @@ class ArticleEditor {
       // LINE/X投稿判定用: 更新前の状態を保存
       const previousLinePublished = this.currentArticle?.line_published || false;
       const previousXPublished = this.currentArticle?.x_published || false;
+      const previousStatus = this.currentArticle?.status || 'draft';
 
       let result;
 
@@ -1280,16 +1281,22 @@ class ArticleEditor {
             }
           }
 
-          // LINE通知トリガー: 更新時、line_publishedがfalse→trueに変更された場合
-          if (!previousLinePublished && lineEnabled) {
-            console.log('📢 LINE通知トリガー: line_publishedがfalse→trueに変更');
+          // LINE通知トリガー: 公開済み記事で、line_publishedがfalse→trueに変更された場合のみ
+          // ※ 下書き（draft）ではLINE配信しない
+          if (result.data.status === 'published' && !previousLinePublished && lineEnabled) {
+            console.log('📢 LINE通知トリガー: 公開済み記事でline_publishedがfalse→trueに変更');
             await this.postToLine(title, excerpt, lineMessage, result.data.slug || this.articleId);
+          } else if (lineEnabled && result.data.status !== 'published') {
+            console.log('⚠️ LINE配信スキップ: 記事が公開状態ではありません (status:', result.data.status, ')');
           }
 
-          // X投稿トリガー: 更新時、x_publishedがfalse→trueに変更された場合
-          if (!previousXPublished && xEnabled) {
-            console.log('📢 X投稿トリガー: x_publishedがfalse→trueに変更');
+          // X投稿トリガー: 公開済み記事で、x_publishedがfalse→trueに変更された場合のみ
+          // ※ 下書き（draft）ではX投稿しない
+          if (result.data.status === 'published' && !previousXPublished && xEnabled) {
+            console.log('📢 X投稿トリガー: 公開済み記事でx_publishedがfalse→trueに変更');
             await this.postToX(title, excerpt, xMessage, xHashtags, result.data.slug || this.articleId);
+          } else if (xEnabled && result.data.status !== 'published') {
+            console.log('⚠️ X投稿スキップ: 記事が公開状態ではありません (status:', result.data.status, ')');
           }
 
           if (!isPublishMode) {
@@ -1354,16 +1361,16 @@ class ArticleEditor {
              // ... (中略) ...
           }
 
-          // LINE通知トリガー: 新規作成時、line_published=trueの場合
+          // LINE通知トリガー: 新規作成時は常にdraft状態なので、LINE配信はスキップ
+          // ※ 公開処理（publishArticle）後に配信される
           if (lineEnabled) {
-            console.log('📢 LINE通知トリガー: 新規作成でline_published=true');
-            await this.postToLine(title, excerpt, lineMessage, result.data.slug || this.articleId);
+            console.log('⚠️ LINE配信スキップ: 新規作成時は下書き状態です。公開後にLINE配信してください。');
           }
 
-          // X投稿トリガー: 新規作成時、x_published=trueの場合
+          // X投稿トリガー: 新規作成時は常にdraft状態なので、X投稿はスキップ
+          // ※ 公開処理（publishArticle）後に投稿される
           if (xEnabled) {
-            console.log('📢 X投稿トリガー: 新規作成でx_published=true');
-            await this.postToX(title, excerpt, xMessage, xHashtags, result.data.slug || this.articleId);
+            console.log('⚠️ X投稿スキップ: 新規作成時は下書き状態です。公開後にX投稿してください。');
           }
 
           if (!isPublishMode) {
@@ -1454,6 +1461,10 @@ class ArticleEditor {
       const result = await supabaseClient.publishArticle(this.articleId);
 
       if (result.success) {
+        // 公開前の状態を取得（LINE/X投稿判定用）
+        const previousLinePublished = this.currentArticle?.line_published || false;
+        const previousXPublished = this.currentArticle?.x_published || false;
+
         this.currentArticle = result.data;
 
         // 詳細ページを生成（公開時のみ）
@@ -1466,6 +1477,27 @@ class ArticleEditor {
             console.warn('⚠️ 記事詳細ページ生成失敗:', detailResult.error);
             // 詳細ページ生成失敗はアラートを出すが、公開処理自体は継続
           }
+        }
+
+        // LINE通知: 公開時にline_publishedがtrueで、まだ配信されていない場合
+        const lineEnabled = document.querySelector('#line-enabled')?.checked || false;
+        const lineMessage = document.querySelector('#line-message')?.value.trim() || '';
+        const excerpt = document.querySelector('#excerpt')?.value.trim() || '';
+        const title = document.querySelector('#title')?.value.trim() || '';
+
+        if (lineEnabled && !previousLinePublished) {
+          console.log('📢 LINE通知トリガー: 公開処理時にLINE配信を実行');
+          await this.postToLine(title, excerpt, lineMessage, result.data.slug || this.articleId);
+        }
+
+        // X投稿: 公開時にx_publishedがtrueで、まだ投稿されていない場合
+        const xEnabled = document.querySelector('#x-enabled')?.checked || false;
+        const xMessage = document.querySelector('#x-message')?.value.trim() || '';
+        const xHashtags = document.querySelector('#x-hashtags')?.value.trim() || '#旭丘一丁目';
+
+        if (xEnabled && !previousXPublished) {
+          console.log('📢 X投稿トリガー: 公開処理時にX投稿を実行');
+          await this.postToX(title, excerpt, xMessage, xHashtags, result.data.slug || this.articleId);
         }
 
         this.showAlert('記事を公開しました', 'success');

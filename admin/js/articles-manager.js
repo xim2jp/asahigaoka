@@ -208,6 +208,11 @@ class ArticlesManager {
         <td>
           <div class="action-buttons">
             <a href="article-edit.html?id=${article.id}" class="btn btn-sm btn-primary">編集</a>
+            ${article.status === 'published' ? `
+              <button class="btn btn-sm btn-warning" data-action="unpublish" data-id="${article.id}">
+                下書きに戻す
+              </button>
+            ` : ''}
             <button class="btn btn-sm btn-danger" data-action="delete" data-id="${article.id}">
               削除
             </button>
@@ -223,6 +228,15 @@ class ArticlesManager {
         e.preventDefault();
         const articleId = btn.getAttribute('data-id');
         this.deleteArticle(articleId);
+      });
+    });
+
+    // 下書きに戻すボタンのイベントリスナー
+    document.querySelectorAll('[data-action="unpublish"]').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        e.preventDefault();
+        const articleId = btn.getAttribute('data-id');
+        this.unpublishArticle(articleId);
       });
     });
 
@@ -277,6 +291,53 @@ class ArticlesManager {
         this.displayArticles();
       });
       paginationContainer.appendChild(nextBtn);
+    }
+  }
+
+  /**
+   * 記事を下書きに戻す（公開解除）
+   * 公開済み記事を下書き状態に戻し、詳細ページを削除する
+   */
+  async unpublishArticle(articleId) {
+    const confirmed = confirm('この記事を下書きに戻しますか？\n（詳細ページがWebサイトから削除されます）');
+    if (!confirmed) return;
+
+    try {
+      // 1. 記事のステータスを下書きに変更
+      const result = await supabaseClient.updateArticle(articleId, {
+        status: 'draft',
+        published_at: null
+      });
+
+      if (!result.success) {
+        this.showAlert('下書きへの変更に失敗しました: ' + result.error, 'error');
+        return;
+      }
+
+      // 2. 詳細ページをGitHubから削除
+      if (window.staticPageGenerator) {
+        console.log('🗑️ 記事詳細ページを削除中...');
+        const detailResult = await window.staticPageGenerator.deleteDetailPage(articleId);
+        if (detailResult.success) {
+          console.log('✅ 記事詳細ページ削除成功:', detailResult.file_path);
+        } else {
+          console.warn('⚠️ 記事詳細ページ削除失敗:', detailResult.error);
+          // 詳細ページ削除失敗は警告を出すが、処理自体は成功扱いにする
+          this.showAlert('記事を下書きに戻しましたが、詳細ページの削除に失敗しました', 'warning');
+        }
+      }
+
+      // 3. 記事一覧を更新
+      const articleIndex = this.articles.findIndex(a => a.id === articleId);
+      if (articleIndex !== -1) {
+        this.articles[articleIndex].status = 'draft';
+        this.articles[articleIndex].published_at = null;
+      }
+      this.applyFilters();
+      this.showAlert('記事を下書きに戻しました', 'success');
+    } catch (error) {
+      console.error('下書きへの変更エラー:', error.message);
+      this.showAlert('下書きへの変更処理でエラーが発生しました', 'error');
     }
   }
 

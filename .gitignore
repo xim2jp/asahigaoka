@@ -32,3 +32,6 @@ yarn-error.log*
 .env.production
 
 .spec/.spabase_info
+
+test-results/*
+playwright-report/*
