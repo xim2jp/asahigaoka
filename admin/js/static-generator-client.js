@@ -9,6 +9,7 @@ class StaticPageGenerator {
     this.apiEndpoint = window.PAGE_GENERATOR_ENDPOINT || 'https://api.asahigaoka-nerima.tokyo/api/generate/index';
     this.articlePageEndpoint = window.ARTICLE_PAGE_GENERATOR_ENDPOINT || 'https://api.asahigaoka-nerima.tokyo/api/generate/article';
     this.newsPageEndpoint = window.NEWS_PAGE_GENERATOR_ENDPOINT || 'https://api.asahigaoka-nerima.tokyo/api/generate/news';
+    this.detailPageEndpoint = window.DETAIL_PAGE_GENERATOR_ENDPOINT || 'https://api.asahigaoka-nerima.tokyo/api/generate/detail';
   }
 
   /**
@@ -244,6 +245,102 @@ class StaticPageGenerator {
         success: false,
         error: error.message,
         results
+      };
+    }
+  }
+
+  /**
+   * 記事詳細ページを生成（Lambda API経由でGitHubにプッシュ）
+   * @param {string} articleId - 記事ID
+   * @returns {Promise<{success: boolean, message: string, file_path?: string, error?: string}>}
+   */
+  async generateDetailPage(articleId) {
+    console.log('🔄 記事詳細ページ生成リクエスト送信開始...', articleId);
+
+    try {
+      const response = await fetch(this.detailPageEndpoint, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          article_id: articleId,
+          delete_flag: false
+        })
+      });
+
+      const result = await response.json();
+
+      if (response.ok && result.success) {
+        console.log('✅ 記事詳細ページ生成成功:', result);
+        return {
+          success: true,
+          message: result.message || '記事詳細ページを生成しました',
+          file_path: result.file_path
+        };
+      } else {
+        console.error('❌ 記事詳細ページ生成失敗:', result);
+        return {
+          success: false,
+          message: '記事詳細ページ生成に失敗しました',
+          error: result.error || 'Unknown error'
+        };
+      }
+
+    } catch (error) {
+      console.error('❌ 記事詳細ページ生成リクエスト失敗:', error);
+      return {
+        success: false,
+        message: '記事詳細ページ生成リクエストに失敗しました',
+        error: error.message
+      };
+    }
+  }
+
+  /**
+   * 記事詳細ページを削除（Lambda API経由でGitHubから削除）
+   * @param {string} articleId - 記事ID
+   * @returns {Promise<{success: boolean, message: string, file_path?: string, error?: string}>}
+   */
+  async deleteDetailPage(articleId) {
+    console.log('🗑️ 記事詳細ページ削除リクエスト送信開始...', articleId);
+
+    try {
+      const response = await fetch(this.detailPageEndpoint, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          article_id: articleId,
+          delete_flag: true
+        })
+      });
+
+      const result = await response.json();
+
+      if (response.ok && result.success) {
+        console.log('✅ 記事詳細ページ削除成功:', result);
+        return {
+          success: true,
+          message: result.message || '記事詳細ページを削除しました',
+          file_path: result.file_path
+        };
+      } else {
+        console.error('❌ 記事詳細ページ削除失敗:', result);
+        return {
+          success: false,
+          message: '記事詳細ページ削除に失敗しました',
+          error: result.error || 'Unknown error'
+        };
+      }
+
+    } catch (error) {
+      console.error('❌ 記事詳細ページ削除リクエスト失敗:', error);
+      return {
+        success: false,
+        message: '記事詳細ページ削除リクエストに失敗しました',
+        error: error.message
       };
     }
   }

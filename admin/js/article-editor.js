@@ -1455,6 +1455,19 @@ class ArticleEditor {
 
       if (result.success) {
         this.currentArticle = result.data;
+
+        // 詳細ページを生成（公開時のみ）
+        if (window.staticPageGenerator) {
+          console.log('📄 記事詳細ページを生成中...');
+          const detailResult = await window.staticPageGenerator.generateDetailPage(this.articleId);
+          if (detailResult.success) {
+            console.log('✅ 記事詳細ページ生成成功:', detailResult.file_path);
+          } else {
+            console.warn('⚠️ 記事詳細ページ生成失敗:', detailResult.error);
+            // 詳細ページ生成失敗はアラートを出すが、公開処理自体は継続
+          }
+        }
+
         this.showAlert('記事を公開しました', 'success');
 
         // 記事一覧に戻る

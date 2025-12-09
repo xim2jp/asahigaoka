@@ -288,6 +288,18 @@ class ArticlesManager {
     if (!confirmed) return;
 
     try {
+      // 先に詳細ページを削除（GitHubから）
+      if (window.staticPageGenerator) {
+        console.log('🗑️ 記事詳細ページを削除中...');
+        const detailResult = await window.staticPageGenerator.deleteDetailPage(articleId);
+        if (detailResult.success) {
+          console.log('✅ 記事詳細ページ削除成功:', detailResult.file_path);
+        } else {
+          console.warn('⚠️ 記事詳細ページ削除失敗:', detailResult.error);
+          // 詳細ページ削除失敗は警告を出すが、記事削除処理自体は継続
+        }
+      }
+
       const result = await supabaseClient.deleteArticle(articleId);
 
       if (result.success) {
