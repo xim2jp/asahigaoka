@@ -20,3 +20,7 @@ window.X_POST_ENDPOINT = 'https://wgoz4zndo3.execute-api.ap-northeast-1.amazonaw
 
 // LINE通知 API エンドポイント（Lambda経由）
 window.LINE_BROADCAST_ENDPOINT = 'https://wgoz4zndo3.execute-api.ap-northeast-1.amazonaws.com/prod/line-broadcast';
+
+// 記事詳細ページ生成 API エンドポイント（Lambda経由）
+// 記事保存時（公開）に詳細ページを生成、削除時に詳細ページを削除
+window.DETAIL_PAGE_GENERATOR_ENDPOINT = 'https://wgoz4zndo3.execute-api.ap-northeast-1.amazonaws.com/prod/generate-detail-page';

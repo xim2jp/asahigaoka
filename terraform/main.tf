@@ -276,11 +276,11 @@ data "archive_file" "dify_proxy_lambda" {
 resource "aws_lambda_function" "dify_proxy" {
   filename         = data.archive_file.dify_proxy_lambda.output_path
   function_name    = "dify-api-proxy"
-  role            = aws_iam_role.dify_proxy_lambda.arn
-  handler         = "lambda_function.lambda_handler"
+  role             = aws_iam_role.dify_proxy_lambda.arn
+  handler          = "lambda_function.lambda_handler"
   source_code_hash = data.archive_file.dify_proxy_lambda.output_base64sha256
-  runtime         = "python3.11"
-  timeout         = 30
+  runtime          = "python3.11"
+  timeout          = 30
 
   environment {
     variables = {
@@ -386,35 +386,9 @@ resource "aws_lambda_permission" "api_gateway" {
   source_arn    = "${aws_api_gateway_rest_api.dify_proxy.execution_arn}/*/*"
 }
 
-# API Gateway デプロイ
-resource "aws_api_gateway_deployment" "dify_proxy" {
-  rest_api_id = aws_api_gateway_rest_api.dify_proxy.id
-
-  triggers = {
-    redeployment = sha1(jsonencode([
-      aws_api_gateway_resource.generate_article.id,
-      aws_api_gateway_method.generate_article_post.id,
-      aws_api_gateway_method.generate_article_options.id,
-      aws_api_gateway_integration.generate_article_post.id,
-      aws_api_gateway_integration.generate_article_options.id,
-      aws_api_gateway_integration_response.generate_article_options.id,
-      timestamp()
-    ]))
-  }
-
-  lifecycle {
-    create_before_destroy = true
-  }
-
-  depends_on = [
-    aws_api_gateway_integration.generate_article_post,
-    aws_api_gateway_integration.generate_article_options
-  ]
-}
-
 # API Gateway ステージ
 resource "aws_api_gateway_stage" "prod" {
-  deployment_id = aws_api_gateway_deployment.dify_proxy.id
+  deployment_id = aws_api_gateway_deployment.dify_proxy_v3.id
   rest_api_id   = aws_api_gateway_rest_api.dify_proxy.id
   stage_name    = "prod"
 }
@@ -440,11 +414,11 @@ data "archive_file" "dify_proxy_image_lambda" {
 resource "aws_lambda_function" "dify_proxy_image" {
   filename         = data.archive_file.dify_proxy_image_lambda.output_path
   function_name    = "dify-api-proxy-image"
-  role            = aws_iam_role.dify_proxy_lambda.arn
-  handler         = "lambda_function.lambda_handler"
+  role             = aws_iam_role.dify_proxy_lambda.arn
+  handler          = "lambda_function.lambda_handler"
   source_code_hash = data.archive_file.dify_proxy_image_lambda.output_base64sha256
-  runtime         = "python3.11"
-  timeout         = 60
+  runtime          = "python3.11"
+  timeout          = 60
 
   environment {
     variables = {
@@ -544,24 +518,279 @@ resource "aws_lambda_permission" "api_gateway_image" {
   source_arn    = "${aws_api_gateway_rest_api.dify_proxy.execution_arn}/*/*"
 }
 
-# デプロイメントトリガーを更新（画像分析エンドポイント追加）
-resource "aws_api_gateway_deployment" "dify_proxy_v2" {
+# 出力：画像分析 API Gateway エンドポイント
+output "dify_proxy_image_api_endpoint" {
+  value       = "${aws_api_gateway_stage.prod.invoke_url}/analyze-image"
+  description = "Dify Proxy API endpoint URL for image analysis"
+}
+
+# ===================================
+# News Page Generator Lambda Function
+# news.htmlを毎日更新してGitHubにプッシュ
+# ===================================
+
+variable "supabase_url" {
+  description = "Supabase Project URL"
+  type        = string
+}
+
+variable "supabase_anon_key" {
+  description = "Supabase Anonymous Key"
+  type        = string
+  sensitive   = true
+}
+
+variable "github_token" {
+  description = "GitHub Personal Access Token for pushing news.html"
+  type        = string
+  sensitive   = true
+}
+
+variable "github_repo" {
+  description = "GitHub repository (owner/repo)"
+  type        = string
+  default     = "asahigaoka/asahigaoka"
+}
+
+variable "github_branch" {
+  description = "GitHub branch to push to"
+  type        = string
+  default     = "main"
+}
+
+# Lambda用IAMロール（news page generator用）
+resource "aws_iam_role" "news_page_generator_lambda" {
+  name = "news-page-generator-lambda-role"
+
+  assume_role_policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Action = "sts:AssumeRole"
+        Effect = "Allow"
+        Principal = {
+          Service = "lambda.amazonaws.com"
+        }
+      }
+    ]
+  })
+}
+
+# CloudWatch Logs用のポリシーをアタッチ
+resource "aws_iam_role_policy_attachment" "news_page_generator_lambda_logs" {
+  role       = aws_iam_role.news_page_generator_lambda.name
+  policy_arn = "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+}
+
+# Lambda関数用のZIPファイルを作成
+data "archive_file" "news_page_generator_lambda" {
+  type        = "zip"
+  source_dir  = "${path.module}/lambda/news_page_generator"
+  output_path = "${path.module}/lambda/news_page_generator.zip"
+}
+
+# Lambda関数
+resource "aws_lambda_function" "news_page_generator" {
+  filename         = data.archive_file.news_page_generator_lambda.output_path
+  function_name    = "news-page-generator"
+  role             = aws_iam_role.news_page_generator_lambda.arn
+  handler          = "lambda_function.lambda_handler"
+  source_code_hash = data.archive_file.news_page_generator_lambda.output_base64sha256
+  runtime          = "python3.11"
+  timeout          = 60
+  memory_size      = 256
+
+  environment {
+    variables = {
+      SUPABASE_URL      = var.supabase_url
+      SUPABASE_ANON_KEY = var.supabase_anon_key
+      GITHUB_TOKEN      = var.github_token
+      GITHUB_REPO       = var.github_repo
+      GITHUB_BRANCH     = var.github_branch
+    }
+  }
+}
+
+# CloudWatch Logsグループ
+resource "aws_cloudwatch_log_group" "news_page_generator_lambda" {
+  name              = "/aws/lambda/${aws_lambda_function.news_page_generator.function_name}"
+  retention_in_days = 14
+}
+
+# EventBridge スケジュールルール（日本時間 0:05 = UTC 15:05）
+resource "aws_cloudwatch_event_rule" "news_page_generator_schedule" {
+  name                = "news-page-generator-daily-schedule"
+  description         = "Trigger news page generator Lambda daily at JST 00:05"
+  schedule_expression = "cron(5 15 * * ? *)" # UTC 15:05 = JST 00:05
+}
+
+# EventBridge ターゲット
+resource "aws_cloudwatch_event_target" "news_page_generator_target" {
+  rule      = aws_cloudwatch_event_rule.news_page_generator_schedule.name
+  target_id = "news-page-generator-lambda"
+  arn       = aws_lambda_function.news_page_generator.arn
+}
+
+# Lambda実行許可（EventBridgeから）
+resource "aws_lambda_permission" "news_page_generator_eventbridge" {
+  statement_id  = "AllowExecutionFromEventBridge"
+  action        = "lambda:InvokeFunction"
+  function_name = aws_lambda_function.news_page_generator.function_name
+  principal     = "events.amazonaws.com"
+  source_arn    = aws_cloudwatch_event_rule.news_page_generator_schedule.arn
+}
+
+# 出力：Lambda関数ARN
+output "news_page_generator_lambda_arn" {
+  value       = aws_lambda_function.news_page_generator.arn
+  description = "News Page Generator Lambda function ARN"
+}
+
+# 出力：EventBridgeルール名
+output "news_page_generator_schedule_rule" {
+  value       = aws_cloudwatch_event_rule.news_page_generator_schedule.name
+  description = "EventBridge schedule rule name"
+}
+
+# ===================================
+# News Detail Page Generator Lambda Function
+# 記事詳細ページを生成してGitHubにプッシュ
+# ===================================
+
+# Lambda関数用のZIPファイルを作成
+data "archive_file" "news_detail_page_generator_lambda" {
+  type        = "zip"
+  source_dir  = "${path.module}/lambda/news_detail_page_generator"
+  output_path = "${path.module}/lambda/news_detail_page_generator.zip"
+}
+
+# Lambda関数
+resource "aws_lambda_function" "news_detail_page_generator" {
+  filename         = data.archive_file.news_detail_page_generator_lambda.output_path
+  function_name    = "news-detail-page-generator"
+  role             = aws_iam_role.news_page_generator_lambda.arn # 既存のロールを再利用
+  handler          = "lambda_function.lambda_handler"
+  source_code_hash = data.archive_file.news_detail_page_generator_lambda.output_base64sha256
+  runtime          = "python3.11"
+  timeout          = 60
+  memory_size      = 256
+
+  environment {
+    variables = {
+      SUPABASE_URL      = var.supabase_url
+      SUPABASE_ANON_KEY = var.supabase_anon_key
+      GITHUB_TOKEN      = var.github_token
+      GITHUB_REPO       = var.github_repo
+      GITHUB_BRANCH     = var.github_branch
+    }
+  }
+}
+
+# CloudWatch Logsグループ
+resource "aws_cloudwatch_log_group" "news_detail_page_generator_lambda" {
+  name              = "/aws/lambda/${aws_lambda_function.news_detail_page_generator.function_name}"
+  retention_in_days = 14
+}
+
+# API Gateway リソース（/generate-detail-page）
+resource "aws_api_gateway_resource" "generate_detail_page" {
+  rest_api_id = aws_api_gateway_rest_api.dify_proxy.id
+  parent_id   = aws_api_gateway_rest_api.dify_proxy.root_resource_id
+  path_part   = "generate-detail-page"
+}
+
+# API Gateway メソッド（POST）
+resource "aws_api_gateway_method" "generate_detail_page_post" {
+  rest_api_id   = aws_api_gateway_rest_api.dify_proxy.id
+  resource_id   = aws_api_gateway_resource.generate_detail_page.id
+  http_method   = "POST"
+  authorization = "NONE"
+}
+
+# API Gateway メソッド（OPTIONS - CORS用）
+resource "aws_api_gateway_method" "generate_detail_page_options" {
+  rest_api_id   = aws_api_gateway_rest_api.dify_proxy.id
+  resource_id   = aws_api_gateway_resource.generate_detail_page.id
+  http_method   = "OPTIONS"
+  authorization = "NONE"
+}
+
+# API Gateway 統合（POST）
+resource "aws_api_gateway_integration" "generate_detail_page_post" {
+  rest_api_id             = aws_api_gateway_rest_api.dify_proxy.id
+  resource_id             = aws_api_gateway_resource.generate_detail_page.id
+  http_method             = aws_api_gateway_method.generate_detail_page_post.http_method
+  integration_http_method = "POST"
+  type                    = "AWS_PROXY"
+  uri                     = aws_lambda_function.news_detail_page_generator.invoke_arn
+}
+
+# API Gateway 統合（OPTIONS - CORS用）
+resource "aws_api_gateway_integration" "generate_detail_page_options" {
+  rest_api_id = aws_api_gateway_rest_api.dify_proxy.id
+  resource_id = aws_api_gateway_resource.generate_detail_page.id
+  http_method = aws_api_gateway_method.generate_detail_page_options.http_method
+  type        = "MOCK"
+
+  request_templates = {
+    "application/json" = "{\"statusCode\": 200}"
+  }
+}
+
+# API Gateway メソッドレスポンス（OPTIONS）
+resource "aws_api_gateway_method_response" "generate_detail_page_options" {
+  rest_api_id = aws_api_gateway_rest_api.dify_proxy.id
+  resource_id = aws_api_gateway_resource.generate_detail_page.id
+  http_method = aws_api_gateway_method.generate_detail_page_options.http_method
+  status_code = "200"
+
+  response_parameters = {
+    "method.response.header.Access-Control-Allow-Headers" = true
+    "method.response.header.Access-Control-Allow-Methods" = true
+    "method.response.header.Access-Control-Allow-Origin"  = true
+  }
+}
+
+# API Gateway 統合レスポンス（OPTIONS）
+resource "aws_api_gateway_integration_response" "generate_detail_page_options" {
+  rest_api_id = aws_api_gateway_rest_api.dify_proxy.id
+  resource_id = aws_api_gateway_resource.generate_detail_page.id
+  http_method = aws_api_gateway_method.generate_detail_page_options.http_method
+  status_code = aws_api_gateway_method_response.generate_detail_page_options.status_code
+
+  response_parameters = {
+    "method.response.header.Access-Control-Allow-Headers" = "'Content-Type'"
+    "method.response.header.Access-Control-Allow-Methods" = "'POST,OPTIONS'"
+    "method.response.header.Access-Control-Allow-Origin"  = "'*'"
+  }
+
+  depends_on = [aws_api_gateway_integration.generate_detail_page_options]
+}
+
+# Lambda実行許可（API Gatewayから）
+resource "aws_lambda_permission" "api_gateway_detail_page" {
+  statement_id  = "AllowAPIGatewayInvokeDetailPage"
+  action        = "lambda:InvokeFunction"
+  function_name = aws_lambda_function.news_detail_page_generator.function_name
+  principal     = "apigateway.amazonaws.com"
+  source_arn    = "${aws_api_gateway_rest_api.dify_proxy.execution_arn}/*/*"
+}
+
+# デプロイメントトリガーを更新（詳細ページ生成エンドポイント追加）
+resource "aws_api_gateway_deployment" "dify_proxy_v3" {
   rest_api_id = aws_api_gateway_rest_api.dify_proxy.id
 
   triggers = {
     redeployment = sha1(jsonencode([
       aws_api_gateway_resource.generate_article.id,
       aws_api_gateway_method.generate_article_post.id,
-      aws_api_gateway_method.generate_article_options.id,
       aws_api_gateway_integration.generate_article_post.id,
-      aws_api_gateway_integration.generate_article_options.id,
-      aws_api_gateway_integration_response.generate_article_options.id,
       aws_api_gateway_resource.analyze_image.id,
       aws_api_gateway_method.analyze_image_post.id,
-      aws_api_gateway_method.analyze_image_options.id,
       aws_api_gateway_integration.analyze_image_post.id,
-      aws_api_gateway_integration.analyze_image_options.id,
-      aws_api_gateway_integration_response.analyze_image_options.id,
+      aws_api_gateway_resource.generate_detail_page.id,
+      aws_api_gateway_method.generate_detail_page_post.id,
+      aws_api_gateway_integration.generate_detail_page_post.id,
       timestamp()
     ]))
   }
@@ -574,12 +803,20 @@ resource "aws_api_gateway_deployment" "dify_proxy_v2" {
     aws_api_gateway_integration.generate_article_post,
     aws_api_gateway_integration.generate_article_options,
     aws_api_gateway_integration.analyze_image_post,
-    aws_api_gateway_integration.analyze_image_options
+    aws_api_gateway_integration.analyze_image_options,
+    aws_api_gateway_integration.generate_detail_page_post,
+    aws_api_gateway_integration.generate_detail_page_options
   ]
 }
 
-# 出力：画像分析 API Gateway エンドポイント
-output "dify_proxy_image_api_endpoint" {
-  value       = "${aws_api_gateway_stage.prod.invoke_url}/analyze-image"
-  description = "Dify Proxy API endpoint URL for image analysis"
+# 出力：詳細ページ生成 API Gateway エンドポイント
+output "news_detail_page_generator_api_endpoint" {
+  value       = "${aws_api_gateway_stage.prod.invoke_url}/generate-detail-page"
+  description = "News Detail Page Generator API endpoint URL"
+}
+
+# 出力：Lambda関数ARN
+output "news_detail_page_generator_lambda_arn" {
+  value       = aws_lambda_function.news_detail_page_generator.arn
+  description = "News Detail Page Generator Lambda function ARN"
 }

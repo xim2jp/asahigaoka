@@ -1,0 +1,3 @@
+# news_page_generator Lambda
+# このLambdaは標準ライブラリのみを使用するため、追加の依存関係はありません
+# urllib.request, json, datetime, calendar, base64 はPython標準ライブラリ

@@ -7,6 +7,9 @@ class StaticPageGenerator {
   constructor() {
     // エンドポイントは config.js から取得、またはデフォルト値
     this.apiEndpoint = window.PAGE_GENERATOR_ENDPOINT || 'https://api.asahigaoka-nerima.tokyo/api/generate/index';
+    this.articlePageEndpoint = window.ARTICLE_PAGE_GENERATOR_ENDPOINT || 'https://api.asahigaoka-nerima.tokyo/api/generate/article';
+    this.newsPageEndpoint = window.NEWS_PAGE_GENERATOR_ENDPOINT || 'https://api.asahigaoka-nerima.tokyo/api/generate/news';
+    this.detailPageEndpoint = window.DETAIL_PAGE_GENERATOR_ENDPOINT || 'https://api.asahigaoka-nerima.tokyo/api/generate/detail';
   }
 
   /**
@@ -69,6 +72,277 @@ class StaticPageGenerator {
         });
       }, 1000);
     });
+  }
+
+  /**
+   * 記事ページを生成
+   * @param {object} articleData - 記事データ
+   * @returns {Promise<{success: boolean, message: string, error?: string}>}
+   */
+  async generateArticlePage(articleData) {
+    console.log('🔄 記事ページ生成リクエスト送信開始...', articleData.id);
+
+    try {
+      // APIが未実装の場合はモックとして振る舞う
+      if (this.articlePageEndpoint.includes('api.asahigaoka-nerima.tokyo')) {
+        console.log('⚠️ 開発モード: 記事ページ生成APIがダミーのため、リクエスト送信をシミュレートします');
+        return await this.mockArticlePageGeneration(articleData);
+      }
+
+      const response = await fetch(this.articlePageEndpoint, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          article_id: articleData.id,
+          article_data: articleData
+        })
+      });
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      const result = await response.json();
+      console.log('✅ 記事ページ生成リクエスト成功:', result);
+      return result;
+
+    } catch (error) {
+      console.error('❌ 記事ページ生成リクエスト失敗:', error);
+      return {
+        success: false,
+        message: '記事ページ生成リクエストに失敗しました',
+        error: error.message
+      };
+    }
+  }
+
+  /**
+   * 記事ページ生成のモック（開発用）
+   * @param {object} articleData - 記事データ
+   */
+  async mockArticlePageGeneration(articleData) {
+    return new Promise((resolve) => {
+      setTimeout(() => {
+        const slug = articleData.slug || articleData.id;
+        console.log(`✅ [Mock] 記事ページ生成完了: news/${slug}.html`);
+        resolve({
+          success: true,
+          message: `記事ページを生成しました: news/${slug}.html（開発モード）`,
+          generated_file: `news/${slug}.html`,
+          generated_at: new Date().toISOString()
+        });
+      }, 500);
+    });
+  }
+
+  /**
+   * お知らせ一覧ページ（news.html）を更新
+   * @param {object} options - オプション（show_in_news_list, show_in_calendarなど）
+   * @returns {Promise<{success: boolean, message: string, error?: string}>}
+   */
+  async updateNewsPage(options = {}) {
+    console.log('🔄 お知らせ一覧ページ更新リクエスト送信開始...');
+
+    try {
+      // APIが未実装の場合はモックとして振る舞う
+      if (this.newsPageEndpoint.includes('api.asahigaoka-nerima.tokyo')) {
+        console.log('⚠️ 開発モード: お知らせ一覧更新APIがダミーのため、リクエスト送信をシミュレートします');
+        return await this.mockNewsPageUpdate(options);
+      }
+
+      const response = await fetch(this.newsPageEndpoint, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(options)
+      });
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      const result = await response.json();
+      console.log('✅ お知らせ一覧ページ更新リクエスト成功:', result);
+      return result;
+
+    } catch (error) {
+      console.error('❌ お知らせ一覧ページ更新リクエスト失敗:', error);
+      return {
+        success: false,
+        message: 'お知らせ一覧ページ更新リクエストに失敗しました',
+        error: error.message
+      };
+    }
+  }
+
+  /**
+   * お知らせ一覧ページ更新のモック（開発用）
+   * @param {object} options - オプション
+   */
+  async mockNewsPageUpdate(options) {
+    return new Promise((resolve) => {
+      setTimeout(() => {
+        const updates = [];
+        if (options.update_news_list) updates.push('お知らせ一覧');
+        if (options.update_calendar) updates.push('カレンダー');
+
+        console.log(`✅ [Mock] news.html 更新完了: ${updates.join(', ') || 'なし'}`);
+        resolve({
+          success: true,
+          message: `news.html を更新しました: ${updates.join(', ') || 'なし'}（開発モード）`,
+          updated_sections: updates,
+          generated_at: new Date().toISOString()
+        });
+      }, 500);
+    });
+  }
+
+  /**
+   * 記事保存時の静的ページ生成処理を一括実行
+   * @param {object} articleData - 保存された記事データ
+   * @param {object} flags - フラグ（generateArticlePage, showInNewsList, showInCalendar）
+   * @returns {Promise<{success: boolean, results: object}>}
+   */
+  async processArticleSave(articleData, flags) {
+    console.log('🔄 記事保存後の静的ページ生成処理開始...', {
+      articleId: articleData.id,
+      flags
+    });
+
+    const results = {
+      articlePage: null,
+      newsPage: null
+    };
+
+    try {
+      // 1. 記事ページ生成
+      if (flags.generateArticlePage) {
+        results.articlePage = await this.generateArticlePage(articleData);
+      }
+
+      // 2. お知らせ一覧・カレンダー更新
+      if (flags.showInNewsList || flags.showInCalendar) {
+        results.newsPage = await this.updateNewsPage({
+          update_news_list: flags.showInNewsList,
+          update_calendar: flags.showInCalendar,
+          article_id: articleData.id,
+          article_slug: articleData.slug || articleData.id
+        });
+      }
+
+      console.log('✅ 静的ページ生成処理完了:', results);
+      return {
+        success: true,
+        results
+      };
+
+    } catch (error) {
+      console.error('❌ 静的ページ生成処理エラー:', error);
+      return {
+        success: false,
+        error: error.message,
+        results
+      };
+    }
+  }
+
+  /**
+   * 記事詳細ページを生成（Lambda API経由でGitHubにプッシュ）
+   * @param {string} articleId - 記事ID
+   * @returns {Promise<{success: boolean, message: string, file_path?: string, error?: string}>}
+   */
+  async generateDetailPage(articleId) {
+    console.log('🔄 記事詳細ページ生成リクエスト送信開始...', articleId);
+
+    try {
+      const response = await fetch(this.detailPageEndpoint, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          article_id: articleId,
+          delete_flag: false
+        })
+      });
+
+      const result = await response.json();
+
+      if (response.ok && result.success) {
+        console.log('✅ 記事詳細ページ生成成功:', result);
+        return {
+          success: true,
+          message: result.message || '記事詳細ページを生成しました',
+          file_path: result.file_path
+        };
+      } else {
+        console.error('❌ 記事詳細ページ生成失敗:', result);
+        return {
+          success: false,
+          message: '記事詳細ページ生成に失敗しました',
+          error: result.error || 'Unknown error'
+        };
+      }
+
+    } catch (error) {
+      console.error('❌ 記事詳細ページ生成リクエスト失敗:', error);
+      return {
+        success: false,
+        message: '記事詳細ページ生成リクエストに失敗しました',
+        error: error.message
+      };
+    }
+  }
+
+  /**
+   * 記事詳細ページを削除（Lambda API経由でGitHubから削除）
+   * @param {string} articleId - 記事ID
+   * @returns {Promise<{success: boolean, message: string, file_path?: string, error?: string}>}
+   */
+  async deleteDetailPage(articleId) {
+    console.log('🗑️ 記事詳細ページ削除リクエスト送信開始...', articleId);
+
+    try {
+      const response = await fetch(this.detailPageEndpoint, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          article_id: articleId,
+          delete_flag: true
+        })
+      });
+
+      const result = await response.json();
+
+      if (response.ok && result.success) {
+        console.log('✅ 記事詳細ページ削除成功:', result);
+        return {
+          success: true,
+          message: result.message || '記事詳細ページを削除しました',
+          file_path: result.file_path
+        };
+      } else {
+        console.error('❌ 記事詳細ページ削除失敗:', result);
+        return {
+          success: false,
+          message: '記事詳細ページ削除に失敗しました',
+          error: result.error || 'Unknown error'
+        };
+      }
+
+    } catch (error) {
+      console.error('❌ 記事詳細ページ削除リクエスト失敗:', error);
+      return {
+        success: false,
+        message: '記事詳細ページ削除リクエストに失敗しました',
+        error: error.message
+      };
+    }
   }
 }
 
