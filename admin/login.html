@@ -59,14 +59,8 @@
         .remember-me {
             display: flex;
             align-items: center;
-            justify-content: space-between;
+            justify-content: flex-end;
             margin-bottom: 20px;
-        }
-        .remember-me label {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            cursor: pointer;
         }
         .forgot-password {
             color: var(--primary-color);
@@ -75,24 +69,6 @@
         }
         .forgot-password:hover {
             text-decoration: underline;
-        }
-        .demo-info {
-            background: var(--bg-secondary);
-            padding: 15px;
-            border-radius: 8px;
-            margin-top: 20px;
-            font-size: 13px;
-        }
-        .demo-info h4 {
-            margin-bottom: 10px;
-            color: var(--text-primary);
-        }
-        .demo-credentials {
-            background: white;
-            padding: 10px;
-            border-radius: 4px;
-            margin-top: 10px;
-            font-family: monospace;
         }
     </style>
 </head>
@@ -117,10 +93,6 @@
                 </div>
 
                 <div class="remember-me">
-                    <label>
-                        <input type="checkbox" id="remember">
-                        ログイン状態を保持
-                    </label>
                     <a href="#" class="forgot-password">パスワードを忘れた方</a>
                 </div>
 
@@ -128,21 +100,6 @@
                     ログイン
                 </button>
             </form>
-
-            <div class="demo-info">
-                <h4>📌 デモアカウント情報</h4>
-                <p>以下のアカウントでお試しいただけます：</p>
-                <div class="demo-credentials">
-                    <strong>管理者アカウント：</strong><br>
-                    メール: admin@example.com<br>
-                    パスワード: admin123
-                </div>
-                <div class="demo-credentials" style="margin-top: 10px;">
-                    <strong>編集者アカウント：</strong><br>
-                    メール: editor@example.com<br>
-                    パスワード: editor123
-                </div>
-            </div>
         </div>
 
         <p style="text-align: center; color: white; margin-top: 20px; font-size: 12px;">
@@ -163,14 +120,6 @@
             const submitBtn = form.querySelector('[type="submit"]');
             const emailInput = document.querySelector('#email');
             const passwordInput = document.querySelector('#password');
-            const rememberCheckbox = document.querySelector('#remember');
-
-            // 保存されたメールアドレスを復元
-            const savedEmail = localStorage.getItem('asahigaoka_saved_email');
-            if (savedEmail) {
-                emailInput.value = savedEmail;
-                rememberCheckbox.checked = true;
-            }
 
             form.addEventListener('submit', async function(e) {
                 e.preventDefault();
@@ -192,13 +141,6 @@
                     const result = await supabaseClient.signIn(email, password);
 
                     if (result.success) {
-                        // メールアドレスを保存（チェックボックスが有効な場合）
-                        if (rememberCheckbox.checked) {
-                            localStorage.setItem('asahigaoka_saved_email', email);
-                        } else {
-                            localStorage.removeItem('asahigaoka_saved_email');
-                        }
-
                         // ユーザー情報をlocalStorageに保存（認証状態を維持）
                         localStorage.setItem('asahigaoka_user', JSON.stringify({
                             id: result.user.id,
@@ -211,7 +153,7 @@
                         localStorage.setItem('asahigaoka_user_role', result.user.role);
 
                         // ダッシュボード へリダイレクト
-                        console.log('✅ ログイン成功:', email);
+                        console.log('ログイン成功:', email);
                         window.location.href = 'index.html';
                     } else {
                         // ログイン失敗

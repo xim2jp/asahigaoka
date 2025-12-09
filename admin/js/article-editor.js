@@ -311,8 +311,12 @@ class ArticleEditor {
       // イベント日時を設定
       if (this.currentArticle.event_start_datetime) {
         const startDatetime = new Date(this.currentArticle.event_start_datetime);
-        const startDate = startDatetime.toISOString().split('T')[0];
-        const startTime = startDatetime.toTimeString().slice(0, 5);
+        // ローカルタイムゾーンで日付を取得（UTCへの変換によるずれを防止）
+        const startYear = startDatetime.getFullYear();
+        const startMonth = String(startDatetime.getMonth() + 1).padStart(2, '0');
+        const startDay = String(startDatetime.getDate()).padStart(2, '0');
+        const startDate = `${startYear}-${startMonth}-${startDay}`;
+        const startTime = `${String(startDatetime.getHours()).padStart(2, '0')}:${String(startDatetime.getMinutes()).padStart(2, '0')}`;
 
         document.querySelector('#event-date-from').value = startDate;
         // has_start_time フラグを使用
@@ -323,8 +327,12 @@ class ArticleEditor {
 
       if (this.currentArticle.event_end_datetime) {
         const endDatetime = new Date(this.currentArticle.event_end_datetime);
-        const endDate = endDatetime.toISOString().split('T')[0];
-        const endTime = endDatetime.toTimeString().slice(0, 5);
+        // ローカルタイムゾーンで日付を取得（UTCへの変換によるずれを防止）
+        const endYear = endDatetime.getFullYear();
+        const endMonth = String(endDatetime.getMonth() + 1).padStart(2, '0');
+        const endDay = String(endDatetime.getDate()).padStart(2, '0');
+        const endDate = `${endYear}-${endMonth}-${endDay}`;
+        const endTime = `${String(endDatetime.getHours()).padStart(2, '0')}:${String(endDatetime.getMinutes()).padStart(2, '0')}`;
 
         document.querySelector('#event-date-to').value = endDate;
         // has_end_time フラグを使用
@@ -1281,20 +1289,22 @@ class ArticleEditor {
             }
           }
 
-          // LINE通知トリガー: 公開済み記事で、line_publishedがfalse→trueに変更された場合のみ
+          // LINE通知トリガー: 公開済み記事で、LINE配信が有効な場合
+          // ※ Lambda側で重複チェックを行うので、ここでは配信を試みる
           // ※ 下書き（draft）ではLINE配信しない
-          if (result.data.status === 'published' && !previousLinePublished && lineEnabled) {
-            console.log('📢 LINE通知トリガー: 公開済み記事でline_publishedがfalse→trueに変更');
-            await this.postToLine(title, excerpt, lineMessage, result.data.slug || this.articleId);
+          if (result.data.status === 'published' && lineEnabled) {
+            console.log('📢 LINE通知トリガー: 公開済み記事でLINE配信有効');
+            await this.postToLine(title, excerpt, lineMessage, result.data.slug || this.articleId, result.data.id);
           } else if (lineEnabled && result.data.status !== 'published') {
             console.log('⚠️ LINE配信スキップ: 記事が公開状態ではありません (status:', result.data.status, ')');
           }
 
-          // X投稿トリガー: 公開済み記事で、x_publishedがfalse→trueに変更された場合のみ
+          // X投稿トリガー: 公開済み記事で、X投稿が有効な場合
+          // ※ Lambda側で重複チェックを行うので、ここでは投稿を試みる
           // ※ 下書き（draft）ではX投稿しない
-          if (result.data.status === 'published' && !previousXPublished && xEnabled) {
-            console.log('📢 X投稿トリガー: 公開済み記事でx_publishedがfalse→trueに変更');
-            await this.postToX(title, excerpt, xMessage, xHashtags, result.data.slug || this.articleId);
+          if (result.data.status === 'published' && xEnabled) {
+            console.log('📢 X投稿トリガー: 公開済み記事でX投稿有効');
+            await this.postToX(title, excerpt, xMessage, xHashtags, result.data.slug || this.articleId, result.data.id);
           } else if (xEnabled && result.data.status !== 'published') {
             console.log('⚠️ X投稿スキップ: 記事が公開状態ではありません (status:', result.data.status, ')');
           }
@@ -1458,13 +1468,16 @@ class ArticleEditor {
         return;
       }
 
+      // 公開前の状態を取得（LINE/X投稿判定用）
+      // 注意: saveArticleInternalで line_published=true で保存済みだが、
+      // まだLINE配信は実行されていない（下書き状態だったため）
+      // したがって、公開処理時にはlineEnabledがtrueならLINE配信を実行する
+      const previousStatus = this.currentArticle?.status || 'draft';
+      console.log('📋 公開前のステータス:', previousStatus);
+
       const result = await supabaseClient.publishArticle(this.articleId);
 
       if (result.success) {
-        // 公開前の状態を取得（LINE/X投稿判定用）
-        const previousLinePublished = this.currentArticle?.line_published || false;
-        const previousXPublished = this.currentArticle?.x_published || false;
-
         this.currentArticle = result.data;
 
         // 詳細ページを生成（公開時のみ）
@@ -1479,25 +1492,27 @@ class ArticleEditor {
           }
         }
 
-        // LINE通知: 公開時にline_publishedがtrueで、まだ配信されていない場合
+        // LINE通知: 公開処理時に実行
+        // ※ Lambda側で重複チェックを行うので、ここでは配信を試みる
         const lineEnabled = document.querySelector('#line-enabled')?.checked || false;
         const lineMessage = document.querySelector('#line-message')?.value.trim() || '';
         const excerpt = document.querySelector('#excerpt')?.value.trim() || '';
         const title = document.querySelector('#title')?.value.trim() || '';
 
-        if (lineEnabled && !previousLinePublished) {
+        if (lineEnabled) {
           console.log('📢 LINE通知トリガー: 公開処理時にLINE配信を実行');
-          await this.postToLine(title, excerpt, lineMessage, result.data.slug || this.articleId);
+          await this.postToLine(title, excerpt, lineMessage, result.data.slug || this.articleId, result.data.id);
         }
 
-        // X投稿: 公開時にx_publishedがtrueで、まだ投稿されていない場合
+        // X投稿: 公開処理時に実行
+        // ※ Lambda側で重複チェックを行うので、ここでは投稿を試みる
         const xEnabled = document.querySelector('#x-enabled')?.checked || false;
         const xMessage = document.querySelector('#x-message')?.value.trim() || '';
         const xHashtags = document.querySelector('#x-hashtags')?.value.trim() || '#旭丘一丁目';
 
-        if (xEnabled && !previousXPublished) {
+        if (xEnabled) {
           console.log('📢 X投稿トリガー: 公開処理時にX投稿を実行');
-          await this.postToX(title, excerpt, xMessage, xHashtags, result.data.slug || this.articleId);
+          await this.postToX(title, excerpt, xMessage, xHashtags, result.data.slug || this.articleId, result.data.id);
         }
 
         this.showAlert('記事を公開しました', 'success');
@@ -1889,8 +1904,9 @@ class ArticleEditor {
    * @param {string} excerpt - 抜粋（SNS用）
    * @param {string} lineMessage - カスタムメッセージ（空の場合はexcerptを使用）
    * @param {string} slug - 記事スラッグ（URL用）
+   * @param {string} articleId - 記事ID（重複防止用）
    */
-  async postToLine(title, excerpt, lineMessage, slug) {
+  async postToLine(title, excerpt, lineMessage, slug, articleId) {
     const endpoint = window.LINE_BROADCAST_ENDPOINT;
     if (!endpoint) {
       console.error('❌ LINE通知エンドポイントが設定されていません');
@@ -1900,6 +1916,7 @@ class ArticleEditor {
 
     try {
       console.log('📢 LINE通知処理を開始...');
+      console.log('📝 記事ID:', articleId);
 
       // 通知メッセージを組み立て
       const articleUrl = `https://asahigaoka-nerima.tokyo/news/${slug}.html`;
@@ -1915,7 +1932,7 @@ class ArticleEditor {
         headers: {
           'Content-Type': 'application/json'
         },
-        body: JSON.stringify({ message })
+        body: JSON.stringify({ message, article_id: articleId })
       });
 
       const result = await response.json();
@@ -1923,6 +1940,9 @@ class ArticleEditor {
       if (response.ok && result.status === 'success') {
         console.log('✅ LINE通知成功:', result.line_response);
         this.showAlert('LINEへの通知が完了しました', 'success');
+      } else if (response.ok && result.status === 'skipped') {
+        console.log('ℹ️ LINE通知スキップ（既に配信済み）:', result.message);
+        this.showAlert('LINEへは既に通知済みです', 'info');
       } else {
         console.error('❌ LINE通知失敗:', result);
         this.showAlert(`LINE通知に失敗しました: ${result.message || 'Unknown error'}`, 'error');
@@ -1940,8 +1960,9 @@ class ArticleEditor {
    * @param {string} xMessage - カスタムメッセージ（空の場合はexcerptを使用）
    * @param {string} xHashtags - ハッシュタグ
    * @param {string} slug - 記事スラッグ（URL用）
+   * @param {string} articleId - 記事ID（重複防止用）
    */
-  async postToX(title, excerpt, xMessage, xHashtags, slug) {
+  async postToX(title, excerpt, xMessage, xHashtags, slug, articleId) {
     const endpoint = window.X_POST_ENDPOINT;
     if (!endpoint) {
       console.error('❌ X投稿エンドポイントが設定されていません');
@@ -1951,6 +1972,7 @@ class ArticleEditor {
 
     try {
       console.log('📢 X投稿処理を開始...');
+      console.log('📝 記事ID:', articleId);
 
       // 投稿メッセージを組み立て
       let message = xMessage || excerpt || title;
@@ -1980,7 +2002,7 @@ class ArticleEditor {
         headers: {
           'Content-Type': 'application/json'
         },
-        body: JSON.stringify({ message })
+        body: JSON.stringify({ message, article_id: articleId })
       });
 
       const result = await response.json();
@@ -1988,6 +2010,9 @@ class ArticleEditor {
       if (response.ok && result.status === 'success') {
         console.log('✅ X投稿成功:', result.tweet_response);
         this.showAlert('Xへの投稿が完了しました', 'success');
+      } else if (response.ok && result.status === 'skipped') {
+        console.log('ℹ️ X投稿スキップ（既に投稿済み）:', result.message);
+        this.showAlert('Xへは既に投稿済みです', 'info');
       } else {
         console.error('❌ X投稿失敗:', result);
         this.showAlert(`X投稿に失敗しました: ${result.message || 'Unknown error'}`, 'error');

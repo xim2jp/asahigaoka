@@ -535,6 +535,16 @@
       </nav>
     </header>
 
+    <!-- ヒーローセクション -->
+    <section class="page-hero">
+      <div class="page-hero-content">
+        <div>
+          <h2 class="page-title">お知らせ</h2>
+          <p class="page-subtitle">町会からの最新情報をお届けします</p>
+        </div>
+      </div>
+    </section>
+
     <!-- メインコンテンツ -->
     <main>
       <article class="py-12">
@@ -556,30 +566,27 @@
             </div>
             <h1 class="article-title">{{title}}</h1>
 
-            <!-- イベント日時（イベントの場合のみ表示） -->
             <!-- {{#if event_datetime}} -->
             <div class="event-datetime">
               <i class="ri-calendar-event-line"></i>
               <span class="event-datetime-text">{{event_datetime_formatted}}</span>
             </div>
-            <!-- {{/if}} -->
+            <!-- {{/if event_datetime}} -->
           </header>
 
-          <!-- アイキャッチ画像 -->
           <!-- {{#if featured_image_url}} -->
           <img
             src="{{featured_image_url}}"
             alt="{{title}}"
             class="featured-image"
           />
-          <!-- {{/if}} -->
+          <!-- {{/if featured_image_url}} -->
 
           <!-- 記事本文 -->
           <div class="article-content">
             {{content}}
           </div>
 
-          <!-- 添付ファイル -->
           <!-- {{#if attachments}} -->
           <section class="attachments-section">
             <h2 class="attachments-title">
@@ -601,7 +608,7 @@
               <!-- {{/each}} -->
             </div>
           </section>
-          <!-- {{/if}} -->
+          <!-- {{/if attachments}} -->
 
           <!-- シェアボタン -->
           <section class="share-section">
@@ -648,9 +655,7 @@
                 </span>
                 <span class="nav-title">{{prev_article.title}}</span>
               </a>
-              <!-- {{else}} -->
-              <div></div>
-              <!-- {{/if}} -->
+              <!-- {{/if prev_article}} -->
 
               <!-- {{#if next_article}} -->
               <a href="{{next_article.slug}}.html" class="nav-link next">
@@ -660,7 +665,7 @@
                 </span>
                 <span class="nav-title">{{next_article.title}}</span>
               </a>
-              <!-- {{/if}} -->
+              <!-- {{/if next_article}} -->
             </div>
 
             <div class="text-center">
