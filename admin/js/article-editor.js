@@ -1458,13 +1458,16 @@ class ArticleEditor {
         return;
       }
 
+      // 公開前の状態を取得（LINE/X投稿判定用）
+      // 注意: saveArticleInternalで line_published=true で保存済みだが、
+      // まだLINE配信は実行されていない（下書き状態だったため）
+      // したがって、公開処理時にはlineEnabledがtrueならLINE配信を実行する
+      const previousStatus = this.currentArticle?.status || 'draft';
+      console.log('📋 公開前のステータス:', previousStatus);
+
       const result = await supabaseClient.publishArticle(this.articleId);
 
       if (result.success) {
-        // 公開前の状態を取得（LINE/X投稿判定用）
-        const previousLinePublished = this.currentArticle?.line_published || false;
-        const previousXPublished = this.currentArticle?.x_published || false;
-
         this.currentArticle = result.data;
 
         // 詳細ページを生成（公開時のみ）
@@ -1479,23 +1482,25 @@ class ArticleEditor {
           }
         }
 
-        // LINE通知: 公開時にline_publishedがtrueで、まだ配信されていない場合
+        // LINE通知: 公開処理時に実行（下書きから公開への遷移時）
         const lineEnabled = document.querySelector('#line-enabled')?.checked || false;
         const lineMessage = document.querySelector('#line-message')?.value.trim() || '';
         const excerpt = document.querySelector('#excerpt')?.value.trim() || '';
         const title = document.querySelector('#title')?.value.trim() || '';
 
-        if (lineEnabled && !previousLinePublished) {
+        // 下書きから公開への遷移時、かつLINE配信が有効な場合
+        if (lineEnabled && previousStatus === 'draft') {
           console.log('📢 LINE通知トリガー: 公開処理時にLINE配信を実行');
           await this.postToLine(title, excerpt, lineMessage, result.data.slug || this.articleId);
         }
 
-        // X投稿: 公開時にx_publishedがtrueで、まだ投稿されていない場合
+        // X投稿: 公開処理時に実行（下書きから公開への遷移時）
         const xEnabled = document.querySelector('#x-enabled')?.checked || false;
         const xMessage = document.querySelector('#x-message')?.value.trim() || '';
         const xHashtags = document.querySelector('#x-hashtags')?.value.trim() || '#旭丘一丁目';
 
-        if (xEnabled && !previousXPublished) {
+        // 下書きから公開への遷移時、かつX投稿が有効な場合
+        if (xEnabled && previousStatus === 'draft') {
           console.log('📢 X投稿トリガー: 公開処理時にX投稿を実行');
           await this.postToX(title, excerpt, xMessage, xHashtags, result.data.slug || this.articleId);
         }
