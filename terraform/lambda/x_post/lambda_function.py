@@ -1,3 +1,4 @@
+import hashlib
 import json
 import logging
 import os
@@ -8,7 +9,7 @@ import time
 import urllib.error
 import urllib.parse
 import urllib.request
-from typing import Dict, List
+from typing import Dict, List, Optional
 
 LOGGER = logging.getLogger()
 LOGGER.setLevel(logging.INFO)
@@ -19,9 +20,17 @@ ACCESS_TOKEN = os.environ.get("TWITTER_ACCESS_TOKEN")
 ACCESS_TOKEN_SECRET = os.environ.get("TWITTER_ACCESS_TOKEN_SECRET")
 API_URL = "https://api.twitter.com/2/tweets"
 
+# Supabase設定（重複チェック用）
+SUPABASE_URL = os.environ.get("SUPABASE_URL")
+SUPABASE_KEY = os.environ.get("SUPABASE_KEY")
+
 
 class ConfigError(Exception):
     """Raised when required configuration is missing."""
+
+
+class DuplicateNotificationError(Exception):
+    """Raised when notification has already been sent for this article."""
 
 
 def _percent_encode(value: str) -> str:
@@ -104,11 +113,88 @@ def _validate_configuration() -> None:
             ("TWITTER_API_SECRET", CONSUMER_SECRET),
             ("TWITTER_ACCESS_TOKEN", ACCESS_TOKEN),
             ("TWITTER_ACCESS_TOKEN_SECRET", ACCESS_TOKEN_SECRET),
+            ("SUPABASE_URL", SUPABASE_URL),
+            ("SUPABASE_KEY", SUPABASE_KEY),
         ]
         if not value
     ]
     if missing:
         raise ConfigError(f"Missing required environment variables: {', '.join(missing)}")
+
+
+def _check_duplicate(article_id: str) -> bool:
+    """
+    Supabaseで既にX投稿済みかチェック
+    Returns: True if already sent, False otherwise
+    """
+    if not article_id:
+        LOGGER.warning("No article_id provided, skipping duplicate check")
+        return False
+
+    endpoint = f"{SUPABASE_URL}/rest/v1/notification_history"
+    params = f"article_id=eq.{article_id}&notification_type=eq.x&select=id"
+    url = f"{endpoint}?{params}"
+
+    headers = {
+        'apikey': SUPABASE_KEY,
+        'Authorization': f'Bearer {SUPABASE_KEY}',
+        'Content-Type': 'application/json'
+    }
+
+    req = urllib.request.Request(url, headers=headers, method='GET')
+
+    try:
+        with urllib.request.urlopen(req, timeout=10) as response:
+            data = json.loads(response.read().decode('utf-8'))
+            if data and len(data) > 0:
+                LOGGER.info(f"X post already sent for article {article_id}")
+                return True
+            return False
+    except urllib.error.HTTPError as e:
+        LOGGER.error(f"Supabase API error checking duplicate: {e.code}")
+        # エラーの場合は安全のため投稿しない
+        return True
+    except Exception as e:
+        LOGGER.error(f"Error checking duplicate: {str(e)}")
+        # エラーの場合は安全のため投稿しない
+        return True
+
+
+def _record_notification(article_id: str, message: str, response_data: Dict) -> None:
+    """
+    Supabaseに投稿履歴を記録
+    """
+    if not article_id:
+        LOGGER.warning("No article_id provided, skipping notification recording")
+        return
+
+    endpoint = f"{SUPABASE_URL}/rest/v1/notification_history"
+    message_hash = hashlib.sha256(message.encode('utf-8')).hexdigest()
+
+    payload = json.dumps({
+        'article_id': article_id,
+        'notification_type': 'x',
+        'message_hash': message_hash,
+        'response_data': response_data
+    }).encode('utf-8')
+
+    headers = {
+        'apikey': SUPABASE_KEY,
+        'Authorization': f'Bearer {SUPABASE_KEY}',
+        'Content-Type': 'application/json',
+        'Prefer': 'return=minimal'
+    }
+
+    req = urllib.request.Request(endpoint, data=payload, headers=headers, method='POST')
+
+    try:
+        with urllib.request.urlopen(req, timeout=10) as response:
+            LOGGER.info(f"X post notification recorded for article {article_id}")
+    except urllib.error.HTTPError as e:
+        error_body = e.read().decode('utf-8')
+        LOGGER.error(f"Failed to record notification: {e.code} - {error_body}")
+    except Exception as e:
+        LOGGER.error(f"Error recording notification: {str(e)}")
 
 
 def _extract_urls(message: str) -> List[str]:
@@ -152,7 +238,11 @@ def _validate_domain(message: str) -> None:
     LOGGER.info("Domain validation passed: %s", found_domains)
 
 
-def _extract_message(event: Dict) -> str:
+def _extract_request_data(event: Dict) -> Dict:
+    """
+    リクエストからmessageとarticle_idを抽出
+    Returns: {'message': str, 'article_id': Optional[str]}
+    """
     if not event:
         raise ValueError("Empty event")
     body = event.get("body")
@@ -174,10 +264,18 @@ def _extract_message(event: Dict) -> str:
     if not isinstance(message, str):
         raise ValueError("'message' must be a string")
 
+    # article_id は必須
+    article_id = parsed_body.get("article_id")
+    if not article_id:
+        raise ValueError("'article_id' field is mandatory for duplicate prevention")
+
     # Validate domain
     _validate_domain(message)
 
-    return message
+    return {
+        'message': message,
+        'article_id': article_id
+    }
 
 
 def lambda_handler(event, context):
@@ -198,8 +296,32 @@ def lambda_handler(event, context):
 
     try:
         _validate_configuration()
-        message = _extract_message(event)
+        request_data = _extract_request_data(event)
+        message = request_data['message']
+        article_id = request_data['article_id']
+
+        # 重複チェック
+        if _check_duplicate(article_id):
+            LOGGER.info(f"Skipping X post - already sent for article {article_id}")
+            return {
+                "statusCode": 200,
+                "headers": {
+                    "Content-Type": "application/json",
+                    "Access-Control-Allow-Origin": "*",
+                },
+                "body": json.dumps({
+                    "status": "skipped",
+                    "message": "X post already sent for this article",
+                    "article_id": article_id,
+                }),
+            }
+
         response = _post_to_x(message)
+        tweet_response = json.loads(response["body"])
+
+        # 投稿成功を記録
+        _record_notification(article_id, message, tweet_response)
+
         return {
             "statusCode": 200,
             "headers": {
@@ -208,7 +330,8 @@ def lambda_handler(event, context):
             },
             "body": json.dumps({
                 "status": "success",
-                "tweet_response": json.loads(response["body"]),
+                "tweet_response": tweet_response,
+                "article_id": article_id,
             }),
         }
     except ConfigError as error:

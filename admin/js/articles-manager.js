@@ -150,6 +150,13 @@ class ArticlesManager {
       );
     }
 
+    // イベント開始日時で降順にソート（新しい順）
+    filtered.sort((a, b) => {
+      const dateA = a.event_start_datetime ? new Date(a.event_start_datetime) : new Date(0);
+      const dateB = b.event_start_datetime ? new Date(b.event_start_datetime) : new Date(0);
+      return dateB - dateA;
+    });
+
     this.filteredArticles = filtered;
     this.displayArticles();
   }
@@ -204,7 +211,7 @@ class ArticlesManager {
           </span>
         </td>
         <td>${article.author?.name || '不明'}</td>
-        <td>${this.formatDate(article.published_at || article.created_at)}</td>
+        <td>${this.formatDate(article.event_start_datetime)}</td>
         <td>
           <div class="action-buttons">
             <a href="article-edit.html?id=${article.id}" class="btn btn-sm btn-primary">編集</a>

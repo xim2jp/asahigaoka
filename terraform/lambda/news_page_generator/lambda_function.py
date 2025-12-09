@@ -231,8 +231,13 @@ def generate_calendar_html(year: int, month: int, today, articles: List[Dict]) -
                 title = article.get('title', '')
                 # タイトルをエスケープ
                 title_escaped = escape_html(title)
-                detail_url = f"news/{slug}.html"
-                event_html = f'<div class="calendar-day-event" onclick="event.stopPropagation(); window.location.href=\'{detail_url}\'" title="{title_escaped}">{title_escaped}</div>'
+                # generate_article_pageフラグがtrueの場合のみリンクを生成
+                if article.get('generate_article_page'):
+                    detail_url = f"news/{slug}.html"
+                    event_html = f'<div class="calendar-day-event" onclick="event.stopPropagation(); window.location.href=\'{detail_url}\'" title="{title_escaped}">{title_escaped}</div>'
+                else:
+                    # リンクなしのイベント表示
+                    event_html = f'<div class="calendar-day-event calendar-day-event-nolink" title="{title_escaped}">{title_escaped}</div>'
 
             html += f'''<div class="calendar-day {today_class} {event_class}">
                 <span class="calendar-day-number">{day}</span>
@@ -252,16 +257,16 @@ def generate_news_list_html(articles: List[Dict]) -> str:
     html = ''
     for article in articles[:30]:  # 最大30件表示
         slug = article.get('slug') or article.get('id')
-        detail_url = f"news/{slug}.html"
 
         title = escape_html(article.get('title', ''))
 
-        # 日付フォーマット
-        published_at = article.get('published_at') or article.get('created_at')
-        if published_at:
-            date_str = format_date_jp(published_at)
+        # イベント開始日を優先して表示
+        event_date = article.get('event_start_datetime')
+        if event_date:
+            date_str = format_date_jp(event_date)
         else:
-            date_str = ''
+            published_at = article.get('published_at') or article.get('created_at')
+            date_str = format_date_jp(published_at) if published_at else ''
 
         # アイキャッチ画像
         featured_image = article.get('featured_image_url')
@@ -277,7 +282,10 @@ def generate_news_list_html(articles: List[Dict]) -> str:
         if article.get('x_published'):
             icons_html += '<div class="news-item-icon x" title="Xで投稿済み"><i class="ri-twitter-x-line text-xs"></i></div>'
 
-        html += f'''
+        # generate_article_pageフラグがtrueの場合のみリンクを生成
+        if article.get('generate_article_page'):
+            detail_url = f"news/{slug}.html"
+            html += f'''
             <a href="{detail_url}" class="news-item">
                 {image_html}
                 <div class="news-item-content">
@@ -288,6 +296,20 @@ def generate_news_list_html(articles: List[Dict]) -> str:
                     </div>
                 </div>
             </a>
+        '''
+        else:
+            # リンクなしの表示
+            html += f'''
+            <div class="news-item news-item-nolink">
+                {image_html}
+                <div class="news-item-content">
+                    <div class="news-item-date">{date_str}</div>
+                    <div class="news-item-title">{title}</div>
+                    <div class="news-item-icons">
+                        {icons_html}
+                    </div>
+                </div>
+            </div>
         '''
 
     return html
@@ -548,6 +570,18 @@ NEWS_HTML_TEMPLATE = '''<!DOCTYPE html>
         position: relative;
       }}
 
+      .calendar-day-event-nolink {{
+        cursor: default;
+      }}
+
+      .calendar-day-event-nolink:hover {{
+        background: #fef3c7;
+      }}
+
+      .calendar-day.today .calendar-day-event-nolink:hover {{
+        background: rgba(255, 255, 255, 0.3);
+      }}
+
       /* お知らせ一覧スタイル */
       .news-item {{
         display: flex;
@@ -619,6 +653,19 @@ NEWS_HTML_TEMPLATE = '''<!DOCTYPE html>
       .news-item-icon.x {{
         background: #000000;
         color: white;
+      }}
+
+      .news-item-nolink {{
+        cursor: default;
+      }}
+
+      .news-item-nolink:hover {{
+        background: transparent;
+        padding-left: 0;
+        padding-right: 0;
+        margin-left: 0;
+        margin-right: 0;
+        border-radius: 0;
       }}
 
       @media (max-width: 768px) {{

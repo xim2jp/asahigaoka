@@ -633,7 +633,7 @@
         container.innerHTML = html;
       }
 
-      // モックデータ生成
+      // モックデータ生成（イベント開始日をベースに）
       function generateMockNews() {
         const news = [];
         const categories = ['お知らせ', 'イベント', '防災・防犯', '子育て支援', '商店街情報', '活動レポート'];
@@ -669,20 +669,21 @@
           '文化活動のご案内',
           '地域安全マップの作成'
         ];
-        
+
         const today = new Date();
-        
+
         for (let i = 0; i < 30; i++) {
-          const date = new Date(today);
-          date.setDate(date.getDate() - i);
-          
+          // イベント開始日（date）を基準に設定
+          const eventDate = new Date(today);
+          eventDate.setDate(eventDate.getDate() - i);
+
           const hasImage = Math.random() > 0.3; // 70%の確率で画像あり
           const hasLine = Math.random() > 0.2; // 80%の確率でLINE配信
           const hasX = Math.random() > 0.3; // 70%の確率でX投稿
-          
+
           news.push({
             id: i + 1,
-            date: date,
+            date: eventDate, // イベント開始日
             title: titles[i % titles.length],
             category: categories[i % categories.length],
             image: hasImage ? `https://picsum.photos/seed/${i}/400/300` : null,
@@ -691,7 +692,10 @@
             detailUrl: `news-${i + 1}.html` // 詳細ページのURL
           });
         }
-        
+
+        // イベント開始日で降順にソート（新しい順）
+        news.sort((a, b) => b.date - a.date);
+
         return news;
       }
 

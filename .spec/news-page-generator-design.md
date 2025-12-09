@@ -122,7 +122,8 @@
 
 - 該当日のセルにイベントタイトルを表示
 - タイトルは最大2行で切り詰め
-- クリックで記事詳細ページ（`news/{slug}.html`）にジャンプ
+- `generate_article_page = true` の記事のみクリックで記事詳細ページ（`news/{slug}.html`）にジャンプ
+- `generate_article_page = false` の記事はタイトル表示のみ（リンクなし、cursor: default）
 
 ## 7. お知らせ一覧表示仕様
 
@@ -135,17 +136,22 @@
 
 ### 7.2 表示順序
 
-- `event_start_datetime` の降順（イベント日優先）
+- `event_start_datetime` の降順（イベント開始日優先）
 - `published_at` の降順
 
 ### 7.3 表示項目
 
 - アイキャッチ画像（設定されている場合）
-- 公開日（日本語形式: YYYY年MM月DD日（曜日））
+- イベント開始日（日本語形式: YYYY年MM月DD日（曜日））※イベント日がない場合は公開日
 - タイトル
 - SNS配信アイコン（LINE配信済み、X投稿済み）
 
-### 7.4 表示件数
+### 7.4 リンク制御
+
+- `generate_article_page = true` の記事のみ詳細ページへのリンク（`<a>`タグ）
+- `generate_article_page = false` の記事はリンクなし（`<div>`タグ、hover効果なし）
+
+### 7.5 表示件数
 
 - 最大30件
 
@@ -362,7 +368,8 @@ API Gateway経由で呼び出され、記事IDと削除フラグをパラメー�
   "body": {
     "success": true,
     "message": "Detail page generated successfully",
-    "file_path": "news/example-article.html"
+    "file_path": "news/example-article.html",
+    "news_page_updated": true
   }
 }
 ```
@@ -374,7 +381,8 @@ API Gateway経由で呼び出され、記事IDと削除フラグをパラメー�
   "body": {
     "success": true,
     "message": "Detail page deleted successfully",
-    "file_path": "news/example-article.html"
+    "file_path": "news/example-article.html",
+    "news_page_updated": true
   }
 }
 ```
@@ -389,6 +397,22 @@ API Gateway経由で呼び出され、記事IDと削除フラグをパラメー�
   }
 }
 ```
+
+### 11.11 news.html同時更新機能
+
+記事詳細ページの生成/削除時に、news.htmlも自動的に更新されます。
+
+**処理内容**:
+1. Supabaseから公開済み記事を取得
+2. `show_in_calendar = true` の記事をカレンダーにマッピング
+3. `show_in_news_list = true` の記事を一覧に表示
+4. `generate_article_page = true` の記事のみリンクを生成
+5. 当月・来月のカレンダーHTMLを生成
+6. お知らせ一覧HTMLを生成
+7. news.htmlをGitHubにプッシュ
+
+**レスポンスフィールド**:
+- `news_page_updated`: boolean - news.htmlの更新が成功したかどうか
 
 ## 12. 今後の拡張
 
