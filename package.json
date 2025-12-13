@@ -25,6 +25,7 @@
   },
   "homepage": "https://github.com/xim2jp/asahigaoka#readme",
   "devDependencies": {
+    "@playwright/mcp": "^0.0.51",
     "@playwright/test": "^1.57.0",
     "playwright": "^1.57.0",
     "typescript": "^5.9.3"

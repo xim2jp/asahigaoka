@@ -1,0 +1,547 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>旭丘一丁目町会 CMS操作ガイド</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Hiragino Kaku Gothic ProN', 'メイリオ', Meiryo, sans-serif;
+            line-height: 1.8;
+            color: #333;
+            background: #f5f5f5;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .cover {
+            background: linear-gradient(135deg, #2c5530 0%, #4CAF50 100%);
+            color: white;
+            padding: 60px 40px;
+            text-align: center;
+            margin-bottom: 40px;
+            border-radius: 12px;
+        }
+        .cover h1 {
+            font-size: 32px;
+            margin-bottom: 20px;
+        }
+        .cover .subtitle {
+            font-size: 18px;
+            opacity: 0.9;
+        }
+        .cover .date {
+            margin-top: 30px;
+            font-size: 14px;
+            opacity: 0.8;
+        }
+        .section {
+            background: white;
+            padding: 30px;
+            margin-bottom: 30px;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            page-break-inside: avoid;
+        }
+        .section h2 {
+            color: #2c5530;
+            font-size: 24px;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 3px solid #4CAF50;
+        }
+        .section h3 {
+            color: #333;
+            font-size: 18px;
+            margin: 25px 0 15px 0;
+            padding-left: 15px;
+            border-left: 4px solid #4CAF50;
+        }
+        .screenshot {
+            margin: 20px 0;
+            text-align: center;
+        }
+        .screenshot img {
+            max-width: 100%;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        }
+        .screenshot .caption {
+            margin-top: 10px;
+            font-size: 14px;
+            color: #666;
+        }
+        .step {
+            background: #f9f9f9;
+            border-left: 4px solid #4CAF50;
+            padding: 15px 20px;
+            margin: 15px 0;
+            border-radius: 0 8px 8px 0;
+        }
+        .step-number {
+            display: inline-block;
+            background: #4CAF50;
+            color: white;
+            width: 30px;
+            height: 30px;
+            line-height: 30px;
+            text-align: center;
+            border-radius: 50%;
+            font-weight: bold;
+            margin-right: 10px;
+        }
+        .note {
+            background: #fff3cd;
+            border: 1px solid #ffc107;
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 8px;
+        }
+        .note::before {
+            content: "💡 ポイント：";
+            font-weight: bold;
+            color: #856404;
+        }
+        .warning {
+            background: #f8d7da;
+            border: 1px solid #f5c6cb;
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 8px;
+        }
+        .warning::before {
+            content: "⚠️ 注意：";
+            font-weight: bold;
+            color: #721c24;
+        }
+        .success {
+            background: #d4edda;
+            border: 1px solid #c3e6cb;
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 8px;
+        }
+        .success::before {
+            content: "✅ ";
+            font-weight: bold;
+        }
+        ul, ol {
+            margin: 15px 0 15px 30px;
+        }
+        li {
+            margin: 8px 0;
+        }
+        .highlight {
+            background: #e8f5e9;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-weight: bold;
+        }
+        .button-example {
+            display: inline-block;
+            background: #4CAF50;
+            color: white;
+            padding: 8px 16px;
+            border-radius: 6px;
+            font-size: 14px;
+            margin: 5px;
+        }
+        .button-example.secondary {
+            background: #ff7043;
+        }
+        .button-example.outline {
+            background: white;
+            color: #333;
+            border: 1px solid #ddd;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 15px 0;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 12px;
+            text-align: left;
+        }
+        th {
+            background: #4CAF50;
+            color: white;
+        }
+        tr:nth-child(even) {
+            background: #f9f9f9;
+        }
+        .page-break {
+            page-break-after: always;
+        }
+        @media print {
+            body {
+                background: white;
+            }
+            .container {
+                max-width: none;
+                padding: 0;
+            }
+            .section {
+                box-shadow: none;
+                border: 1px solid #ddd;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- 表紙 -->
+        <div class="cover">
+            <h1>🏘️ 旭丘一丁目町会<br>CMS操作ガイド</h1>
+            <p class="subtitle">ホームページ・LINE・X への記事配信方法</p>
+            <p class="date">2025年12月 作成</p>
+        </div>
+
+        <!-- 目次 -->
+        <div class="section">
+            <h2>📋 目次</h2>
+            <ol>
+                <li><a href="#login">ログインする</a></li>
+                <li><a href="#articles">記事一覧を見る</a></li>
+                <li><a href="#create">新しい記事を作る</a></li>
+                <li><a href="#sns">LINE・Xに配信する</a></li>
+                <li><a href="#faq">よくある質問</a></li>
+            </ol>
+        </div>
+
+        <div class="page-break"></div>
+
+        <!-- 1. ログイン -->
+        <div class="section" id="login">
+            <h2>1. ログインする</h2>
+
+            <p>まず、管理画面にログインします。</p>
+
+            <h3>ログイン画面を開く</h3>
+            <div class="step">
+                <span class="step-number">1</span>
+                インターネットブラウザ（Chrome、Edge など）を開きます
+            </div>
+            <div class="step">
+                <span class="step-number">2</span>
+                アドレスバーに以下を入力してEnterキーを押します：<br>
+                <code style="background:#eee; padding:5px 10px; border-radius:4px; font-size:16px;">https://asahigaoka-nerima.tokyo/admin/login.html</code>
+            </div>
+
+            <div class="screenshot">
+                <img src="screenshots/01_login.png" alt="ログイン画面">
+                <p class="caption">【図1】ログイン画面</p>
+            </div>
+
+            <h3>ログイン情報を入力する</h3>
+            <div class="step">
+                <span class="step-number">3</span>
+                <strong>メールアドレス</strong>の欄に、お知らせしたメールアドレスを入力します
+            </div>
+            <div class="step">
+                <span class="step-number">4</span>
+                <strong>パスワード</strong>の欄に、お知らせしたパスワードを入力します
+            </div>
+            <div class="step">
+                <span class="step-number">5</span>
+                <span class="button-example">ログイン</span> ボタンをクリックします
+            </div>
+
+            <div class="note">
+                パスワードは大文字・小文字・記号の区別があります。正確に入力してください。
+            </div>
+
+            <div class="success">
+                ログインに成功すると、ダッシュボード画面が表示されます。
+            </div>
+        </div>
+
+        <div class="page-break"></div>
+
+        <!-- 2. 記事一覧 -->
+        <div class="section" id="articles">
+            <h2>2. 記事一覧を見る</h2>
+
+            <p>作成した記事の一覧を確認できます。</p>
+
+            <h3>記事一覧画面を開く</h3>
+            <div class="step">
+                <span class="step-number">1</span>
+                左側メニューの <span class="highlight">📝 記事管理</span> をクリックします
+            </div>
+
+            <div class="screenshot">
+                <img src="screenshots/02_articles.png" alt="記事一覧画面">
+                <p class="caption">【図2】記事一覧画面</p>
+            </div>
+
+            <h3>画面の見かた</h3>
+            <table>
+                <tr>
+                    <th>項目</th>
+                    <th>説明</th>
+                </tr>
+                <tr>
+                    <td>タイトル</td>
+                    <td>記事のタイトル（クリックすると編集できます）</td>
+                </tr>
+                <tr>
+                    <td>カテゴリ</td>
+                    <td>お知らせ、イベント情報、防災・防犯 など</td>
+                </tr>
+                <tr>
+                    <td>ステータス</td>
+                    <td><span style="color:green">公開</span> または <span style="color:orange">下書き</span></td>
+                </tr>
+                <tr>
+                    <td>作成者</td>
+                    <td>記事を作成した人の名前</td>
+                </tr>
+                <tr>
+                    <td>イベント日</td>
+                    <td>イベントの開催日</td>
+                </tr>
+                <tr>
+                    <td>操作</td>
+                    <td>編集・削除ボタン</td>
+                </tr>
+            </table>
+
+            <h3>記事を探す</h3>
+            <ul>
+                <li><strong>検索ボックス</strong>：記事のタイトルで検索できます</li>
+                <li><strong>カテゴリ</strong>：カテゴリで絞り込みできます</li>
+                <li><strong>ステータス</strong>：公開中・下書きで絞り込みできます</li>
+            </ul>
+        </div>
+
+        <div class="page-break"></div>
+
+        <!-- 3. 新規記事作成 -->
+        <div class="section" id="create">
+            <h2>3. 新しい記事を作る</h2>
+
+            <p>ホームページに掲載する記事を作成します。</p>
+
+            <h3>記事作成画面を開く</h3>
+            <div class="step">
+                <span class="step-number">1</span>
+                左側メニューの <span class="highlight">✏️ 新規記事作成</span> をクリック<br>
+                または、記事一覧画面の <span class="button-example">+ 新規記事作成</span> ボタンをクリック
+            </div>
+
+            <div class="screenshot">
+                <img src="screenshots/03_article_edit_basic.png" alt="記事編集画面（基本情報）">
+                <p class="caption">【図3】記事編集画面（基本情報タブ）</p>
+            </div>
+
+            <h3>基本情報を入力する</h3>
+
+            <div class="step">
+                <span class="step-number">2</span>
+                <strong>記事タイトル</strong>を入力します<br>
+                <small>例：「餅つき大会を開催します」「防災訓練のお知らせ」</small>
+            </div>
+
+            <div class="step">
+                <span class="step-number">3</span>
+                <strong>カテゴリ</strong>を選択します
+            </div>
+            <table>
+                <tr>
+                    <th>カテゴリ</th>
+                    <th>使う場面</th>
+                </tr>
+                <tr>
+                    <td>お知らせ</td>
+                    <td>一般的なお知らせ、連絡事項</td>
+                </tr>
+                <tr>
+                    <td>イベント情報</td>
+                    <td>お祭り、餅つき、総会など</td>
+                </tr>
+                <tr>
+                    <td>防災・防犯</td>
+                    <td>防災訓練、注意喚起など</td>
+                </tr>
+                <tr>
+                    <td>子育て支援</td>
+                    <td>子ども向けイベント、子育て情報</td>
+                </tr>
+                <tr>
+                    <td>商店街情報</td>
+                    <td>地域のお店の情報</td>
+                </tr>
+                <tr>
+                    <td>活動レポート</td>
+                    <td>活動の報告、写真の掲載</td>
+                </tr>
+            </table>
+
+            <div class="step">
+                <span class="step-number">4</span>
+                <strong>イベント日時</strong>を設定します<br>
+                <small>開始日は必須です。終了日は複数日にまたがる場合に入力します。</small>
+            </div>
+
+            <div class="step">
+                <span class="step-number">5</span>
+                <strong>記事本文</strong>を入力します<br>
+                <small>ツールバーで太字や見出しなどの装飾ができます。</small>
+            </div>
+
+            <div class="note">
+                <span class="button-example">🤖 AIに書いてもらう</span> ボタンを押すと、簡単なメモから正式な文章を自動生成できます！
+            </div>
+
+            <div class="step">
+                <span class="step-number">6</span>
+                <strong>アイキャッチ画像</strong>を設定します（任意）<br>
+                <small>記事の一覧やSNSで表示される画像です。</small>
+            </div>
+
+            <div class="step">
+                <span class="step-number">7</span>
+                <strong>添付ファイル</strong>を追加します（任意）<br>
+                <small>PDFやWord文書など、ダウンロードしてもらいたいファイルがある場合。</small>
+            </div>
+
+            <div class="step">
+                <span class="step-number">8</span>
+                <strong>抜粋（SNS配信用）</strong>を入力します<br>
+                <small>LINEやXで配信するときの短い説明文です。100文字程度。</small>
+            </div>
+        </div>
+
+        <div class="page-break"></div>
+
+        <!-- 4. SNS配信 -->
+        <div class="section" id="sns">
+            <h2>4. LINE・Xに配信する</h2>
+
+            <p>記事をLINEやX（Twitter）に同時配信できます。</p>
+
+            <h3>SEO/SNS設定タブを開く</h3>
+            <div class="step">
+                <span class="step-number">1</span>
+                画面上部の <span class="highlight">SEO/SNS設定</span> タブをクリックします
+            </div>
+
+            <div class="screenshot">
+                <img src="screenshots/04_article_edit_seo_sns.png" alt="SEO/SNS設定画面">
+                <p class="caption">【図4】SEO/SNS設定タブ</p>
+            </div>
+
+            <h3>LINE配信の設定</h3>
+            <div class="step">
+                <span class="step-number">2</span>
+                <strong>「LINEに配信する」</strong>にチェックを入れます
+            </div>
+            <div class="step">
+                <span class="step-number">3</span>
+                <strong>配信メッセージ</strong>を確認・編集します<br>
+                <small>空欄の場合は「抜粋」の内容が自動で使われます。</small>
+            </div>
+
+            <h3>X（Twitter）投稿の設定</h3>
+            <div class="step">
+                <span class="step-number">4</span>
+                <strong>「Xに投稿する」</strong>にチェックを入れます
+            </div>
+            <div class="step">
+                <span class="step-number">5</span>
+                <strong>投稿内容</strong>を確認・編集します（280文字以内）
+            </div>
+            <div class="step">
+                <span class="step-number">6</span>
+                <strong>ハッシュタグ</strong>を設定します<br>
+                <small>例：#旭丘一丁目 #練馬区</small>
+            </div>
+
+            <div class="warning">
+                LINE・Xへの配信は<strong>「保存して公開」</strong>ボタンを押したときに行われます。下書き保存では配信されません。
+            </div>
+
+            <h3>記事を保存・公開する</h3>
+            <div class="step">
+                <span class="step-number">7</span>
+                すべての入力が終わったら、画面下部のボタンをクリックします
+            </div>
+
+            <table>
+                <tr>
+                    <th>ボタン</th>
+                    <th>動作</th>
+                </tr>
+                <tr>
+                    <td><span class="button-example secondary">📝 下書き保存</span></td>
+                    <td>保存のみ。ホームページには表示されません。</td>
+                </tr>
+                <tr>
+                    <td><span class="button-example">💾 保存して公開</span></td>
+                    <td>保存して公開。ホームページに表示され、LINE・Xにも配信されます。</td>
+                </tr>
+                <tr>
+                    <td><span class="button-example outline">👁️ プレビュー</span></td>
+                    <td>公開前に見た目を確認できます。</td>
+                </tr>
+            </table>
+
+            <div class="success">
+                「記事を保存しました」と表示されたら完了です！
+            </div>
+        </div>
+
+        <div class="page-break"></div>
+
+        <!-- 5. FAQ -->
+        <div class="section" id="faq">
+            <h2>5. よくある質問</h2>
+
+            <h3>Q. パスワードを忘れました</h3>
+            <p>→ 管理者にお問い合わせください。パスワードの再設定を行います。</p>
+
+            <h3>Q. 記事を間違えて公開してしまいました</h3>
+            <p>→ 記事一覧から該当の記事を開き、ステータスを「下書き」に変更して保存してください。ホームページからは非表示になります。</p>
+
+            <h3>Q. 画像がアップロードできません</h3>
+            <p>→ 以下を確認してください：</p>
+            <ul>
+                <li>ファイルサイズが大きすぎないか（10MB以下推奨）</li>
+                <li>対応形式か（PNG、JPG、GIF、WebP）</li>
+                <li>インターネット接続が安定しているか</li>
+            </ul>
+
+            <h3>Q. LINEに配信されたか確認したい</h3>
+            <p>→ ご自身のスマートフォンで町会のLINE公式アカウントを開いて確認してください。</p>
+
+            <h3>Q. 記事を削除したい</h3>
+            <p>→ 記事一覧で該当記事の「削除」ボタンをクリックします。削除すると元に戻せませんのでご注意ください。</p>
+
+            <div class="note">
+                その他ご不明な点は、お気軽に管理者までお問い合わせください。
+            </div>
+        </div>
+
+        <!-- 問い合わせ先 -->
+        <div class="section">
+            <h2>📞 お問い合わせ</h2>
+            <p>操作でわからないことがあれば、お気軽にご連絡ください。</p>
+            <p style="margin-top:15px;">
+                <strong>旭丘一丁目町会 広報担当</strong><br>
+                メール：block1@asahigaoka-nerima.tokyo
+            </p>
+        </div>
+
+    </div>
+</body>
+</html>
