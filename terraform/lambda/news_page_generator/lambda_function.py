@@ -739,9 +739,9 @@ NEWS_HTML_TEMPLATE = '''<!DOCTYPE html>
               >町会について</a
             >
             <a
-              href="antidisaster_index.html"
+              href="antidisaster-evacuation.html"
               class="text-gray-700 hover:text-primary transition-colors"
-              >災害特集</a
+              >指定避難所</a
             >
             <a
               href="contact.html"
@@ -779,9 +779,9 @@ NEWS_HTML_TEMPLATE = '''<!DOCTYPE html>
               >町会について</a
             >
             <a
-              href="antidisaster_index.html"
+              href="antidisaster-evacuation.html"
               class="text-gray-700 hover:text-primary transition-colors"
-              >災害特集</a
+              >指定避難所</a
             >
             <a
               href="contact.html"
