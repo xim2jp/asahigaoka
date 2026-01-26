@@ -776,7 +776,7 @@ resource "aws_lambda_permission" "api_gateway_detail_page" {
   source_arn    = "${aws_api_gateway_rest_api.dify_proxy.execution_arn}/*/*"
 }
 
-# デプロイメントトリガーを更新（詳細ページ生成エンドポイント追加）
+# デプロイメントトリガーを更新（LINE Webhookエンドポイント追加）
 resource "aws_api_gateway_deployment" "dify_proxy_v3" {
   rest_api_id = aws_api_gateway_rest_api.dify_proxy.id
 
@@ -791,6 +791,9 @@ resource "aws_api_gateway_deployment" "dify_proxy_v3" {
       aws_api_gateway_resource.generate_detail_page.id,
       aws_api_gateway_method.generate_detail_page_post.id,
       aws_api_gateway_integration.generate_detail_page_post.id,
+      aws_api_gateway_resource.line_webhook.id,
+      aws_api_gateway_method.line_webhook_post.id,
+      aws_api_gateway_integration.line_webhook_post.id,
       timestamp()
     ]))
   }
@@ -805,7 +808,9 @@ resource "aws_api_gateway_deployment" "dify_proxy_v3" {
     aws_api_gateway_integration.analyze_image_post,
     aws_api_gateway_integration.analyze_image_options,
     aws_api_gateway_integration.generate_detail_page_post,
-    aws_api_gateway_integration.generate_detail_page_options
+    aws_api_gateway_integration.generate_detail_page_options,
+    aws_api_gateway_integration.line_webhook_post,
+    aws_api_gateway_integration.line_webhook_options
   ]
 }
 
@@ -819,4 +824,173 @@ output "news_detail_page_generator_api_endpoint" {
 output "news_detail_page_generator_lambda_arn" {
   value       = aws_lambda_function.news_detail_page_generator.arn
   description = "News Detail Page Generator Lambda function ARN"
+}
+
+# ===================================
+# LINE Webhook Lambda Function
+# LINE AIチャット（Dify連携）
+# 環境変数はAWSコンソールで手動設定
+# ===================================
+
+# Lambda用IAMロール（LINE Webhook用）
+resource "aws_iam_role" "line_webhook_lambda" {
+  name = "line-webhook-lambda-role"
+
+  assume_role_policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Action = "sts:AssumeRole"
+        Effect = "Allow"
+        Principal = {
+          Service = "lambda.amazonaws.com"
+        }
+      }
+    ]
+  })
+}
+
+# CloudWatch Logs用のポリシーをアタッチ
+resource "aws_iam_role_policy_attachment" "line_webhook_lambda_logs" {
+  role       = aws_iam_role.line_webhook_lambda.name
+  policy_arn = "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+}
+
+# Lambda関数用のZIPファイルを作成
+data "archive_file" "line_webhook_lambda" {
+  type        = "zip"
+  source_dir  = "${path.module}/lambda/line_webhook"
+  output_path = "${path.module}/lambda/line_webhook.zip"
+}
+
+# Lambda関数
+resource "aws_lambda_function" "line_webhook" {
+  filename         = data.archive_file.line_webhook_lambda.output_path
+  function_name    = "asahigaoka-line-webhook"
+  role             = aws_iam_role.line_webhook_lambda.arn
+  handler          = "lambda_function.lambda_handler"
+  source_code_hash = data.archive_file.line_webhook_lambda.output_base64sha256
+  runtime          = "python3.11"
+  timeout          = 30
+  memory_size      = 256
+
+  environment {
+    variables = {
+      # 初回デプロイ用のプレースホルダー
+      # 実際の値はAWSコンソールで設定
+      LINE_CHANNEL_SECRET       = "SET_IN_AWS_CONSOLE"
+      LINE_CHANNEL_ACCESS_TOKEN = "SET_IN_AWS_CONSOLE"
+      DIFY_API_KEY              = "SET_IN_AWS_CONSOLE"
+      DIFY_API_ENDPOINT         = "http://top-overly-pup.ngrok-free.app/v1/chat-messages"
+      SUPABASE_URL              = var.supabase_url
+      SUPABASE_KEY              = var.supabase_anon_key
+    }
+  }
+
+  # AWSコンソールで設定した環境変数をTerraformで上書きしない
+  lifecycle {
+    ignore_changes = [environment]
+  }
+}
+
+# CloudWatch Logsグループ
+resource "aws_cloudwatch_log_group" "line_webhook_lambda" {
+  name              = "/aws/lambda/${aws_lambda_function.line_webhook.function_name}"
+  retention_in_days = 14
+}
+
+# API Gateway リソース（/line-webhook）
+resource "aws_api_gateway_resource" "line_webhook" {
+  rest_api_id = aws_api_gateway_rest_api.dify_proxy.id
+  parent_id   = aws_api_gateway_rest_api.dify_proxy.root_resource_id
+  path_part   = "line-webhook"
+}
+
+# API Gateway メソッド（POST）
+resource "aws_api_gateway_method" "line_webhook_post" {
+  rest_api_id   = aws_api_gateway_rest_api.dify_proxy.id
+  resource_id   = aws_api_gateway_resource.line_webhook.id
+  http_method   = "POST"
+  authorization = "NONE"
+}
+
+# API Gateway メソッド（OPTIONS - CORS用）
+resource "aws_api_gateway_method" "line_webhook_options" {
+  rest_api_id   = aws_api_gateway_rest_api.dify_proxy.id
+  resource_id   = aws_api_gateway_resource.line_webhook.id
+  http_method   = "OPTIONS"
+  authorization = "NONE"
+}
+
+# API Gateway 統合（POST）
+resource "aws_api_gateway_integration" "line_webhook_post" {
+  rest_api_id             = aws_api_gateway_rest_api.dify_proxy.id
+  resource_id             = aws_api_gateway_resource.line_webhook.id
+  http_method             = aws_api_gateway_method.line_webhook_post.http_method
+  integration_http_method = "POST"
+  type                    = "AWS_PROXY"
+  uri                     = aws_lambda_function.line_webhook.invoke_arn
+}
+
+# API Gateway 統合（OPTIONS - CORS用）
+resource "aws_api_gateway_integration" "line_webhook_options" {
+  rest_api_id = aws_api_gateway_rest_api.dify_proxy.id
+  resource_id = aws_api_gateway_resource.line_webhook.id
+  http_method = aws_api_gateway_method.line_webhook_options.http_method
+  type        = "MOCK"
+
+  request_templates = {
+    "application/json" = "{\"statusCode\": 200}"
+  }
+}
+
+# API Gateway メソッドレスポンス（OPTIONS）
+resource "aws_api_gateway_method_response" "line_webhook_options" {
+  rest_api_id = aws_api_gateway_rest_api.dify_proxy.id
+  resource_id = aws_api_gateway_resource.line_webhook.id
+  http_method = aws_api_gateway_method.line_webhook_options.http_method
+  status_code = "200"
+
+  response_parameters = {
+    "method.response.header.Access-Control-Allow-Headers" = true
+    "method.response.header.Access-Control-Allow-Methods" = true
+    "method.response.header.Access-Control-Allow-Origin"  = true
+  }
+}
+
+# API Gateway 統合レスポンス（OPTIONS）
+resource "aws_api_gateway_integration_response" "line_webhook_options" {
+  rest_api_id = aws_api_gateway_rest_api.dify_proxy.id
+  resource_id = aws_api_gateway_resource.line_webhook.id
+  http_method = aws_api_gateway_method.line_webhook_options.http_method
+  status_code = aws_api_gateway_method_response.line_webhook_options.status_code
+
+  response_parameters = {
+    "method.response.header.Access-Control-Allow-Headers" = "'Content-Type,X-Line-Signature'"
+    "method.response.header.Access-Control-Allow-Methods" = "'POST,OPTIONS'"
+    "method.response.header.Access-Control-Allow-Origin"  = "'*'"
+  }
+
+  depends_on = [aws_api_gateway_integration.line_webhook_options]
+}
+
+# Lambda実行許可（API Gatewayから）
+resource "aws_lambda_permission" "api_gateway_line_webhook" {
+  statement_id  = "AllowAPIGatewayInvokeLineWebhook"
+  action        = "lambda:InvokeFunction"
+  function_name = aws_lambda_function.line_webhook.function_name
+  principal     = "apigateway.amazonaws.com"
+  source_arn    = "${aws_api_gateway_rest_api.dify_proxy.execution_arn}/*/*"
+}
+
+# 出力：LINE Webhook API Gateway エンドポイント
+output "line_webhook_api_endpoint" {
+  value       = "${aws_api_gateway_stage.prod.invoke_url}/line-webhook"
+  description = "LINE Webhook API endpoint URL"
+}
+
+# 出力：Lambda関数ARN
+output "line_webhook_lambda_arn" {
+  value       = aws_lambda_function.line_webhook.arn
+  description = "LINE Webhook Lambda function ARN"
 }

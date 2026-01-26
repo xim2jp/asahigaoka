@@ -2086,6 +2086,27 @@ Response: 200 OK
 - S3 アップロード失敗時: 3回リトライ
 - CloudFront キャッシュ無効化失敗時: 警告のみ（処理続行）
 
+## 14
+LINEチャット仕様
+以下のcurl と同等のAPIリクエストを送信しますと、AIからの回答がノンブロッキングで受信できます。
+USER_QUERYを設定して送信してください。
+```bash
+curl -X POST 'http://top-overly-pup.ngrok-free.app/v1/chat-messages' \
+--header 'Authorization: Bearer app-ralT9hLWWKvhmWDJMcONZzsy' \
+--header 'Content-Type: application/json' \
+--data-raw '{
+    "inputs": {},
+    "query": "{USER_QUERY}",
+    "response_mode": "blocking",
+    "conversation_id": "",
+    "user": "abc-123"
+    ]
+}'
+```
+
+
+
+
 ---
 
 **文書作成日**: 2025年11月13日

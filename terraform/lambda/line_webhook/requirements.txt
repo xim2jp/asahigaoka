@@ -1,0 +1,2 @@
+# LINE Webhook Lambda
+# 標準ライブラリのみ使用（外部依存なし）
