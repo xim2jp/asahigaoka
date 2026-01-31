@@ -2534,8 +2534,214 @@ cors_headers = {
 
 ---
 
+## 16. スマホ版管理画面設計
+
+### 16.1 概要
+
+スマホからログインした管理者向けに、記事の一覧・簡易編集・新規作成に特化したモバイル専用画面を提供する。既存のバックエンド（Supabase、Dify API Proxy、LINE/X Lambda）をそのまま利用する。
+
+### 16.2 ファイル構成
+
+```
+/admin/
+├── mobile.html              # スマホ版管理画面（新規）
+├── css/
+│   └── mobile.css           # スマホ版専用スタイル（新規）
+├── js/
+│   ├── mobile-admin.js      # スマホ版ロジック（新規）
+│   ├── supabase-client.js   # 既存（変更なし）
+│   └── config.js            # 既存（変更なし）
+└── login.html               # 既存（スマホ判定リダイレクト追加）
+```
+
+### 16.3 ログイン・遷移フロー
+
+```
+login.html
+  ↓ ログイン成功
+  ↓ window.innerWidth <= 768 ?
+  ├─ YES → mobile.html
+  └─ NO  → index.html（従来通り）
+```
+
+### 16.4 画面設計
+
+#### 16.4.1 画面構成
+
+```
+┌────────────────────────────┐
+│  ヘッダー                    │
+│  旭丘一丁目町会 ┃ ログアウト  │
+├────────────────────────────┤
+│  [ 記事一覧 ] [ 新規作成 ]    │  ← タブナビゲーション
+├────────────────────────────┤
+│                            │
+│  コンテンツエリア             │
+│  （タブに応じて切り替え）      │
+│                            │
+└────────────────────────────┘
+```
+
+#### 16.4.2 記事一覧タブ
+
+```
+┌────────────────────────────┐
+│ ● 公開中   餅つき大会のお知らせ │  ← タップで展開
+│            2026-01-15        │
+├────────────────────────────┤
+│ ○ 下書き   防災訓練のお知らせ   │
+│            2026-02-01        │
+├────────────────────────────┤
+│ ...（最大30件）               │
+└────────────────────────────┘
+
+展開時:
+┌────────────────────────────┐
+│ 件名: [餅つき大会のお知らせ  ] │
+│ 本文:                        │
+│ [テキストエリア              ] │
+│                              │
+│ ステータス: [●公開中 ○下書き]  │  ← トグルスイッチ
+│                              │
+│ [ 保存 ]    [ 閉じる ]        │
+└────────────────────────────┘
+```
+
+#### 16.4.3 新規作成タブ
+
+```
+┌────────────────────────────┐
+│ 開始日 *     終了日            │
+│ [2026-01-15] [2026-01-15]    │
+│                              │
+│ 件名 *                       │
+│ [                          ] │
+│                              │
+│ 要約（下書き） *              │
+│ [                          ] │
+│                              │
+│ アイキャッチ画像              │
+│ [ ファイルを選択 ]            │
+│ (プレビュー表示)             │
+│                              │
+│      [ AIに依頼 ]            │
+│                              │
+│ 本文                         │
+│ [                          ] │
+│                              │
+│ SNS用サマリ文                │
+│ [                          ] │
+│                              │
+│ [ 投稿 ]      [ キャンセル ]  │
+└────────────────────────────┘
+```
+
+### 16.5 コンポーネント設計
+
+#### 16.5.1 MobileAdmin クラス
+
+```javascript
+class MobileAdmin {
+  // --- 認証 ---
+  checkAuth()               // localStorage からユーザー確認、未認証なら login.html へ
+  logout()                  // supabaseClient.signOut() → login.html
+
+  // --- 記事一覧 ---
+  loadArticles()            // supabaseClient.getArticles({ limit:30, status:'all' })
+  renderArticleList(articles)
+  toggleArticleExpand(id)   // カード展開・折りたたみ
+  saveInlineEdit(id)        // title, content のみ更新
+  toggleStatus(id, article) // ステータス変更 + SNS自動投稿判定
+
+  // --- SNS自動投稿 ---
+  autoPublishSNS(article)   // line_published/x_published が false の場合のみ投稿
+  postToLine(article)       // LINE_BROADCAST_ENDPOINT
+  postToX(article)          // X_POST_ENDPOINT
+
+  // --- 新規作成 ---
+  handleImageUpload(e)      // supabaseClient.uploadMedia(file)
+  generateWithAI()          // DIFY_PROXY_ENDPOINT（既存パターン）
+  saveNewArticle()          // supabaseClient.createArticle({ status:'draft' })
+  resetForm()               // フォームクリア
+
+  // --- UI ---
+  switchTab(tabName)        // 記事一覧 ↔ 新規作成
+  showAlert(msg, type)      // 通知メッセージ
+  showLoading() / hideLoading()
+}
+```
+
+### 16.6 データフロー
+
+#### 記事一覧読み込み
+```
+mobile-admin.js → supabaseClient.getArticles({limit:30}) → Supabase DB → 画面描画
+```
+
+#### インライン編集
+```
+ユーザー編集 → 保存ボタン → supabaseClient.updateArticle(id, {title, content}) → Supabase DB
+```
+
+#### ステータストグル（下書き→公開、SNS自動投稿）
+```
+トグル操作
+  ↓
+supabaseClient.updateArticle(id, { status:'published', published_at })
+  ↓
+line_published == false?
+  ├─ YES → fetch(LINE_BROADCAST_ENDPOINT) → supabaseClient.updateArticle(id, {line_published:true})
+  └─ NO  → skip
+  ↓
+x_published == false?
+  ├─ YES → fetch(X_POST_ENDPOINT) → supabaseClient.updateArticle(id, {x_published:true})
+  └─ NO  → skip
+```
+
+#### AI記事生成
+```
+件名 + 開始日 + 要約 → fetch(DIFY_PROXY_ENDPOINT)
+  ↓
+レスポンス { text350, text80 }
+  ↓
+text350 → 本文フィールドに自動入力
+text80  → SNS用サマリ文に自動入力
+```
+
+#### 新規記事保存
+```
+フォーム入力
+  ↓ (画像があれば先にアップロード)
+supabaseClient.uploadMedia(file) → featured_image_url 取得
+  ↓
+supabaseClient.createArticle({
+  title, content, excerpt, category:'notice',
+  event_start_datetime, event_end_datetime,
+  featured_image_url, status:'draft'
+})
+  ↓
+記事一覧タブに切り替え＆リスト再読込
+```
+
+### 16.7 既存リソース利用マップ
+
+| 機能 | 利用する既存リソース |
+|------|-------------------|
+| 認証 | supabase-client.js `getCurrentUser()`, `signOut()` |
+| 記事取得 | supabase-client.js `getArticles()` |
+| 記事更新 | supabase-client.js `updateArticle()` |
+| 記事作成 | supabase-client.js `createArticle()` |
+| 画像アップロード | supabase-client.js `uploadMedia()` |
+| AI生成 | config.js `DIFY_PROXY_ENDPOINT` |
+| LINE投稿 | config.js `LINE_BROADCAST_ENDPOINT` |
+| X投稿 | config.js `X_POST_ENDPOINT` |
+
+**新規API/DBテーブル: なし**
+
+---
+
 **文書作成日**: 2025年11月13日
-**最終更新**: 2025年12月07日
-**バージョン**: 2.3（ニュース記事詳細ページテンプレート追加）
-**ステータス**: 第1フェーズ完了、AI記事生成実装済み、静的ページ生成設計完了
+**最終更新**: 2026年01月31日
+**バージョン**: 2.4（スマホ版管理画面設計追加）
+**ステータス**: 第1フェーズ完了、AI記事生成実装済み、静的ページ生成設計完了、スマホ版管理画面設計追加
 **次回レビュー**: 第2フェーズ開始時

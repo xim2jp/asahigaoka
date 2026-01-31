@@ -152,9 +152,13 @@
                         // ロール情報をセッションに保存
                         localStorage.setItem('asahigaoka_user_role', result.user.role);
 
-                        // ダッシュボード へリダイレクト
+                        // デバイス判定してリダイレクト
                         console.log('ログイン成功:', email);
-                        window.location.href = 'index.html';
+                        if (window.innerWidth <= 768) {
+                            window.location.href = 'mobile.html';
+                        } else {
+                            window.location.href = 'index.html';
+                        }
                     } else {
                         // ログイン失敗
                         alert('ログインに失敗しました。\n' + result.error);

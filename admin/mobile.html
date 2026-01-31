@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>管理画面 - 旭丘一丁目町会</title>
+    <link rel="stylesheet" href="css/mobile.css">
+</head>
+<body>
+
+    <!-- ヘッダー -->
+    <header class="mobile-header">
+        <div>
+            <h1>旭丘一丁目町会<span class="user-name" id="user-name"></span></h1>
+        </div>
+        <button class="btn-logout" id="btn-logout">ログアウト</button>
+    </header>
+
+    <!-- タブナビゲーション -->
+    <nav class="tab-nav">
+        <button class="tab-btn active" data-tab="list">記事一覧</button>
+        <button class="tab-btn" data-tab="create">新規作成</button>
+    </nav>
+
+    <!-- アラート表示エリア -->
+    <div id="alert-area"></div>
+
+    <!-- 記事一覧タブ -->
+    <div class="tab-content active" id="tab-list">
+        <div class="article-list" id="article-list">
+            <!-- JS で描画 -->
+        </div>
+    </div>
+
+    <!-- 新規作成タブ -->
+    <div class="tab-content" id="tab-create">
+        <form id="create-form" autocomplete="off">
+            <!-- 日付範囲 -->
+            <div class="form-group">
+                <div class="date-row">
+                    <div>
+                        <label class="form-label">開始日 <span class="required">*</span></label>
+                        <input type="date" id="new-date-from" class="form-input" required>
+                    </div>
+                    <div>
+                        <label class="form-label">終了日</label>
+                        <input type="date" id="new-date-to" class="form-input">
+                    </div>
+                </div>
+            </div>
+
+            <!-- 件名 -->
+            <div class="form-group">
+                <label class="form-label" for="new-title">件名 <span class="required">*</span></label>
+                <input type="text" id="new-title" class="form-input" placeholder="記事のタイトル">
+            </div>
+
+            <!-- 要約 -->
+            <div class="form-group">
+                <label class="form-label" for="new-summary">要約（下書き） <span class="required">*</span></label>
+                <textarea id="new-summary" class="form-textarea" rows="3" placeholder="AIに伝える下書き内容"></textarea>
+            </div>
+
+            <!-- アイキャッチ画像 -->
+            <div class="form-group">
+                <label class="form-label">アイキャッチ画像</label>
+                <div class="image-upload-area" id="image-upload-area">
+                    <input type="file" id="new-image" accept="image/jpeg,image/png,image/gif,image/webp">
+                    <span class="image-upload-label">タップして画像を選択</span>
+                </div>
+                <div class="image-preview" id="image-preview">
+                    <img id="image-preview-img" src="" alt="プレビュー">
+                    <button type="button" class="image-remove-btn" id="image-remove-btn">画像を削除</button>
+                </div>
+            </div>
+
+            <!-- AIに依頼ボタン -->
+            <div class="form-group">
+                <button type="button" class="btn btn-ai" id="btn-ai-generate">AIに依頼</button>
+            </div>
+
+            <!-- 本文 -->
+            <div class="form-group">
+                <label class="form-label" for="new-content">本文</label>
+                <textarea id="new-content" class="form-textarea" rows="8" placeholder="AI生成または手動入力"></textarea>
+            </div>
+
+            <!-- SNS用サマリ文 -->
+            <div class="form-group">
+                <label class="form-label" for="new-excerpt">SNS用サマリ文</label>
+                <textarea id="new-excerpt" class="form-textarea" rows="3" placeholder="AI生成または手動入力"></textarea>
+            </div>
+
+            <!-- ボタン -->
+            <div class="btn-row">
+                <button type="submit" class="btn btn-save">投稿（下書き保存）</button>
+                <button type="button" class="btn btn-cancel" id="btn-cancel">キャンセル</button>
+            </div>
+        </form>
+    </div>
+
+    <!-- PC版リンク -->
+    <div class="pc-link">
+        <a href="index.html">PC版管理画面へ</a>
+    </div>
+
+    <!-- ローディングオーバーレイ -->
+    <div class="loading-overlay" id="loading-overlay">
+        <div class="loading-content">
+            <div class="loading-spinner"></div>
+            <div class="loading-text" id="loading-text">処理中...</div>
+        </div>
+    </div>
+
+    <!-- Supabase JS SDK -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="js/supabase-client.js"></script>
+    <script src="js/config.js"></script>
+    <script src="js/mobile-admin.js"></script>
+</body>
+</html>

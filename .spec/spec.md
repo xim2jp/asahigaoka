@@ -2109,8 +2109,82 @@ curl -X POST 'http://top-overly-pup.ngrok-free.app/v1/chat-messages' \
 
 ---
 
+## 15. スマホ版管理画面
+
+### 15.1 概要
+
+管理画面 `/admin/login.html` からスマホでログインした場合、スマホ専用の管理画面 (`/admin/mobile.html`) に遷移させる。PC版の全機能ではなく、記事の一覧・簡易編集・新規作成に特化したシンプルなインターフェースを提供する。
+
+既存のデータベース（Supabase）・API（Dify Proxy, LINE/X Lambda）をそのまま利用し、新規バックエンド要素は追加しない。
+
+### 15.2 スマホ判定
+
+- **判定タイミング**: ログイン成功後のリダイレクト時
+- **判定条件**: `window.innerWidth <= 768`（既存CSSブレークポイントと一致）
+- **遷移先**:
+  - スマホ（768px以下）→ `/admin/mobile.html`
+  - PC（769px以上）→ `/admin/index.html`（従来通り）
+
+### 15.3 記事一覧機能
+
+#### 15.3.1 表示仕様
+- 記事を時系列（新しい順）に最大30件表示
+- ステータスは公開中・下書き両方を表示
+- カード形式で表示（タイトル、イベント日、ステータスバッジ）
+
+#### 15.3.2 インライン編集
+- カードタップで展開し、件名・本文のみ編集可能
+- 保存ボタンで `supabaseClient.updateArticle()` を呼び出し
+
+#### 15.3.3 ステータストグル
+- 下書き／公開中のスイッチ（トグルUI）
+- **下書き→公開中に変更した場合**:
+  - `line_published == false` かつ `x_published == false` の記事のみSNS自動投稿を実行
+  - LINE: `LINE_BROADCAST_ENDPOINT` へPOST
+  - X: `X_POST_ENDPOINT` へPOST
+  - 投稿完了後、`line_published`/`x_published` フラグを `true` に更新
+
+#### 15.3.4 API利用
+```
+supabaseClient.getArticles({ limit: 30, status: 'all', sortBy: 'created_at', sortOrder: 'desc' })
+supabaseClient.updateArticle(id, { title, content })
+supabaseClient.updateArticle(id, { status, published_at })
+```
+
+### 15.4 記事作成フォーム
+
+#### 15.4.1 フォーム項目
+
+| 項目 | 入力方式 | 必須 | 備考 |
+|-----|---------|------|------|
+| 開始日 | date input | ○ | ネイティブカレンダー使用 |
+| 終了日 | date input | × | |
+| 件名 | text input | ○ | |
+| 要約（下書き） | textarea | ○ | AI生成の元テキスト |
+| アイキャッチ画像 | file input | × | プレビュー表示付き |
+| 「AIに依頼」ボタン | button | - | 件名・日付・要約を元にAI生成 |
+| 本文 | textarea | × | AI生成で自動入力 |
+| SNS用サマリ文 | textarea | × | AI生成で自動入力 |
+| 投稿ボタン | button | - | 下書きステータスで保存 |
+| キャンセルボタン | button | - | フォームクリア、一覧へ戻る |
+
+#### 15.4.2 AI生成処理
+- 既存の Dify API Proxy (`DIFY_PROXY_ENDPOINT`) を使用
+- リクエスト: `{ title, summary, date, date_to, intro_url }`
+- レスポンス: `{ text350, text80, meta_desc, meta_kwd }`
+- `text350` → 本文に自動入力
+- `text80` → SNS用サマリ文に自動入力
+
+#### 15.4.3 保存処理
+- 保存時は自動で `status: 'draft'` に設定
+- `supabaseClient.createArticle()` で保存
+- アイキャッチ画像がある場合は `supabaseClient.uploadMedia()` で先にアップロード
+- 保存後、記事一覧タブに切り替え＆リスト更新
+
+---
+
 **文書作成日**: 2025年11月13日
-**最終更新**: 2025年12月09日
-**バージョン**: 2.5（管理画面改善、news.html同時更新機能追加）
-**ステータス**: 第1フェーズ実装完了、記事編集機能改善完了、ニュース詳細ページテンプレート追加、管理画面UX改善
+**最終更新**: 2026年01月31日
+**バージョン**: 2.6（スマホ版管理画面追加）
+**ステータス**: 第1フェーズ実装完了、スマホ版管理画面追加
 
