@@ -16,8 +16,8 @@ class MobileAdmin {
   // ============================
 
   async init() {
-    // 認証チェック
-    if (!this.checkAuth()) return;
+    // 認証チェック（localStorageからユーザー情報を復元）
+    if (!(await this.checkAuth())) return;
 
     // ユーザー名表示
     const user = supabaseClient.currentUser;
@@ -32,8 +32,8 @@ class MobileAdmin {
     await this.loadArticles();
   }
 
-  checkAuth() {
-    const user = supabaseClient.currentUser;
+  async checkAuth() {
+    const user = await supabaseClient.getCurrentUser();
     if (!user) {
       window.location.href = 'login.html';
       return false;
