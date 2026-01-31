@@ -167,7 +167,7 @@ test.describe('スマホ版 - 記事一覧', () => {
     // 編集フィールドが表示される
     await expect(firstCard.locator('.edit-title')).toBeVisible();
     await expect(firstCard.locator('.edit-content')).toBeVisible();
-    await expect(firstCard.locator('.status-toggle')).toBeVisible();
+    await expect(firstCard.locator('.toggle-switch')).toBeVisible();
     await expect(firstCard.locator('.btn-save-edit')).toBeVisible();
 
     await context.close();
