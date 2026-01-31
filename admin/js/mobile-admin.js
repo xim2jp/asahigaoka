@@ -272,8 +272,20 @@ class MobileAdmin {
       return;
     }
 
-    // 下書き→公開中に変更した場合、SNS自動投稿チェック
+    // 下書き→公開中に変更した場合
     if (!wasPublished && isPublished && article) {
+      // 記事詳細ページを生成
+      if (window.staticPageGenerator) {
+        console.log('📄 記事詳細ページを生成中...');
+        const detailResult = await window.staticPageGenerator.generateDetailPage(id);
+        if (detailResult.success) {
+          console.log('✅ 記事詳細ページ生成成功:', detailResult.file_path);
+        } else {
+          console.warn('⚠️ 記事詳細ページ生成失敗:', detailResult.error);
+        }
+      }
+
+      // SNS自動投稿チェック
       await this.autoPublishSNS(result.data || { ...article, ...updates });
     }
 
