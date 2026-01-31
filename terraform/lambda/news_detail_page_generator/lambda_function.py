@@ -301,14 +301,14 @@ def generate_detail_html(template: str, article: Dict[str, Any], attachments: Li
     import re
 
     slug = article.get('slug') or article.get('id')
-    title = escape_html(article.get('title', ''))
-    content = article.get('content', '')
-    category = article.get('category', 'notice')
+    title = escape_html(article.get('title') or '')
+    content = article.get('content') or ''
+    category = article.get('category') or 'notice'
     category_label = CATEGORY_LABELS.get(category, 'お知らせ')
-    featured_image_url = article.get('featured_image_url', '')
+    featured_image_url = article.get('featured_image_url') or ''
 
     # 公開日
-    published_at = article.get('published_at') or article.get('created_at', '')
+    published_at = article.get('published_at') or article.get('created_at') or ''
     published_at_formatted = format_date_jp(published_at) if published_at else ''
 
     # イベント日時
@@ -319,7 +319,7 @@ def generate_detail_html(template: str, article: Dict[str, Any], attachments: Li
     # SEO関連
     meta_title = article.get('meta_title') or title
     meta_description = article.get('meta_description') or extract_description(content)
-    meta_keywords = article.get('meta_keywords', '')
+    meta_keywords = article.get('meta_keywords') or ''
 
     # 記事URL
     article_url = f"{SITE_BASE_URL}/news/{slug}.html"
