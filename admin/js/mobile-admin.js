@@ -452,26 +452,24 @@ class MobileAdmin {
     const dateFrom = document.getElementById('new-date-from').value;
     const dateTo = document.getElementById('new-date-to').value;
 
-    // バリデーション（画像/PDFがある場合は必須解除）
-    if (!this.uploadedImageUrl) {
-      if (!title) {
-        this.showAlert('件名を入力してください', 'error');
-        return;
-      }
-      if (!summary) {
-        this.showAlert('要約（下書き）を入力してください', 'error');
-        return;
-      }
-      if (!dateFrom) {
-        this.showAlert('開始日を入力してください', 'error');
-        return;
-      }
+    // バリデーション
+    if (!title) {
+      this.showAlert('件名を入力してください', 'error');
+      return;
+    }
+    if (!summary) {
+      this.showAlert('要約（下書き）を入力してください', 'error');
+      return;
+    }
+    if (!dateFrom) {
+      this.showAlert('開始日を入力してください', 'error');
+      return;
     }
 
     this.showLoading('AIが記事を生成中...');
 
     try {
-      const result = await this.callDifyAPI(title, summary, dateFrom, dateTo, this.uploadedImageUrl);
+      const result = await this.callDifyAPI(title, summary, dateFrom, dateTo);
 
       this.hideLoading();
 
@@ -490,7 +488,7 @@ class MobileAdmin {
     }
   }
 
-  async callDifyAPI(title, summary, date, dateTo = null, imageUrl = null) {
+  async callDifyAPI(title, summary, date, dateTo = null) {
     const apiEndpoint = window.DIFY_PROXY_ENDPOINT;
     if (!apiEndpoint) {
       return { success: false, error: 'APIエンドポイント未設定' };
@@ -505,10 +503,6 @@ class MobileAdmin {
 
     if (dateTo) {
       requestBody.date_to = dateTo;
-    }
-
-    if (imageUrl) {
-      requestBody.image_url = imageUrl;
     }
 
     try {

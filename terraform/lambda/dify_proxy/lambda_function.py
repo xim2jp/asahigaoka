@@ -44,13 +44,10 @@ def lambda_handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
         body = json.loads(event['body'])
 
         # 必須パラメータのバリデーション
-        # image_url がある場合は title, summary, date は任意（Dify側で生成/補完を期待）
-        image_url = body.get('image_url')
-        if not image_url:
-            required_fields = ['title', 'summary', 'date']
-            for field in required_fields:
-                if field not in body:
-                    return error_response(f'{field} は必須です', 400, cors_headers)
+        required_fields = ['title', 'summary', 'date']
+        for field in required_fields:
+            if field not in body:
+                return error_response(f'{field} は必須です', 400, cors_headers)
 
         # Dify API呼び出し
         result = call_dify_api(
@@ -58,8 +55,7 @@ def lambda_handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
             summary=body.get('summary', ''),
             date=body.get('date', ''),
             date_to=body.get('date_to'),
-            intro_url=body.get('intro_url', 'https://asahigaoka-nerima.tokyo/town.html'),
-            image_url=image_url
+            intro_url=body.get('intro_url', 'https://asahigaoka-nerima.tokyo/town.html')
         )
 
         return {
@@ -78,7 +74,7 @@ def lambda_handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
         return error_response(f'サーバーエラー: {str(e)}', 500, cors_headers)
 
 
-def call_dify_api(title: str, summary: str, date: str, date_to: str = None, intro_url: str = None, image_url: str = None) -> Dict[str, Any]:
+def call_dify_api(title: str, summary: str, date: str, date_to: str = None, intro_url: str = None) -> Dict[str, Any]:
     """
     Dify APIを呼び出す
 
@@ -88,19 +84,13 @@ def call_dify_api(title: str, summary: str, date: str, date_to: str = None, intr
         date: 記事の開始日付
         date_to: 記事の終了日付（オプション）
         intro_url: イントロURL
-        image_url: 画像URL（オプション）
 
     Returns:
         API レスポンス
     """
     # 環境変数からAPIキーとエンドポイントを取得
-    api_key = os.environ.get('DIFY_API_KEY')
-    api_endpoint = os.environ.get('DIFY_API_ENDPOINT')
-
-    if not api_key:
-        raise ValueError('DIFY_API_KEY が設定されていません')
-    if not api_endpoint:
-        raise ValueError('DIFY_API_ENDPOINT が設定されていません')
+    api_key = os.environ['DIFY_API_KEY']
+    api_endpoint = os.environ['DIFY_API_ENDPOINT']
 
     # header.
     # header.
@@ -119,17 +109,6 @@ def call_dify_api(title: str, summary: str, date: str, date_to: str = None, intr
     if date_to:
         inputs['date_to'] = date_to
     
-    # image_url がある場合
-    if image_url:
-        # 画像の場合は picture 変数を追加
-        inputs['picture'] = [
-            {
-                'type': 'image',
-                'transfer_method': 'remote_url',
-                'url': image_url
-            }
-        ]
-
     request_body = {
         'inputs': inputs,
         'response_mode': 'blocking',
