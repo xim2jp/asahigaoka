@@ -265,6 +265,8 @@ resource "aws_iam_role_policy" "dify_proxy_lambda_s3" {
   })
 }
 
+
+
 # Lambda関数用のZIPファイルを作成
 data "archive_file" "dify_proxy_lambda" {
   type        = "zip"

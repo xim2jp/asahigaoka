@@ -411,19 +411,13 @@ class MobileAdmin {
     }
 
     // プレビュー表示
-    if (file.type === 'application/pdf') {
-      // PDFの場合はアイコンを表示（またはそれっぽい画像）
-      document.getElementById('image-preview-img').src = 'images/pdf-icon.png'; // 仮のアイコン
-      // 実際には画像ではないので、代替表示が必要かもしれないが、簡易的に
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      const previewHtml = `<img src="${e.target.result}" style="max-width: 100%; max-height: 200px; border-radius: 8px;">`;
+      document.getElementById('image-preview').innerHTML = previewHtml;
       document.getElementById('image-preview').classList.add('has-image');
-    } else {
-      const reader = new FileReader();
-      reader.onload = (ev) => {
-        document.getElementById('image-preview-img').src = ev.target.result;
-        document.getElementById('image-preview').classList.add('has-image');
-      };
-      reader.readAsDataURL(file);
-    }
+    };
+    reader.readAsDataURL(file);
 
     // アップロード
     this.showLoading('ファイルをアップロード中...');

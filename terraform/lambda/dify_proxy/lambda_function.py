@@ -119,8 +119,9 @@ def call_dify_api(title: str, summary: str, date: str, date_to: str = None, intr
     if date_to:
         inputs['date_to'] = date_to
     
-    # image_url がある場合は picture 変数を追加
+    # image_url がある場合
     if image_url:
+        # 画像の場合は picture 変数を追加
         inputs['picture'] = [
             {
                 'type': 'image',
