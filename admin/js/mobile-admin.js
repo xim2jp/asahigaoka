@@ -307,10 +307,10 @@ class MobileAdmin {
     const excerpt = article.excerpt || '';
     const slug = article.slug || article.id;
 
-    // LINE投稿（テスト中のため無効化 - 本番利用者がいるため）
-    // if (!article.line_published) {
-    //   await this.postToLine(title, excerpt, slug, article.id);
-    // }
+    // LINE投稿
+    if (!article.line_published) {
+      await this.postToLine(title, excerpt, slug, article.id);
+    }
 
     // X投稿（未投稿の場合のみ）
     if (!article.x_published) {
