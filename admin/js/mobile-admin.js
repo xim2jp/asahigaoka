@@ -399,9 +399,9 @@ class MobileAdmin {
     if (!file) return;
 
     // バリデーション
-    const allowedTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
+    const allowedTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp', 'application/pdf'];
     if (!allowedTypes.includes(file.type)) {
-      this.showAlert('JPG, PNG, GIF, WebP のみ対応しています', 'error');
+      this.showAlert('JPG, PNG, GIF, WebP, PDF のみ対応しています', 'error');
       return;
     }
 
@@ -411,15 +411,22 @@ class MobileAdmin {
     }
 
     // プレビュー表示
-    const reader = new FileReader();
-    reader.onload = (ev) => {
-      document.getElementById('image-preview-img').src = ev.target.result;
+    if (file.type === 'application/pdf') {
+      // PDFの場合はアイコンを表示（またはそれっぽい画像）
+      document.getElementById('image-preview-img').src = 'images/pdf-icon.png'; // 仮のアイコン
+      // 実際には画像ではないので、代替表示が必要かもしれないが、簡易的に
       document.getElementById('image-preview').classList.add('has-image');
-    };
-    reader.readAsDataURL(file);
+    } else {
+      const reader = new FileReader();
+      reader.onload = (ev) => {
+        document.getElementById('image-preview-img').src = ev.target.result;
+        document.getElementById('image-preview').classList.add('has-image');
+      };
+      reader.readAsDataURL(file);
+    }
 
     // アップロード
-    this.showLoading('画像をアップロード中...');
+    this.showLoading('ファイルをアップロード中...');
     const result = await supabaseClient.uploadMedia(file, 'featured-images');
     this.hideLoading();
 
@@ -468,7 +475,7 @@ class MobileAdmin {
     this.showLoading('AIが記事を生成中...');
 
     try {
-      const result = await this.callDifyAPI(title, summary, dateFrom, dateTo);
+      const result = await this.callDifyAPI(title, summary, dateFrom, dateTo, this.uploadedImageUrl);
 
       this.hideLoading();
 
@@ -487,7 +494,7 @@ class MobileAdmin {
     }
   }
 
-  async callDifyAPI(title, summary, date, dateTo = null) {
+  async callDifyAPI(title, summary, date, dateTo = null, imageUrl = null) {
     const apiEndpoint = window.DIFY_PROXY_ENDPOINT;
     if (!apiEndpoint) {
       return { success: false, error: 'APIエンドポイント未設定' };
@@ -502,6 +509,10 @@ class MobileAdmin {
 
     if (dateTo) {
       requestBody.date_to = dateTo;
+    }
+
+    if (imageUrl) {
+      requestBody.image_url = imageUrl;
     }
 
     try {

@@ -55,7 +55,8 @@ def lambda_handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
             summary=body['summary'],
             date=body['date'],
             date_to=body.get('date_to'),
-            intro_url=body.get('intro_url', 'https://asahigaoka-nerima.tokyo/town.html')
+            intro_url=body.get('intro_url', 'https://asahigaoka-nerima.tokyo/town.html'),
+            image_url=body.get('image_url')
         )
 
         return {
@@ -74,7 +75,7 @@ def lambda_handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
         return error_response(f'サーバーエラー: {str(e)}', 500, cors_headers)
 
 
-def call_dify_api(title: str, summary: str, date: str, date_to: str = None, intro_url: str = None) -> Dict[str, Any]:
+def call_dify_api(title: str, summary: str, date: str, date_to: str = None, intro_url: str = None, image_url: str = None) -> Dict[str, Any]:
     """
     Dify APIを呼び出す
 
@@ -84,6 +85,7 @@ def call_dify_api(title: str, summary: str, date: str, date_to: str = None, intr
         date: 記事の開始日付
         date_to: 記事の終了日付（オプション）
         intro_url: イントロURL
+        image_url: 画像URL（オプション）
 
     Returns:
         API レスポンス
@@ -97,6 +99,11 @@ def call_dify_api(title: str, summary: str, date: str, date_to: str = None, intr
     if not api_endpoint:
         raise ValueError('DIFY_API_ENDPOINT が設定されていません')
 
+    # header.
+    # header.
+    # header.
+    # header.
+
     # リクエストボディを構築
     inputs = {
         'date': date,
@@ -108,6 +115,16 @@ def call_dify_api(title: str, summary: str, date: str, date_to: str = None, intr
     # date_to がある場合は追加
     if date_to:
         inputs['date_to'] = date_to
+    
+    # image_url がある場合は picture 変数を追加
+    if image_url:
+        inputs['picture'] = [
+            {
+                'type': 'image',
+                'transfer_method': 'remote_url',
+                'url': image_url
+            }
+        ]
 
     request_body = {
         'inputs': inputs,
