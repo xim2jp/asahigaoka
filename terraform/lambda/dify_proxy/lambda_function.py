@@ -44,19 +44,22 @@ def lambda_handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
         body = json.loads(event['body'])
 
         # 必須パラメータのバリデーション
-        required_fields = ['title', 'summary', 'date']
-        for field in required_fields:
-            if field not in body:
-                return error_response(f'{field} は必須です', 400, cors_headers)
+        # image_url がある場合は title, summary, date は任意（Dify側で生成/補完を期待）
+        image_url = body.get('image_url')
+        if not image_url:
+            required_fields = ['title', 'summary', 'date']
+            for field in required_fields:
+                if field not in body:
+                    return error_response(f'{field} は必須です', 400, cors_headers)
 
         # Dify API呼び出し
         result = call_dify_api(
-            title=body['title'],
-            summary=body['summary'],
-            date=body['date'],
+            title=body.get('title', ''),
+            summary=body.get('summary', ''),
+            date=body.get('date', ''),
             date_to=body.get('date_to'),
             intro_url=body.get('intro_url', 'https://asahigaoka-nerima.tokyo/town.html'),
-            image_url=body.get('image_url')
+            image_url=image_url
         )
 
         return {

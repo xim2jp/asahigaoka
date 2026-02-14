@@ -458,18 +458,20 @@ class MobileAdmin {
     const dateFrom = document.getElementById('new-date-from').value;
     const dateTo = document.getElementById('new-date-to').value;
 
-    // バリデーション
-    if (!title) {
-      this.showAlert('件名を入力してください', 'error');
-      return;
-    }
-    if (!summary) {
-      this.showAlert('要約（下書き）を入力してください', 'error');
-      return;
-    }
-    if (!dateFrom) {
-      this.showAlert('開始日を入力してください', 'error');
-      return;
+    // バリデーション（画像/PDFがある場合は必須解除）
+    if (!this.uploadedImageUrl) {
+      if (!title) {
+        this.showAlert('件名を入力してください', 'error');
+        return;
+      }
+      if (!summary) {
+        this.showAlert('要約（下書き）を入力してください', 'error');
+        return;
+      }
+      if (!dateFrom) {
+        this.showAlert('開始日を入力してください', 'error');
+        return;
+      }
     }
 
     this.showLoading('AIが記事を生成中...');
