@@ -286,6 +286,32 @@
         font-size: 1.25rem;
       }
 
+      .attachment-images {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 10px;
+        margin-bottom: 12px;
+      }
+
+      .attachment-image-item {
+        display: block;
+        aspect-ratio: 4 / 3;
+        overflow: hidden;
+        border-radius: 8px;
+        background: #f3f4f6;
+      }
+
+      .attachment-image-item img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        transition: transform 0.2s;
+      }
+
+      .attachment-image-item:hover img {
+        transform: scale(1.05);
+      }
+
       /* シェアボタン */
       .share-section {
         margin-top: 48px;
@@ -436,6 +462,16 @@
         .share-button {
           justify-content: center;
         }
+
+        .attachment-images {
+          grid-template-columns: repeat(2, 1fr);
+        }
+      }
+
+      @media (max-width: 480px) {
+        .attachment-images {
+          grid-template-columns: 1fr;
+        }
       }
     </style>
   </head>
@@ -562,7 +598,7 @@
           <header class="article-header">
             <div class="article-meta">
               <span class="article-category category-activity_report">活動レポート</span>
-              <time class="article-date" datetime="2026-03-08T02:31:30.828+00:00">2026年3月8日（日）</time>
+              <time class="article-date" datetime="2026-03-08T04:48:31.486+00:00">2026年3月8日（日）</time>
             </div>
             <h1 class="article-title">駅前花壇整備しました</h1>
 
