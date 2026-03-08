@@ -288,14 +288,14 @@
 
       .attachment-images {
         display: grid;
-        grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-        gap: 12px;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 10px;
         margin-bottom: 12px;
       }
 
       .attachment-image-item {
         display: block;
-        aspect-ratio: 1;
+        aspect-ratio: 4 / 3;
         overflow: hidden;
         border-radius: 8px;
         background: #f3f4f6;
@@ -309,7 +309,7 @@
       }
 
       .attachment-image-item:hover img {
-        transform: scale(1.03);
+        transform: scale(1.05);
       }
 
       /* シェアボタン */
@@ -461,6 +461,16 @@
 
         .share-button {
           justify-content: center;
+        }
+
+        .attachment-images {
+          grid-template-columns: repeat(2, 1fr);
+        }
+      }
+
+      @media (max-width: 480px) {
+        .attachment-images {
+          grid-template-columns: 1fr;
         }
       }
     </style>
