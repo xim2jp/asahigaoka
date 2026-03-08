@@ -1359,7 +1359,10 @@ class ArticleEditor {
 
           // アップロード済みの添付ファイルに article_id を設定
           if (this.uploadedAttachmentIds && this.uploadedAttachmentIds.length > 0) {
-            // ... (中略) ...
+            const linkResult = await supabaseClient.updateMediaArticleIds(this.uploadedAttachmentIds, this.articleId);
+            if (!linkResult.success) {
+              console.warn('⚠️ 添付ファイルのリンクに失敗:', linkResult.error);
+            }
           }
 
           // ローカルキャッシュをクリア
@@ -1660,7 +1663,15 @@ class ArticleEditor {
 
       // アップロード後に添付ファイル一覧を更新
       if (this.articleId) {
-        // 既存記事の場合：DB から取得して表示
+        // 既存記事の場合：新規アップロードに article_id を設定してからDB取得
+        if (this.uploadedAttachmentIds.length > 0) {
+          const linkResult = await supabaseClient.updateMediaArticleIds(this.uploadedAttachmentIds, this.articleId);
+          if (!linkResult.success) {
+            console.warn('⚠️ 添付ファイルのリンクに失敗:', linkResult.error);
+          }
+          this.uploadedAttachmentIds = [];
+          this.uploadedAttachments = [];
+        }
         const attachmentsResult = await supabaseClient.getArticleAttachments(this.articleId);
         if (attachmentsResult.success && attachmentsResult.data) {
           this.displayAttachments(attachmentsResult.data);

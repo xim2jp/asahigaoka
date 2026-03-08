@@ -246,8 +246,8 @@ def fetch_attachments_from_supabase(supabase_url: str, supabase_key: str, articl
     """
     Supabaseから添付ファイル情報を取得
     """
-    endpoint = f"{supabase_url}/rest/v1/article_attachments"
-    params = f"select=*&article_id=eq.{article_id}&order=display_order.asc"
+    endpoint = f"{supabase_url}/rest/v1/media"
+    params = f"select=*&article_id=eq.{article_id}&deleted_at=is.null&order=created_at.asc"
     url = f"{endpoint}?{params}"
 
     headers = {
@@ -447,27 +447,36 @@ def generate_detail_html(template: str, article: Dict[str, Any], attachments: Li
     return html
 
 
+IMAGE_EXTENSIONS = {'jpg', 'jpeg', 'png', 'gif', 'webp'}
+
+
 def generate_attachments_html(attachments: List[Dict[str, Any]]) -> str:
     """
     添付ファイル一覧のHTMLを生成
+    画像ファイルはグリッド表示、それ以外はリンク表示
     """
     if not attachments:
         return ''
 
-    html_parts = []
+    image_parts = []
+    file_parts = []
+
     for att in attachments:
         file_name = escape_html(att.get('file_name', ''))
         file_url = att.get('file_url', '')
         file_size = att.get('file_size', 0)
 
-        # ファイルタイプを判定
         ext = file_name.lower().split('.')[-1] if '.' in file_name else ''
-        file_type, file_icon = FILE_TYPE_ICONS.get(ext, ('other', 'file'))
 
-        # ファイルサイズをフォーマット
-        file_size_formatted = format_file_size(file_size)
-
-        html_parts.append(f'''
+        if ext in IMAGE_EXTENSIONS:
+            image_parts.append(f'''
+              <a href="{file_url}" class="attachment-image-item" target="_blank">
+                <img src="{file_url}" alt="{file_name}" loading="lazy">
+              </a>''')
+        else:
+            file_type, file_icon = FILE_TYPE_ICONS.get(ext, ('other', 'file'))
+            file_size_formatted = format_file_size(file_size)
+            file_parts.append(f'''
               <a href="{file_url}" class="attachment-item" download="{file_name}" target="_blank">
                 <div class="attachment-icon {file_type}">
                   <i class="ri-file-{file_icon}-line"></i>
@@ -479,7 +488,12 @@ def generate_attachments_html(attachments: List[Dict[str, Any]]) -> str:
                 <i class="ri-download-line attachment-download"></i>
               </a>''')
 
-    return '\n'.join(html_parts)
+    result = ''
+    if image_parts:
+        result += f'<div class="attachment-images">\n' + '\n'.join(image_parts) + '\n</div>'
+    if file_parts:
+        result += '\n'.join(file_parts)
+    return result
 
 
 def format_file_size(size_bytes: int) -> str:
