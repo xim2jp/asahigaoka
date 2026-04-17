@@ -9,6 +9,8 @@ class MobileAdmin {
     this.expandedId = null;
     this.uploadedImageUrl = null;
     this.uploadedImageId = null;
+    this.selectedFile = null;
+    this.isUploading = false;
   }
 
   // ============================
@@ -397,11 +399,12 @@ class MobileAdmin {
   async handleImageUpload(e) {
     const file = e.target.files[0];
     if (!file) return;
+    this.selectedFile = file;
 
     // バリデーション
-    const allowedTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp', 'application/pdf'];
+    const allowedTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
     if (!allowedTypes.includes(file.type)) {
-      this.showAlert('JPG, PNG, GIF, WebP, PDF のみ対応しています', 'error');
+      this.showAlert('JPG, PNG, GIF, WebP のみ対応しています', 'error');
       return;
     }
 
@@ -421,22 +424,32 @@ class MobileAdmin {
 
     // アップロード
     this.showLoading('ファイルをアップロード中...');
-    const result = await supabaseClient.uploadMedia(file, 'featured-images');
-    this.hideLoading();
+    this.isUploading = true;
+    try {
+      const result = await supabaseClient.uploadMedia(file, 'featured-images');
 
-    if (result.success) {
-      this.uploadedImageUrl = result.data.file_url;
-      this.uploadedImageId = result.data.id;
-      this.showAlert('画像をアップロードしました', 'success');
-    } else {
+      if (result.success) {
+        this.uploadedImageUrl = result.data.file_url;
+        this.uploadedImageId = result.data.id;
+        this.showAlert('画像をアップロードしました', 'success');
+      } else {
+        this.showAlert('画像のアップロードに失敗しました', 'error');
+        this.removeImage();
+      }
+    } catch (error) {
+      console.error('画像アップロードエラー:', error);
       this.showAlert('画像のアップロードに失敗しました', 'error');
       this.removeImage();
+    } finally {
+      this.isUploading = false;
+      this.hideLoading();
     }
   }
 
   removeImage() {
     this.uploadedImageUrl = null;
     this.uploadedImageId = null;
+    this.selectedFile = null;
     document.getElementById('new-image').value = '';
     document.getElementById('image-preview-img').src = '';
     document.getElementById('image-preview').classList.remove('has-image');
@@ -447,44 +460,146 @@ class MobileAdmin {
   // ============================
 
   async generateWithAI() {
-    const title = document.getElementById('new-title').value.trim();
-    const summary = document.getElementById('new-summary').value.trim();
-    const dateFrom = document.getElementById('new-date-from').value;
-    const dateTo = document.getElementById('new-date-to').value;
-
-    // バリデーション
-    if (!title) {
-      this.showAlert('件名を入力してください', 'error');
-      return;
-    }
-    if (!summary) {
-      this.showAlert('要約（下書き）を入力してください', 'error');
-      return;
-    }
-    if (!dateFrom) {
-      this.showAlert('開始日を入力してください', 'error');
+    // 画像アップロード中ガード
+    if (this.isUploading) {
+      this.showAlert('画像アップロード中です。完了までお待ちください', 'error');
       return;
     }
 
-    this.showLoading('AIが記事を生成中...');
+    // 多重クリック防止
+    const btn = document.getElementById('btn-ai-generate');
+    btn.disabled = true;
+
+    const hasImage = !!this.selectedFile;
 
     try {
-      const result = await this.callDifyAPI(title, summary, dateFrom, dateTo);
+      if (hasImage) {
+        // 画像添付時: バリデーション不要。画像AIが title/text350/text80 を生成
+        this.showLoading('画像を分析してAIが記事を生成中...');
+        const base64 = await this.fileToBase64(this.selectedFile);
+        const result = await this.callDifyImageAPI(base64);
 
-      this.hideLoading();
+        if (result.success) {
+          const title = result.data.title || '';
+          const text350 = result.data.text350 || '';
+          const text80 = result.data.text80 || '';
 
-      if (result.success) {
-        // 本文に自動入力
-        document.getElementById('new-content').value = result.data.text350 || '';
-        // SNS用サマリ文に自動入力
-        document.getElementById('new-excerpt').value = result.data.text80 || '';
-        this.showAlert('AIが記事を生成しました', 'success');
+          // 全て空文字の場合はエラー扱い
+          if (!title && !text350 && !text80) {
+            this.showAlert('AIが記事を生成できませんでした。別の画像でお試しください', 'error');
+          } else {
+            if (title) {
+              document.getElementById('new-title').value = title;
+            }
+            if (text350) {
+              document.getElementById('new-content').value = text350;
+            }
+            if (text80) {
+              document.getElementById('new-excerpt').value = text80;
+            }
+            this.showAlert('AIが記事を生成しました', 'success');
+          }
+        } else {
+          this.showAlert('AI生成に失敗しました: ' + (result.error || ''), 'error');
+        }
       } else {
-        this.showAlert('AI生成に失敗しました: ' + (result.error || ''), 'error');
+        // 画像なし: 従来通り title/summary/dateFrom 必須でテキストAPI
+        const title = document.getElementById('new-title').value.trim();
+        const summary = document.getElementById('new-summary').value.trim();
+        const dateFrom = document.getElementById('new-date-from').value;
+        const dateTo = document.getElementById('new-date-to').value;
+
+        if (!title) {
+          this.showAlert('件名を入力してください', 'error');
+          return;
+        }
+        if (!summary) {
+          this.showAlert('要約（下書き）を入力してください', 'error');
+          return;
+        }
+        if (!dateFrom) {
+          this.showAlert('開始日を入力してください', 'error');
+          return;
+        }
+
+        this.showLoading('AIが記事を生成中...');
+        const result = await this.callDifyAPI(title, summary, dateFrom, dateTo);
+
+        if (result.success) {
+          document.getElementById('new-content').value = result.data.text350 || '';
+          document.getElementById('new-excerpt').value = result.data.text80 || '';
+          this.showAlert('AIが記事を生成しました', 'success');
+        } else {
+          this.showAlert('AI生成に失敗しました: ' + (result.error || ''), 'error');
+        }
       }
     } catch (error) {
-      this.hideLoading();
+      console.error('AI生成エラー:', error);
       this.showAlert('AI生成中にエラーが発生しました', 'error');
+    } finally {
+      this.hideLoading();
+      btn.disabled = false;
+    }
+  }
+
+  fileToBase64(file) {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.readAsDataURL(file);
+      reader.onload = () => {
+        const base64 = reader.result.split(',')[1];
+        resolve(base64);
+      };
+      reader.onerror = error => reject(error);
+    });
+  }
+
+  async callDifyImageAPI(base64Data) {
+    const apiEndpoint = window.DIFY_IMAGE_PROXY_ENDPOINT;
+    if (!apiEndpoint) {
+      return { success: false, error: '画像APIエンドポイント未設定' };
+    }
+
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 60000);
+
+    try {
+      const response = await fetch(apiEndpoint, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ request: base64Data }),
+        signal: controller.signal
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(errorData.error || `HTTP ${response.status}`);
+      }
+
+      const data = await response.json();
+
+      if (data.success && data.data) {
+        return {
+          success: true,
+          data: {
+            title: data.data.title || '',
+            text350: data.data.text350 || '',
+            text80: data.data.text80 || '',
+            meta_desc: data.data.meta_desc || '',
+            meta_kwd: data.data.meta_kwd || ''
+          }
+        };
+      } else {
+        throw new Error(data.error || 'レスポンス形式不正');
+      }
+    } catch (error) {
+      console.error('画像分析API エラー:', error);
+      if (error.name === 'AbortError') {
+        return { success: false, error: 'AIの応答が遅すぎました。しばらくしてからお試しください' };
+      }
+      return { success: false, error: error.message };
+    } finally {
+      clearTimeout(timeoutId);
     }
   }
 
@@ -505,11 +620,15 @@ class MobileAdmin {
       requestBody.date_to = dateTo;
     }
 
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 60000);
+
     try {
       const response = await fetch(apiEndpoint, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(requestBody)
+        body: JSON.stringify(requestBody),
+        signal: controller.signal
       });
 
       if (!response.ok) {
@@ -534,7 +653,12 @@ class MobileAdmin {
       }
     } catch (error) {
       console.error('Dify API エラー:', error);
+      if (error.name === 'AbortError') {
+        return { success: false, error: 'AIの応答が遅すぎました。しばらくしてからお試しください' };
+      }
       return { success: false, error: error.message };
+    } finally {
+      clearTimeout(timeoutId);
     }
   }
 
@@ -543,6 +667,12 @@ class MobileAdmin {
   // ============================
 
   async saveNewArticle() {
+    // 画像アップロード中ガード
+    if (this.isUploading) {
+      this.showAlert('画像アップロード中です。完了までお待ちください', 'error');
+      return;
+    }
+
     const title = document.getElementById('new-title').value.trim();
     const dateFrom = document.getElementById('new-date-from').value;
     const dateTo = document.getElementById('new-date-to').value;
@@ -550,7 +680,7 @@ class MobileAdmin {
     const contentText = document.getElementById('new-content').value.trim();
     const excerpt = document.getElementById('new-excerpt').value.trim();
 
-    // バリデーション
+    // バリデーション（画像AI経由で summary が空、excerpt のみ埋まっているケースを許可）
     if (!title) {
       this.showAlert('件名を入力してください', 'error');
       return;
@@ -559,8 +689,8 @@ class MobileAdmin {
       this.showAlert('開始日を入力してください', 'error');
       return;
     }
-    if (!summary) {
-      this.showAlert('要約を入力してください', 'error');
+    if (!summary && !excerpt) {
+      this.showAlert('要約または SNS用サマリ文を入力してください', 'error');
       return;
     }
 
