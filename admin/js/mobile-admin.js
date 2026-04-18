@@ -682,7 +682,7 @@ class MobileAdmin {
     const contentText = document.getElementById('new-content').value.trim();
     const excerpt = document.getElementById('new-excerpt').value.trim();
 
-    // バリデーション（画像AI経由で summary が空、excerpt のみ埋まっているケースを許可）
+    // バリデーション
     if (!title) {
       this.showAlert('件名を入力してください', 'error');
       return;
@@ -691,8 +691,8 @@ class MobileAdmin {
       this.showAlert('開始日を入力してください', 'error');
       return;
     }
-    if (!summary && !excerpt) {
-      this.showAlert('要約または SNS用サマリ文を入力してください', 'error');
+    if (!summary) {
+      this.showAlert('要約を入力してください', 'error');
       return;
     }
 
