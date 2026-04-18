@@ -229,6 +229,12 @@ body {
   margin-left: 2px;
 }
 
+.optional {
+  color: #888;
+  font-size: 0.75em;
+  font-weight: normal;
+}
+
 .form-input,
 .form-textarea {
   width: 100%;

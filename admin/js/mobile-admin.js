@@ -678,6 +678,8 @@ class MobileAdmin {
     const title = document.getElementById('new-title').value.trim();
     const dateFrom = document.getElementById('new-date-from').value;
     const dateTo = document.getElementById('new-date-to').value;
+    const timeFrom = document.getElementById('new-time-from').value;
+    const timeTo = document.getElementById('new-time-to').value;
     const summary = document.getElementById('new-summary').value.trim();
     const contentText = document.getElementById('new-content').value.trim();
     const excerpt = document.getElementById('new-excerpt').value.trim();
@@ -695,6 +697,10 @@ class MobileAdmin {
       this.showAlert('要約を入力してください', 'error');
       return;
     }
+    if (timeTo && !dateTo) {
+      this.showAlert('終了時刻を指定する場合は終了日も入力してください', 'error');
+      return;
+    }
 
     this.showLoading('記事を保存中...');
 
@@ -703,9 +709,26 @@ class MobileAdmin {
       ? contentText.split('\n').filter(l => l.trim()).map(l => `<p>${this.escapeHtml(l)}</p>`).join('')
       : '';
 
-    // 日時組み立て
-    const eventStartDatetime = dateFrom + ' 00:00:00';
-    const eventEndDatetime = dateTo ? dateTo + ' 23:59:59' : null;
+    // 日時組み立て（PC版 article-editor.js と同一ロジック）
+    const hasStartTime = timeFrom ? true : false;
+    const hasEndTime = timeTo ? true : false;
+
+    let eventStartDatetime = dateFrom;
+    if (hasStartTime) {
+      eventStartDatetime += ' ' + timeFrom + ':00';
+    } else {
+      eventStartDatetime += ' 00:00:00';
+    }
+
+    let eventEndDatetime = null;
+    if (dateTo) {
+      eventEndDatetime = dateTo;
+      if (hasEndTime) {
+        eventEndDatetime += ' ' + timeTo + ':00';
+      } else {
+        eventEndDatetime += ' 23:59:59';
+      }
+    }
 
     const articleData = {
       title,
@@ -715,8 +738,8 @@ class MobileAdmin {
       status: 'draft',
       event_start_datetime: eventStartDatetime,
       event_end_datetime: eventEndDatetime,
-      has_start_time: false,
-      has_end_time: false,
+      has_start_time: hasStartTime,
+      has_end_time: hasEndTime,
       featured_image_url: this.uploadedImageUrl || null,
       line_published: false,
       x_published: false,
@@ -743,6 +766,8 @@ class MobileAdmin {
     this.removeImage();
     document.getElementById('new-content').value = '';
     document.getElementById('new-excerpt').value = '';
+    document.getElementById('new-time-from').value = '';
+    document.getElementById('new-time-to').value = '';
   }
 
   // ============================
