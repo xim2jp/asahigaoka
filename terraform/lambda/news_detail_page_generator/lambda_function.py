@@ -314,7 +314,11 @@ def generate_detail_html(template: str, article: Dict[str, Any], attachments: Li
     # イベント日時
     event_start = article.get('event_start_datetime')
     event_end = article.get('event_end_datetime')
-    event_datetime_formatted = format_event_datetime(event_start, event_end) if event_start else ''
+    has_start_time = bool(article.get('has_start_time'))
+    has_end_time = bool(article.get('has_end_time'))
+    event_datetime_formatted = format_event_datetime(
+        event_start, event_end, has_start_time, has_end_time
+    ) if event_start else ''
 
     # SEO関連
     meta_title = article.get('meta_title') or title
@@ -533,21 +537,29 @@ def format_date_jp(iso_date: str) -> str:
         return iso_date
 
 
-def format_event_datetime(start: str, end: Optional[str]) -> str:
+def format_event_datetime(
+    start: str,
+    end: Optional[str],
+    has_start_time: bool = False,
+    has_end_time: bool = False,
+) -> str:
     """
     イベント日時をフォーマット
+
+    has_start_time/has_end_time が False の場合、対応する時刻部分（HH:MM）は出力しない。
     """
     try:
         start_dt = parse_datetime(start)
-        formatted = format_datetime_jp(start_dt)
+        formatted = format_datetime_jp(start_dt, include_time=has_start_time)
 
         if end:
             end_dt = parse_datetime(end)
-            # 同じ日の場合は終了時刻のみ
             if start_dt.date() == end_dt.date():
-                formatted += f" 〜 {end_dt.strftime('%H:%M')}"
+                # 同日: 終了時刻フラグありなら「〜 HH:MM」のみ追記。フラグなしなら何も追記しない
+                if has_end_time:
+                    formatted += f" 〜 {end_dt.strftime('%H:%M')}"
             else:
-                formatted += f" 〜 {format_datetime_jp(end_dt)}"
+                formatted += f" 〜 {format_datetime_jp(end_dt, include_time=has_end_time)}"
 
         return formatted
     except Exception:
@@ -568,13 +580,18 @@ def parse_datetime(iso_str: str) -> datetime:
         return datetime.fromisoformat(iso_str + 'T00:00:00')
 
 
-def format_datetime_jp(dt: datetime) -> str:
+def format_datetime_jp(dt: datetime, include_time: bool = True) -> str:
     """
     datetimeを日本語形式に変換
+
+    include_time=False の場合は「YYYY年M月D日（曜）」のみ。既定値 True で従来動作と互換。
     """
     weekdays = ['月', '火', '水', '木', '金', '土', '日']
     weekday = weekdays[dt.weekday()]
-    return f"{dt.year}年{dt.month}月{dt.day}日（{weekday}）{dt.strftime('%H:%M')}"
+    base = f"{dt.year}年{dt.month}月{dt.day}日（{weekday}）"
+    if include_time:
+        return base + dt.strftime('%H:%M')
+    return base
 
 
 def extract_description(content: str) -> str:
