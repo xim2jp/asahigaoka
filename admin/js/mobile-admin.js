@@ -468,15 +468,17 @@ class MobileAdmin {
 
     // 多重クリック防止
     const btn = document.getElementById('btn-ai-generate');
-    btn.disabled = true;
+    if (btn) btn.disabled = true;
 
-    const hasImage = !!this.selectedFile;
+    // 非同期処理中に removeImage() で null 化されないようローカルに退避
+    const selectedFile = this.selectedFile;
+    const hasImage = !!selectedFile;
 
     try {
       if (hasImage) {
         // 画像添付時: バリデーション不要。画像AIが title/text350/text80 を生成
         this.showLoading('画像を分析してAIが記事を生成中...');
-        const base64 = await this.fileToBase64(this.selectedFile);
+        const base64 = await this.fileToBase64(selectedFile);
         const result = await this.callDifyImageAPI(base64);
 
         if (result.success) {
@@ -538,7 +540,7 @@ class MobileAdmin {
       this.showAlert('AI生成中にエラーが発生しました', 'error');
     } finally {
       this.hideLoading();
-      btn.disabled = false;
+      if (btn) btn.disabled = false;
     }
   }
 
