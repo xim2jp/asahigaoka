@@ -547,13 +547,25 @@ def format_event_datetime(
     イベント日時をフォーマット
 
     has_start_time/has_end_time が False の場合、対応する時刻部分（HH:MM）は出力しない。
+    DB側にフラグがない場合は 00:00/23:59 の慣例から自動判定する。
     """
     try:
         start_dt = parse_datetime(start)
+
+        if not has_start_time:
+            has_start_time = (start_dt.hour != 0 or start_dt.minute != 0)
+
         formatted = format_datetime_jp(start_dt, include_time=has_start_time)
 
         if end:
             end_dt = parse_datetime(end)
+
+            if not has_end_time:
+                has_end_time = not (
+                    (end_dt.hour == 23 and end_dt.minute == 59)
+                    or (end_dt.hour == 0 and end_dt.minute == 0)
+                )
+
             if start_dt.date() == end_dt.date():
                 # 同日: 終了時刻フラグありなら「〜 HH:MM」のみ追記。フラグなしなら何も追記しない
                 if has_end_time:
@@ -592,7 +604,6 @@ def format_datetime_jp(dt: datetime, include_time: bool = True) -> str:
     if include_time:
         return base + dt.strftime('%H:%M')
     return base
-
 
 def extract_description(content: str) -> str:
     """

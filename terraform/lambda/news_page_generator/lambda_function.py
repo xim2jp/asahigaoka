@@ -336,7 +336,7 @@ def format_date_jp(iso_date: str) -> str:
         weekdays = ['月', '火', '水', '木', '金', '土', '日']
         weekday = weekdays[dt.weekday()]
 
-        return f"{year}年{int(month):02d}月{int(day):02d}日（{weekday}）"
+        return f"{year}年{int(month)}月{int(day)}日（{weekday}）"
     except Exception:
         return iso_date
 
