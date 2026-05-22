@@ -314,8 +314,37 @@ def generate_detail_html(template: str, article: Dict[str, Any], attachments: Li
     # イベント日時
     event_start = article.get('event_start_datetime')
     event_end = article.get('event_end_datetime')
-    has_start_time = bool(article.get('has_start_time'))
-    has_end_time = bool(article.get('has_end_time'))
+
+    # has_start_time / has_end_time フラグの判定
+    # DBカラムにあればそれを使う、なければ日時値から自動判定
+    # 00:00始まり = 時間情報なし, 23:59終わり = 時間情報なし
+    if 'has_start_time' in article:
+        has_start_time = bool(article.get('has_start_time'))
+    elif event_start:
+        try:
+            from datetime import datetime as _dt
+            _s = event_start.replace('Z', '+00:00').split('+')[0]
+            _sdt = _dt.fromisoformat(_s) if 'T' in _s else _dt.fromisoformat(_s + 'T00:00:00')
+            has_start_time = (_sdt.hour != 0 or _sdt.minute != 0)
+        except Exception:
+            has_start_time = False
+    else:
+        has_start_time = False
+
+    if 'has_end_time' in article:
+        has_end_time = bool(article.get('has_end_time'))
+    elif event_end:
+        try:
+            from datetime import datetime as _dt
+            _e = event_end.replace('Z', '+00:00').split('+')[0]
+            _edt = _dt.fromisoformat(_e) if 'T' in _e else _dt.fromisoformat(_e + 'T00:00:00')
+            has_end_time = not (_edt.hour == 23 and _edt.minute == 59) and \
+                           not (_edt.hour == 0 and _edt.minute == 0)
+        except Exception:
+            has_end_time = False
+    else:
+        has_end_time = False
+
     event_datetime_formatted = format_event_datetime(
         event_start, event_end, has_start_time, has_end_time
     ) if event_start else ''
@@ -572,7 +601,6 @@ def format_event_datetime(
                     formatted += f" 〜 {end_dt.strftime('%H:%M')}"
             else:
                 formatted += f" 〜 {format_datetime_jp(end_dt, include_time=has_end_time)}"
-
         return formatted
     except Exception:
         return start
