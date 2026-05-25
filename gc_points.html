@@ -1,0 +1,528 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>再生資源集団回収ポイントマップ - 東京都練馬区旭丘一丁目町会</title>
+    <script src="https://cdn.tailwindcss.com/3.4.16"></script>
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            colors: { primary: "#57b5e7", secondary: "#8dd3c7" },
+            borderRadius: {
+              none: "0px",
+              sm: "4px",
+              DEFAULT: "8px",
+              md: "12px",
+              lg: "16px",
+              xl: "20px",
+              "2xl": "24px",
+              "3xl": "32px",
+              full: "9999px",
+              button: "8px",
+            },
+          },
+        },
+      };
+    </script>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Pacifico&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      href="https://cdnjs.cloudflare.com/ajax/libs/remixicon/4.6.0/remixicon.min.css"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="css/template.css" />
+    <style>
+      #gc-map {
+        height: 560px;
+        width: 100%;
+        border-radius: 16px;
+        background: #e5e7eb;
+      }
+      @media (max-width: 768px) {
+        #gc-map { height: 420px; }
+      }
+      .legend-dot {
+        display: inline-block;
+        width: 12px;
+        height: 12px;
+        border-radius: 9999px;
+        margin-right: 6px;
+        vertical-align: middle;
+      }
+      .gc-section-1 { background-color: #ef4444; }
+      .gc-section-2 { background-color: #57b5e7; }
+      .gc-section-3 { background-color: #10b981; }
+      .gc-section-4 { background-color: #a855f7; }
+      .gc-info-window {
+        font-family: inherit;
+        max-width: 240px;
+      }
+      .gc-info-window h4 {
+        font-weight: 700;
+        margin-bottom: 4px;
+        color: #111827;
+      }
+      .gc-info-window p {
+        margin: 2px 0;
+        color: #4b5563;
+        font-size: 13px;
+      }
+      .gc-info-window a {
+        display: inline-block;
+        margin-top: 6px;
+        font-size: 12px;
+        color: #2563eb;
+        text-decoration: underline;
+      }
+      #map-fallback {
+        display: none;
+        padding: 24px;
+        background: #fef3c7;
+        border: 1px solid #f59e0b;
+        border-radius: 12px;
+        color: #92400e;
+      }
+    </style>
+  </head>
+  <body class="bg-white">
+    <!-- ヘッダー -->
+    <header class="bg-white shadow-sm sticky top-0 z-50">
+      <nav class="w-full px-6 py-4">
+        <div class="flex items-center justify-between">
+          <div class="flex items-center space-x-3">
+            <div
+              class="w-12 h-12 flex items-center justify-center bg-primary rounded-lg"
+            >
+              <i class="ri-community-line text-white text-xl"></i>
+            </div>
+            <div>
+              <h1 class="text-xl font-bold text-gray-900">
+                東京都練馬区旭丘一丁目町会
+              </h1>
+              <p class="text-sm text-gray-600">
+                みんなでつくる安心・安全なまち
+              </p>
+            </div>
+          </div>
+          <div class="hidden md:flex items-center space-x-8">
+            <a
+              href="index.html"
+              class="text-gray-700 hover:text-primary transition-colors"
+              >ホーム</a
+            >
+            <a
+              href="news.html"
+              class="text-gray-700 hover:text-primary transition-colors"
+              >お知らせ</a
+            >
+            <a
+              href="reports.html"
+              class="text-gray-700 hover:text-primary transition-colors"
+              >事業資料</a
+            >
+            <a
+              href="town.html"
+              class="text-gray-700 hover:text-primary transition-colors"
+              >町会について</a
+            >
+            <a
+              href="antidisaster-evacuation.html"
+              class="text-gray-700 hover:text-primary transition-colors"
+              >指定避難所</a
+            >
+            <a
+              href="contact.html"
+              class="text-gray-700 hover:text-primary transition-colors"
+              >お問い合わせ</a
+            >
+          </div>
+          <button
+            class="md:hidden w-10 h-10 flex items-center justify-center"
+            id="mobile-menu-btn"
+          >
+            <i class="ri-menu-line text-xl"></i>
+          </button>
+        </div>
+        <div class="md:hidden mt-4 hidden" id="mobile-menu">
+          <div class="flex flex-col space-y-3 py-4 border-t">
+            <a
+              href="index.html"
+              class="text-gray-700 hover:text-primary transition-colors"
+              >ホーム</a
+            >
+            <a
+              href="news.html"
+              class="text-gray-700 hover:text-primary transition-colors"
+              >お知らせ</a
+            >
+            <a
+              href="reports.html"
+              class="text-gray-700 hover:text-primary transition-colors"
+              >事業資料</a
+            >
+            <a
+              href="town.html"
+              class="text-gray-700 hover:text-primary transition-colors"
+              >町会について</a
+            >
+            <a
+              href="antidisaster-evacuation.html"
+              class="text-gray-700 hover:text-primary transition-colors"
+              >指定避難所</a
+            >
+            <a
+              href="contact.html"
+              class="text-gray-700 hover:text-primary transition-colors"
+              >お問い合わせ</a
+            >
+          </div>
+        </div>
+      </nav>
+    </header>
+
+    <!-- ページヒーローセクション -->
+    <section class="page-hero">
+      <div class="page-hero-content">
+        <div>
+          <h2 class="page-title">再生資源集団回収ポイントマップ</h2>
+          <p class="page-subtitle">資源回収集荷所一覧（令和8年5月現在）</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- メインコンテンツ -->
+    <main>
+      <!-- 概要セクション -->
+      <section class="py-12 bg-white">
+        <div class="max-w-6xl mx-auto px-6">
+          <div class="md:flex md:items-start md:justify-between gap-8">
+            <div class="md:max-w-3xl">
+              <h3 class="text-2xl md:text-3xl font-bold text-gray-900 mb-4">
+                旭丘一丁目町会の資源回収集荷所
+              </h3>
+              <p class="text-gray-700 leading-relaxed">
+                旭丘一丁目町会では、町内に
+                <strong class="text-primary">20か所</strong>
+                の資源回収集荷所を設置しています。お住まいに近い集荷所をマップでご確認いただき、決められた曜日・時間に資源・ごみを出してください。
+              </p>
+              <p class="text-gray-700 leading-relaxed mt-3">
+                マーカーの色は所属する <strong>部</strong>（1部〜4部）を表しています。マーカーをクリックすると詳細が表示されます。
+              </p>
+            </div>
+            <div class="mt-6 md:mt-0 bg-gray-50 rounded-xl p-5 w-full md:w-auto">
+              <p class="font-semibold text-gray-900 mb-3 flex items-center">
+                <i class="ri-pin-distance-line text-primary mr-2"></i>
+                マーカー凡例
+              </p>
+              <ul class="space-y-2 text-sm text-gray-700">
+                <li><span class="legend-dot gc-section-1"></span>1部（9か所）</li>
+                <li><span class="legend-dot gc-section-2"></span>2部（5か所）</li>
+                <li><span class="legend-dot gc-section-3"></span>3部（3か所）</li>
+                <li><span class="legend-dot gc-section-4"></span>4部（3か所）</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- マップセクション -->
+      <section class="py-8 bg-gray-50">
+        <div class="max-w-6xl mx-auto px-6">
+          <div class="bg-white rounded-2xl shadow-sm p-4 md:p-6">
+            <div id="map-fallback">
+              <p class="font-semibold mb-2">
+                <i class="ri-error-warning-line mr-2"></i>地図を読み込めませんでした
+              </p>
+              <p class="text-sm">
+                Google Maps APIキーが未設定、またはネットワークエラーが発生しています。下部の一覧表から各集荷所をご確認ください。
+              </p>
+            </div>
+            <div id="gc-map" aria-label="収集ポイントの地図"></div>
+            <p class="text-xs text-gray-500 mt-3">
+              ※マーカー位置は住所をジオコーディングしたものです。実際の集荷所の位置と多少前後する場合があります。
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <!-- 一覧表セクション -->
+      <section class="py-16 bg-white">
+        <div class="max-w-6xl mx-auto px-6">
+          <div class="mb-8">
+            <h3 class="text-2xl md:text-3xl font-bold text-gray-900 mb-2">
+              集荷所一覧（全20か所）
+            </h3>
+            <p class="text-gray-600">
+              各行の「地図で開く」をタップすると、Googleマップでその場所を開きます。
+            </p>
+          </div>
+          <div class="overflow-x-auto rounded-xl border border-gray-200">
+            <table class="min-w-full bg-white text-sm">
+              <thead class="bg-gray-100 text-gray-700">
+                <tr>
+                  <th class="px-3 py-3 text-left font-semibold w-12">No.</th>
+                  <th class="px-3 py-3 text-left font-semibold">名称</th>
+                  <th class="px-3 py-3 text-left font-semibold">住所</th>
+                  <th class="px-3 py-3 text-left font-semibold w-16">部</th>
+                  <th class="px-3 py-3 text-left font-semibold w-28">地図で開く</th>
+                </tr>
+              </thead>
+              <tbody id="gc-table-body" class="divide-y divide-gray-100"></tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+    </main>
+
+    <!-- フッター -->
+    <footer class="bg-gray-900 text-white py-12">
+      <div class="max-w-6xl mx-auto px-6">
+        <div class="grid md:grid-cols-4 gap-8">
+          <div>
+            <div class="flex items-center space-x-3 mb-4">
+              <div
+                class="w-10 h-10 flex items-center justify-center bg-primary rounded-lg"
+              >
+                <i class="ri-community-line text-white"></i>
+              </div>
+              <div>
+                <h5 class="font-semibold">東京都練馬区</h5>
+                <p class="text-sm text-gray-400">旭丘一丁目町会</p>
+              </div>
+            </div>
+            <p class="text-gray-400 text-sm">
+              AI
+              と共に築く新しい地域コミュニティ。すべての世代が参加しやすい町会活動を目指しています。
+            </p>
+          </div>
+          <div>
+            <h6 class="font-semibold mb-4">基本情報</h6>
+            <div class="space-y-2 text-sm text-gray-400">
+              <p>〒179-0071</p>
+              <p>東京都練馬区旭丘1丁目</p>
+              <p>TEL: 03-3950-4842（旭丘地域集会所）</p>
+              <p>Email: block1@asahigaoka-nerima.tokyo</p>
+            </div>
+          </div>
+          <div>
+            <h6 class="font-semibold mb-4">リンク</h6>
+            <div class="space-y-2 text-sm">
+              <a
+                href="privacy-policy.html"
+                class="text-gray-400 hover:text-white transition-colors block"
+                >プライバシーポリシー</a
+              >
+              <a
+                href="terms-of-service.html"
+                class="text-gray-400 hover:text-white transition-colors block"
+                >利用規約</a
+              >
+              <a
+                href="contact.html"
+                class="text-gray-400 hover:text-white transition-colors block"
+                >お問い合わせ</a
+              >
+            </div>
+          </div>
+          <div>
+            <h6 class="font-semibold mb-4">SNS</h6>
+            <div class="flex space-x-3">
+              <a
+                href="https://www.facebook.com/b1.asahigaoka"
+                target="_blank"
+                class="w-8 h-8 flex items-center justify-center bg-gray-800 rounded hover:bg-gray-700 transition-colors"
+              >
+                <i class="ri-facebook-fill"></i>
+              </a>
+              <a
+                href="https://x.com/b1_asahigaoka"
+                target="_blank"
+                class="w-8 h-8 flex items-center justify-center bg-gray-800 rounded hover:bg-gray-700 transition-colors"
+              >
+                <i class="ri-twitter-x-line"></i>
+              </a>
+              <a
+                href="https://line.me/R/ti/p/@619ynqur"
+                target="_blank"
+                class="w-8 h-8 flex items-center justify-center bg-gray-800 rounded hover:bg-gray-700 transition-colors"
+              >
+                <i class="ri-line-fill"></i>
+              </a>
+            </div>
+          </div>
+        </div>
+        <div
+          class="border-t border-gray-800 mt-8 pt-8 text-center text-sm text-gray-400"
+        >
+          <p>&copy; 2024 東京都練馬区旭丘一丁目町会. All rights reserved.</p>
+        </div>
+      </div>
+    </footer>
+
+    <!-- JavaScript -->
+    <script src="js/template.js"></script>
+
+    <!-- 集荷所データ・マップ初期化 -->
+    <script>
+      const GC_POINTS = [
+        { no: 1,  landmark: "MEマンション角",     address: "東京都練馬区旭丘1-30-6",  section: "1部", lat: 35.733227, lng: 139.675064 },
+        { no: 2,  landmark: "木下炭店前",         address: "東京都練馬区旭丘1-33-8",  section: "1部", lat: 35.733521, lng: 139.676010 },
+        { no: 3,  landmark: "ベネッセ前（元郵政官舎前）", address: "東京都練馬区旭丘1-40-9",  section: "1部", lat: 35.733700, lng: 139.674454 },
+        { no: 4,  landmark: "中正金物店前",       address: "東京都練馬区旭丘1-46-1",  section: "1部", lat: 35.734123, lng: 139.675369 },
+        { no: 5,  landmark: "郵便ポスト前",       address: "東京都練馬区旭丘1-46-3",  section: "1部", lat: 35.734333, lng: 139.675171 },
+        { no: 6,  landmark: "天野宅前",           address: "東京都練馬区旭丘1-46-4",  section: "1部", lat: 35.734444, lng: 139.675064 },
+        { no: 7,  landmark: "中島宅前",           address: "東京都練馬区旭丘1-47-1",  section: "1部", lat: 35.734592, lng: 139.675858 },
+        { no: 8,  landmark: "橋本宅前",           address: "東京都練馬区旭丘1-50-7",  section: "1部", lat: 35.734936, lng: 139.676285 },
+        { no: 9,  landmark: "田代たばこ店前",     address: "東京都練馬区旭丘1-57-6",  section: "1部", lat: 35.735092, lng: 139.675308 },
+        { no: 10, landmark: "イケハラ電機店横",   address: "東京都練馬区旭丘1-53-6",  section: "2部", lat: 35.735455, lng: 139.675034 },
+        { no: 11, landmark: "なかよし緑地角",     address: "東京都練馬区旭丘1-54-9",  section: "2部", lat: 35.736057, lng: 139.674622 },
+        { no: 12, landmark: "巣鴨信用金庫前",     address: "東京都練馬区旭丘1-55-1",  section: "2部", lat: 35.735218, lng: 139.674118 },
+        { no: 13, landmark: "コスモス江古田",     address: "東京都練馬区旭丘1-58-9",  section: "2部", lat: 35.735012, lng: 139.674133 },
+        { no: 14, landmark: "えごのみ公園西入口前", address: "東京都練馬区旭丘1-58-15", section: "2部", lat: 35.734493, lng: 139.674408 },
+        { no: 15, landmark: "ぴーぷる野口前",     address: "東京都練馬区旭丘1-64-12", section: "3部", lat: 35.735458, lng: 139.673218 },
+        { no: 16, landmark: "斉藤同志舎斜め前",   address: "東京都練馬区旭丘1-66-1",  section: "3部", lat: 35.735992, lng: 139.673248 },
+        { no: 17, landmark: "今井葬儀社前",       address: "東京都練馬区旭丘1-76-2",  section: "3部", lat: 35.736782, lng: 139.672394 },
+        { no: 18, landmark: "森相宅角",           address: "東京都練馬区旭丘1-62-18", section: "4部", lat: 35.734234, lng: 139.673080 },
+        { no: 19, landmark: "小林宅南側",         address: "東京都練馬区旭丘1-63-6",  section: "4部", lat: 35.734634, lng: 139.672501 },
+        { no: 20, landmark: "パレス江古田北側角", address: "東京都練馬区旭丘1-63-12", section: "4部", lat: 35.734840, lng: 139.673157 }
+      ];
+
+      const SECTION_COLORS = {
+        "1部": "#ef4444",
+        "2部": "#57b5e7",
+        "3部": "#10b981",
+        "4部": "#a855f7"
+      };
+
+      // 一覧表を描画
+      (function renderTable() {
+        const tbody = document.getElementById("gc-table-body");
+        const rows = GC_POINTS.map(p => {
+          const mapUrl = `https://www.google.com/maps?q=${p.lat},${p.lng}`;
+          const colorClass = `gc-section-${p.section.charAt(0)}`;
+          return `
+            <tr class="hover:bg-gray-50">
+              <td class="px-3 py-3 text-gray-700">${p.no}</td>
+              <td class="px-3 py-3 font-medium text-gray-900">${p.landmark}</td>
+              <td class="px-3 py-3 text-gray-700">${p.address}</td>
+              <td class="px-3 py-3"><span class="legend-dot ${colorClass}"></span>${p.section}</td>
+              <td class="px-3 py-3">
+                <a href="${mapUrl}" target="_blank" rel="noopener" class="text-primary hover:underline inline-flex items-center">
+                  <i class="ri-map-pin-line mr-1"></i>地図で開く
+                </a>
+              </td>
+            </tr>
+          `;
+        }).join("");
+        tbody.innerHTML = rows;
+      })();
+
+      // Google Maps 初期化コールバック
+      let gcMap;
+      function initGcMap() {
+        const center = { lat: 35.7349, lng: 139.6743 };
+        gcMap = new google.maps.Map(document.getElementById("gc-map"), {
+          center: center,
+          zoom: 16,
+          mapTypeControl: true,
+          streetViewControl: true,
+          fullscreenControl: true
+        });
+
+        const bounds = new google.maps.LatLngBounds();
+        const infoWindow = new google.maps.InfoWindow();
+
+        GC_POINTS.forEach(p => {
+          const color = SECTION_COLORS[p.section] || "#6b7280";
+          const marker = new google.maps.Marker({
+            position: { lat: p.lat, lng: p.lng },
+            map: gcMap,
+            title: `${p.no}. ${p.landmark}`,
+            label: { text: String(p.no), color: "#ffffff", fontSize: "12px", fontWeight: "bold" },
+            icon: {
+              path: google.maps.SymbolPath.CIRCLE,
+              scale: 13,
+              fillColor: color,
+              fillOpacity: 1,
+              strokeColor: "#ffffff",
+              strokeWeight: 2
+            }
+          });
+          bounds.extend(marker.getPosition());
+
+          marker.addListener("click", () => {
+            const mapUrl = `https://www.google.com/maps?q=${p.lat},${p.lng}`;
+            const content = `
+              <div class="gc-info-window">
+                <h4>${p.no}. ${p.landmark}</h4>
+                <p><i class="ri-map-pin-2-line"></i> ${p.address}</p>
+                <p>所属：${p.section}</p>
+                <a href="${mapUrl}" target="_blank" rel="noopener">Googleマップで開く →</a>
+              </div>
+            `;
+            infoWindow.setContent(content);
+            infoWindow.open(gcMap, marker);
+          });
+        });
+
+        gcMap.fitBounds(bounds, 40);
+      }
+
+      // APIキー未設定／読み込み失敗時のフォールバック
+      function gmAuthFailure() {
+        document.getElementById("map-fallback").style.display = "block";
+        document.getElementById("gc-map").style.display = "none";
+      }
+      window.gm_authFailure = gmAuthFailure;
+
+      setTimeout(() => {
+        if (typeof google === "undefined" || !google.maps) {
+          gmAuthFailure();
+        }
+      }, 6000);
+    </script>
+
+    <!--
+      Google Maps JavaScript API を有効化するには、下記の YOUR_GOOGLE_MAPS_API_KEY を
+      実際のAPIキーに置き換えてください。
+      取得方法: https://console.cloud.google.com/  →  「Maps JavaScript API」を有効化
+    -->
+    <script
+      async
+      defer
+      src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAtMd3Mp1vV5ylGMXv3OpPVHYSPoQ5NZUs&callback=initGcMap&language=ja&region=JP"
+    ></script>
+
+    <script>
+      window.difyChatbotConfig = {
+        token: 't7gW8m8CMAZ2rcNw',
+        baseUrl: 'https://top-overly-pup.ngrok-free.app',
+        inputs: {},
+        systemVariables: {},
+        userVariables: {},
+      }
+    </script>
+    <script
+      src="https://top-overly-pup.ngrok-free.app/embed.min.js"
+      id="t7gW8m8CMAZ2rcNw"
+      defer
+    ></script>
+    <style>
+      #dify-chatbot-bubble-button {
+        background-color: #1C64F2 !important;
+      }
+      #dify-chatbot-bubble-window {
+        width: 24rem !important;
+        height: 40rem !important;
+      }
+    </style>
+
+</body>
+</html>
