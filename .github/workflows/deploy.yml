@@ -37,8 +37,13 @@ jobs:
             --exclude "misc/*" \
             --exclude "mics/*" \
             --exclude "database/*" \
-            --exclude "docs/*"
-      
+            --exclude "docs/*" \
+            --exclude "demo/*" \
+            --exclude "tests/*" \
+            --exclude "playwright-report/*" \
+            --exclude "test-results/*" \
+            --exclude "playwright.config.ts"
+
       - name: Invalidate CloudFront
         run: |
           DISTRIBUTION_ID=$(aws cloudfront list-distributions \

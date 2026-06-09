@@ -413,11 +413,12 @@ class MobileAdmin {
       return;
     }
 
-    // プレビュー表示
+    // プレビュー表示（既存の #image-preview-img を更新。innerHTML を差し替えると
+    // 削除ボタンや img 要素が失われ、resetForm/removeImage が落ちるため要素を保持する）
     const reader = new FileReader();
     reader.onload = (e) => {
-      const previewHtml = `<img src="${e.target.result}" style="max-width: 100%; max-height: 200px; border-radius: 8px;">`;
-      document.getElementById('image-preview').innerHTML = previewHtml;
+      const previewImg = document.getElementById('image-preview-img');
+      if (previewImg) previewImg.src = e.target.result;
       document.getElementById('image-preview').classList.add('has-image');
     };
     reader.readAsDataURL(file);
@@ -451,7 +452,8 @@ class MobileAdmin {
     this.uploadedImageId = null;
     this.selectedFile = null;
     document.getElementById('new-image').value = '';
-    document.getElementById('image-preview-img').src = '';
+    const previewImg = document.getElementById('image-preview-img');
+    if (previewImg) previewImg.src = '';
     document.getElementById('image-preview').classList.remove('has-image');
   }
 

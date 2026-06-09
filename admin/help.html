@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>つかいかた動画 - 旭丘一丁目町会 管理画面</title>
+    <style>
+        * { box-sizing: border-box; }
+        body {
+            margin: 0;
+            font-family: -apple-system, "Hiragino Kaku Gothic ProN", "Noto Sans JP", sans-serif;
+            background: linear-gradient(135deg, #2c5530 0%, #4CAF50 100%);
+            min-height: 100vh;
+            color: #333;
+            padding: 20px 16px 48px;
+        }
+        .wrap { max-width: 460px; margin: 0 auto; }
+        .card {
+            background: #fff;
+            border-radius: 16px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.18);
+            padding: 24px 20px 28px;
+        }
+        h1 {
+            font-size: 24px;
+            color: #2c5530;
+            margin: 0 0 6px;
+            text-align: center;
+        }
+        .lead {
+            text-align: center;
+            font-size: 16px;
+            color: #555;
+            margin: 0 0 20px;
+            line-height: 1.6;
+        }
+        video {
+            width: 100%;
+            border-radius: 12px;
+            background: #000;
+            display: block;
+        }
+        .steps {
+            margin: 22px 0 4px;
+            padding: 18px 18px 6px;
+            background: #f4f9f4;
+            border-radius: 12px;
+        }
+        .steps h2 { font-size: 18px; color: #2c5530; margin: 0 0 12px; }
+        .steps ol { margin: 0; padding-left: 1.3em; }
+        .steps li { font-size: 16px; line-height: 1.9; }
+        .back {
+            display: block;
+            text-align: center;
+            margin-top: 26px;
+            background: #4CAF50;
+            color: #fff;
+            text-decoration: none;
+            font-size: 18px;
+            font-weight: 700;
+            padding: 16px;
+            border-radius: 12px;
+        }
+        .back:active { background: #3d8b40; }
+    </style>
+</head>
+<body>
+    <div class="wrap">
+        <div class="card">
+            <h1>📱 つかいかた動画</h1>
+            <p class="lead">スマホでお知らせを投稿して公開するまでの<br>かんたんな手順をご案内します（約1分）。</p>
+
+            <video controls playsinline preload="metadata"
+                   poster="help/cms-guide-poster.jpg">
+                <source src="help/cms-guide-mobile.mp4" type="video/mp4">
+                お使いのブラウザは動画再生に対応していません。
+            </video>
+
+            <div class="steps">
+                <h2>この動画でわかること</h2>
+                <ol>
+                    <li>ログインする</li>
+                    <li>日付・件名を入力する</li>
+                    <li>AIに記事を書いてもらう</li>
+                    <li>写真を選ぶ</li>
+                    <li>下書き保存して、公開する</li>
+                </ol>
+            </div>
+
+            <a class="back" href="login.html">ログイン画面にもどる</a>
+        </div>
+    </div>
+</body>
+</html>
