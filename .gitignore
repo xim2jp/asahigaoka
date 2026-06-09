@@ -36,3 +36,7 @@ yarn-error.log*
 
 test-results/*
 playwright-report/*
+
+# 動画録画ハーネスのビルド成果物（公開コピーは admin/help/ にある）
+demo/cms-guide/output/
+demo/cms-guide/_*.png
