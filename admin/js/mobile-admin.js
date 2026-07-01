@@ -399,19 +399,41 @@ class MobileAdmin {
   async handleImageUpload(e) {
     const file = e.target.files[0];
     if (!file) return;
-    this.selectedFile = file;
 
-    // バリデーション
-    const allowedTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
-    if (!allowedTypes.includes(file.type)) {
-      this.showAlert('JPG, PNG, GIF, WebP のみ対応しています', 'error');
+    // バリデーション（selectedFile への代入は検証通過後に行う。
+    // 検証前に代入すると、拒否したファイルが残り generateWithAI が誤って画像ありと判定する）
+    // iOS の写真アプリ経由では file.type が空になることがあるため拡張子でも判定する
+    const allowedTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp', 'image/heic', 'image/heif'];
+    const nameExt = (file.name.split('.').pop() || '').toLowerCase();
+    const extAllowed = ['jpg', 'jpeg', 'png', 'gif', 'webp', 'heic', 'heif'].includes(nameExt);
+    if (file.type && !allowedTypes.includes(file.type) && !extAllowed) {
+      this.showAlert('JPG, PNG, GIF, WebP, HEIC のみ対応しています', 'error');
       return;
     }
 
-    if (file.size > 5 * 1024 * 1024) {
-      this.showAlert('画像サイズは5MB以下にしてください', 'error');
+    // スマホで撮影した高解像度写真（5MB超やHEIC）をそのまま扱えるよう、
+    // アップロード前にブラウザ内で自動縮小・JPEG圧縮する。
+    // これにより「サイズが大きすぎて弾かれ画像が欠落する」問題を根本的に回避する。
+    this.showLoading('画像を準備中...');
+    let uploadFile = file;
+    try {
+      // GIF はアニメーションを保持するため縮小しない
+      if (file.type !== 'image/gif' && nameExt !== 'gif') {
+        uploadFile = await this.resizeImage(file);
+      }
+    } catch (err) {
+      console.warn('画像リサイズに失敗、元ファイルを使用します:', err);
+      uploadFile = file;
+    }
+
+    // 縮小してもまだ大きすぎる場合のみ拒否
+    if (uploadFile.size > 5 * 1024 * 1024) {
+      this.hideLoading();
+      this.showAlert('画像サイズが大きすぎます。もっと小さい画像でお試しください', 'error');
       return;
     }
+
+    this.selectedFile = uploadFile;
 
     // プレビュー表示（既存の #image-preview-img を更新。innerHTML を差し替えると
     // 削除ボタンや img 要素が失われ、resetForm/removeImage が落ちるため要素を保持する）
@@ -421,13 +443,13 @@ class MobileAdmin {
       if (previewImg) previewImg.src = e.target.result;
       document.getElementById('image-preview').classList.add('has-image');
     };
-    reader.readAsDataURL(file);
+    reader.readAsDataURL(uploadFile);
 
     // アップロード
     this.showLoading('ファイルをアップロード中...');
     this.isUploading = true;
     try {
-      const result = await supabaseClient.uploadMedia(file, 'featured-images');
+      const result = await supabaseClient.uploadMedia(uploadFile, 'featured-images');
 
       if (result.success) {
         this.uploadedImageUrl = result.data.file_url;
@@ -445,6 +467,56 @@ class MobileAdmin {
       this.isUploading = false;
       this.hideLoading();
     }
+  }
+
+  /**
+   * 画像をブラウザ内で縮小・JPEG圧縮する。
+   * 長辺を maxEdge px 以下に収め、透過は白背景で塗りつぶす。
+   * iOS Safari は HEIC を canvas に描画できるため、これにより HEIC→JPEG 変換も兼ねる。
+   * デコードできない形式の場合は onerror で reject し、呼び出し側が元ファイルにフォールバックする。
+   * @param {File} file - 元画像ファイル
+   * @param {number} maxEdge - 長辺の最大ピクセル数
+   * @param {number} quality - JPEG品質(0-1)
+   * @returns {Promise<File>} 縮小後のJPEGファイル
+   */
+  resizeImage(file, maxEdge = 1600, quality = 0.85) {
+    return new Promise((resolve, reject) => {
+      const url = URL.createObjectURL(file);
+      const img = new Image();
+      img.onload = () => {
+        URL.revokeObjectURL(url);
+        const scale = Math.min(1, maxEdge / Math.max(img.width, img.height));
+        const w = Math.max(1, Math.round(img.width * scale));
+        const h = Math.max(1, Math.round(img.height * scale));
+
+        const canvas = document.createElement('canvas');
+        canvas.width = w;
+        canvas.height = h;
+        const ctx = canvas.getContext('2d');
+        // 透過PNG等をJPEG化すると透過部分が黒くなるため、白で塗ってから描画
+        ctx.fillStyle = '#ffffff';
+        ctx.fillRect(0, 0, w, h);
+        ctx.drawImage(img, 0, 0, w, h);
+
+        canvas.toBlob((blob) => {
+          if (!blob) {
+            reject(new Error('画像の変換に失敗しました'));
+            return;
+          }
+          const baseName = file.name.replace(/\.[^.]+$/, '') || 'image';
+          const newFile = new File([blob], `${baseName}.jpg`, {
+            type: 'image/jpeg',
+            lastModified: Date.now()
+          });
+          resolve(newFile);
+        }, 'image/jpeg', quality);
+      };
+      img.onerror = () => {
+        URL.revokeObjectURL(url);
+        reject(new Error('画像を読み込めませんでした'));
+      };
+      img.src = url;
+    });
   }
 
   removeImage() {
@@ -677,6 +749,12 @@ class MobileAdmin {
       return;
     }
 
+    // 画像を選んだのにアップロードが完了/成功していない場合は誤って画像なし保存しないよう確認
+    if (this.selectedFile && !this.uploadedImageUrl) {
+      const proceed = confirm('画像のアップロードが完了していません。このまま画像なしで保存しますか？');
+      if (!proceed) return;
+    }
+
     const title = document.getElementById('new-title').value.trim();
     const dateFrom = document.getElementById('new-date-from').value;
     const dateTo = document.getElementById('new-date-to').value;
@@ -783,11 +861,13 @@ class MobileAdmin {
     alert.textContent = message;
     area.appendChild(alert);
 
+    // エラーは見落とし防止のため長めに表示する
+    const duration = type === 'error' ? 8000 : 4000;
     setTimeout(() => {
       alert.style.opacity = '0';
       alert.style.transition = 'opacity 0.3s';
       setTimeout(() => alert.remove(), 300);
-    }, 4000);
+    }, duration);
   }
 
   showLoading(text = '処理中...') {
