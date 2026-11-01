@@ -144,12 +144,32 @@
       }
 
       /* アイキャッチ画像 */
+      .featured-image-link {
+        display: block;
+        margin-bottom: 32px;
+        border-radius: 12px;
+        cursor: zoom-in;
+      }
+
+      .featured-image-link:focus-visible {
+        outline: 2px solid #57b5e7;
+        outline-offset: 4px;
+      }
+
       .featured-image {
+        display: block;
         width: 100%;
         max-height: 500px;
         object-fit: cover;
         border-radius: 12px;
-        margin-bottom: 32px;
+      }
+
+      .featured-image-hint {
+        display: block;
+        margin-top: 8px;
+        color: #4b5563;
+        font-size: 0.875rem;
+        text-align: center;
       }
 
       /* 記事本文 */
@@ -608,11 +628,19 @@
             </div>
           </header>
 
-          <img
-            src="https://swaringqrzthsdpsyoft.supabase.co/storage/v1/object/public/featured-images/1772934857072-my1s4i20d.jpg"
-            alt="駅前花壇整備しました"
-            class="featured-image"
-          />
+          <a
+            href="https://swaringqrzthsdpsyoft.supabase.co/storage/v1/object/public/featured-images/1772934857072-my1s4i20d.jpg"
+            class="featured-image-link"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            <img
+              src="https://swaringqrzthsdpsyoft.supabase.co/storage/v1/object/public/featured-images/1772934857072-my1s4i20d.jpg"
+              alt="駅前花壇整備しました"
+              class="featured-image"
+            />
+            <span class="featured-image-hint">画像をクリックすると元の画像を別タブで表示します</span>
+          </a>
 
           <!-- 記事本文 -->
           <div class="article-content">
